@@ -1,24 +1,38 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
+import { MantineProvider } from '@mantine/core';
+import '@mantine/core/styles.css'
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import Home from './pages/home/Home';
+import Dashboard from './pages/dashboard/Dashboard';
+import SoundExercise from './pages/sound-exercise/SoundExercise';
+import SynthExercise from './pages/synth-exercise/SynthExercise';
 
 function App() {
+  const router = createBrowserRouter([
+    {
+      path: '/',
+      element: <Home />
+    },
+    {
+      path: '/Dashboard',
+      element: <Dashboard />
+    },
+    {
+      path: '/SoundExercise',
+      element: <SoundExercise />
+    },
+    {
+      path: '/SynthExercise',
+      element: <SynthExercise />
+    }
+  ]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <React.StrictMode>
+      <MantineProvider>
+        <RouterProvider router={router} />
+      </MantineProvider>
+    </React.StrictMode>
   );
 }
 
