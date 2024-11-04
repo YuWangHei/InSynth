@@ -1,14 +1,14 @@
 import React from 'react';
-import { MantineProvider } from '@mantine/core';
+import { MantineProvider, Switch } from '@mantine/core';
 import '@mantine/core/styles.css'
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, createHashRouter, HashRouter, Route, RouterProvider, Routes } from 'react-router-dom';
 import Home from './pages/home/Home';
 import Dashboard from './pages/dashboard/Dashboard';
 import SoundExercise from './pages/sound-exercise/SoundExercise';
 import SynthExercise from './pages/synth-exercise/SynthExercise';
 
 function App() {
-  const router = createBrowserRouter([
+  const router = [
     {
       path: '/',
       element: <Home />
@@ -18,21 +18,39 @@ function App() {
       element: <Dashboard />
     },
     {
-      path: '/SoundExercise',
+      path: '/SoundQ1',
       element: <SoundExercise />
     },
     {
-      path: '/SynthExercise',
+      path: '/SoundQ2',
+      element: <SoundExercise />
+    },
+    {
+      path: '/SoundQ3',
+      element: <SoundExercise />
+    },
+    {
+      path: '/SynthQ1',
       element: <SynthExercise />
-    }
-  ]);
+    },
+    {
+      path: '/SynthQ2',
+      element: <SynthExercise />
+    },
+    {
+      path: '/SynthQ3',
+      element: <SynthExercise />
+    },
+  ];
 
   return (
-    <React.StrictMode>
-      <MantineProvider>
-        <RouterProvider router={router} />
-      </MantineProvider>
-    </React.StrictMode>
+    <Routes>
+      {router.map(item => {
+        return (
+          <Route path={item.path} element={item.element} />
+        )
+      })}
+    </Routes>
   );
 }
 

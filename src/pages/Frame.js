@@ -26,10 +26,19 @@ function Frame({ children }) {
         </Group>
       </AppShell.Header>
       <AppShell.Navbar p="md">
+        {/* Links have to be in shape of "/#/{name}" to fit in HashRouter's need */}
         <NavLink href='/' label='Home' leftSection={<IconHome />} />
-        <NavLink href='/Dashboard' label='Dashboard' leftSection={<IconDashboard />} />
-        <NavLink href='/SoundExercise' label='Sound Exercise' leftSection={<IconHeadphones />} />
-        <NavLink href='/SynthExercise' label='Synth Exercise' leftSection={<IconAdjustmentsAlt />} />
+        <NavLink href='/#/Dashboard' label='Dashboard' leftSection={<IconDashboard />} />
+        <NavLink label='Sound Exercise' leftSection={<IconHeadphones />}>
+          <NavLink href='/#/SoundQ1' label='Question Type 1' />
+          <NavLink href='/#/SoundQ2' label='Question Type 2' />
+          <NavLink href='/#/SoundQ3' label='Question Type 3' />
+        </NavLink>
+        <NavLink label='Synth Exercise' leftSection={<IconAdjustmentsAlt />}>
+          <NavLink href='/#/SynthQ1' label='Question Type 1' />
+          <NavLink href='/#/SynthQ2' label='Question Type 2' />
+          <NavLink href='/#/SynthQ3' label='Question Type 3' />
+        </NavLink>
       </AppShell.Navbar>
       <AppShell.Main>
         {children}
