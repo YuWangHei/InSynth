@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Frame from '../Frame';
 import styled from 'styled-components';
+import music from './SoundSample/NokiaRingTone.mp3'
 
 // Styled components
 const EQContainer = styled.div`
@@ -96,7 +97,7 @@ function SynthExercise() {
   // Initialize Web Audio API
   useEffect(() => {
     audioContext.current = new (window.AudioContext || window.webkitAudioContext)();
-    audioElement.current = new Audio('/NOKIA RINGTONE [1994].mp3'); // Replace with actual audio path
+    audioElement.current = new Audio(music); // Replace with actual audio path
     
     const source = audioContext.current.createMediaElementSource(audioElement.current);
     
