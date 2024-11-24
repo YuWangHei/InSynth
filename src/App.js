@@ -1,11 +1,11 @@
 import React from 'react';
-import { MantineProvider, Switch } from '@mantine/core';
 import '@mantine/core/styles.css'
-import { createBrowserRouter, createHashRouter, HashRouter, Route, RouterProvider, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import Home from './pages/home/Home';
 import Dashboard from './pages/dashboard/Dashboard';
 import SoundExercise from './pages/sound-exercise/SoundExercise';
 import SynthExercise from './pages/synth-exercise/SynthExercise';
+import EQExercise from './pages/synth-exercise/EQExercise';
 
 function App() {
   const router = [
@@ -31,7 +31,7 @@ function App() {
     },
     {
       path: '/SynthQ1',
-      element: <SynthExercise />
+      element: <EQExercise />
     },
     {
       path: '/SynthQ2',
