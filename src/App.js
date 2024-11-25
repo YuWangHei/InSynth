@@ -47,9 +47,9 @@ function App() {
 
   return (
     <Routes>
-      {router.map(item => {
+      {router.map((item, idx) => {
         return (
-          <Route path={item.path} element={item.element} />
+          <Route path={item.path} element={item.element} key={idx} />
         )
       })}
     </Routes>
