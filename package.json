@@ -21,12 +21,16 @@
     "chart.js": "^4.4.6",
     "mathjs": "^14.0.0",
     "react": "^18.3.1",
+    "react-audio-spectrum": "^0.1.5",
+    "react-audio-visualize": "^1.2.0",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.27.0",
     "react-scripts": "5.0.1",
+    "react-spectrogram": "^0.4.1",
     "recharts": "^2.13.3",
     "styled-components": "^6.1.13",
+    "tone": "^15.0.4",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
