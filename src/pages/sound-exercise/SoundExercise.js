@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Button, Group, Text, Container, Paper } from '@mantine/core';
+import { Button, Group, Text, Container, Paper, RingProgress} from '@mantine/core';
 import Frame from '../Frame';
 import * as Tone from 'tone';
 function SoundExercise() {
@@ -7,13 +7,14 @@ function SoundExercise() {
   const [currentWaveform, setCurrentWaveform] = useState(null);
   const [showSpectrum, setShowSpectrum] = useState(false);
   const [showWaveform, setShowWaveform] = useState(false);
+  const [score, setScore] = useState({ correct: 0, total: 0 });
   const canvasRef = useRef(null);
   const waveformCanvasRef = useRef(null);
   const analyzerRef = useRef(null);
   const waveformAnalyzerRef = useRef(null);
   const animationRef = useRef(null);
   const waveformAnimationRef = useRef(null);
-
+  const TotalScore = 10;
   useEffect(() => {
     return () => {
       if (animationRef.current) {
@@ -127,7 +128,10 @@ function SoundExercise() {
     if (Tone.context.state !== "running") {
       await initializeAudio();
     }
-    
+    if (score.total > TotalScore) {
+      setResult("Start Next Round!")
+      return;
+    }
     const waveforms = ['sine', 'square', 'sawtooth'];
     const randomWaveform = waveforms[Math.floor(Math.random() * waveforms.length)];
     
@@ -145,56 +149,90 @@ function SoundExercise() {
 
     if (guess === currentWaveform) {
       setResult('Correct! You identified the waveform.');
+      setScore(prev => ({
+        correct: prev.correct + 1,
+        total: prev.total + 1
+      }));
     } else {
       setResult(`Incorrect! The correct answer was ${currentWaveform}.`);
+      setScore(prev => ({
+        ...prev,
+        total: prev.total + 1
+      }));
     }
   };
 
   return (
     <Frame>
       <Container size="lg" mt="xl">
-        <Paper shadow="md" p="xl" radius="md">
+        <Paper shadow="md" p="xl" radius="md" align="center">
           <h1>Sound Exercise</h1>
           
           <Text size="lg" weight={500} align="center" mb="md">
             {result}
           </Text>
-
-          <Group position="center" mb="md">
-            <Button onClick={handlePlayRandomWaveform} variant="gradient" 
-              gradient={{ from: 'indigo', to: 'cyan' }}>
-              Play
-            </Button>
-          </Group>
-
-          <Group position="center" mb="xl">
-            <Button onClick={() => handleGuess('square')} color="blue">
-              Square Wave
-            </Button>
-            <Button onClick={() => handleGuess('sawtooth')} color="orange">
-              Sawtooth Wave
-            </Button>
-            <Button onClick={() => handleGuess('sine')} color="green">
-              Sine Wave
-            </Button>
-          </Group>
-
-          <Group position="center" mb="xl">
-            <Button 
-              onClick={() => setShowSpectrum(!showSpectrum)} 
-              color="teal"
-            >
+  
+          {/* Main content area with flex layout */}
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            alignItems: 'center', 
+            marginBottom: '2rem' 
+          }}>
+            {/* Left side with Play button and wave buttons */}
+            <div style={{ flex: '2', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <Button 
+                onClick={handlePlayRandomWaveform} 
+                variant="gradient" 
+                gradient={{ from: 'indigo', to: 'cyan' }}
+                size="xl"
+                mb={30}
+              >
+                Play
+              </Button>
+  
+              <Group spacing="md">
+                <Button onClick={() => handleGuess('square')} disabled={score.total >= 10} color="blue">
+                  Square Wave
+                </Button>
+                <Button onClick={() => handleGuess('sawtooth')} disabled={score.total >= 10} color="orange">
+                  Sawtooth Wave
+                </Button>
+                <Button onClick={() => handleGuess('sine')} disabled={score.total >= 10} color="green">
+                  Sine Wave
+                </Button>
+              </Group>
+            </div>
+  
+            {/* Right side with RingProgress */}
+            <div style={{ flex: '1' }}>
+              <RingProgress
+                size={150}
+                label={
+                  <Text size="lg" ta="center">
+                    {score.total}/{TotalScore}
+                  </Text>
+                }
+                sections={[
+                  { value: (score.correct / TotalScore)*100, color: 'green' },
+                  { value: ((score.total - score.correct) / TotalScore)*100, color: 'red' },
+                ]}
+              />
+            </div>
+          </div>
+  
+          {/* Visualization controls */}
+          <Group position="center" mb="xl" align="center">
+            <Button onClick={() => setShowSpectrum(!showSpectrum)} color="teal">
               {showSpectrum ? 'Hide Spectrum' : 'Show Spectrum'}
             </Button>
-            <Button 
-              onClick={() => setShowWaveform(!showWaveform)} 
-              color="grape"
-            >
+            <Button onClick={() => setShowWaveform(!showWaveform)} color="grape">
               {showWaveform ? 'Hide Waveform' : 'Show Waveform'}
             </Button>
           </Group>
-
-          <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px' }}>
+  
+          {/* Visualizations */}
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '20px' }}>
             {showSpectrum && (
               <div>
                 <Text weight={500} mb="sm">Spectrum</Text>
