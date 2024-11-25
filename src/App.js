@@ -6,6 +6,7 @@ import Dashboard from './pages/dashboard/Dashboard';
 import SoundExercise from './pages/sound-exercise/SoundExercise';
 import EffectExercise from './pages/sound-exercise/EffectExercise';
 import SynthExercise from './pages/synth-exercise/SynthExercise';
+import AmplitudeExercise from './pages/sound-exercise/AmplitudeExercise';
 import EQExercise from './pages/synth-exercise/EQExercise';
 import AmplitudeExercise from './pages/sound-exercise/AmplitudeExercise';
 
@@ -25,7 +26,7 @@ function App() {
     },
     {
       path: '/SoundQ2',
-      element: <SoundExercise />
+      element: <AmplitudeExercise />
     },
     {
       path: '/SoundEffect',
