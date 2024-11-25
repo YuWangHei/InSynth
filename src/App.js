@@ -4,8 +4,10 @@ import { Route, Routes } from 'react-router-dom';
 import Home from './pages/home/Home';
 import Dashboard from './pages/dashboard/Dashboard';
 import SoundExercise from './pages/sound-exercise/SoundExercise';
+import EffectExercise from './pages/sound-exercise/EffectExercise';
 import SynthExercise from './pages/synth-exercise/SynthExercise';
 import EQExercise from './pages/synth-exercise/EQExercise';
+import AmplitudeExercise from './pages/sound-exercise/AmplitudeExercise';
 
 function App() {
   const router = [
@@ -18,7 +20,7 @@ function App() {
       element: <Dashboard />
     },
     {
-      path: '/SoundQ1',
+      path: '/SoundSynth',
       element: <SoundExercise />
     },
     {
@@ -26,11 +28,11 @@ function App() {
       element: <SoundExercise />
     },
     {
-      path: '/SoundQ3',
-      element: <SoundExercise />
+      path: '/SoundEffect',
+      element: <EffectExercise />
     },
     {
-      path: '/SynthQ1',
+      path: '/MixingEq',
       element: <EQExercise />
     },
     {
@@ -38,9 +40,9 @@ function App() {
       element: <SynthExercise />
     },
     {
-      path: '/SynthQ3',
-      element: <SynthExercise />
-    },
+      path: '/SoundAmplitude',
+      element: <AmplitudeExercise />
+    }
   ];
 
   return (

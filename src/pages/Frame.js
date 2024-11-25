@@ -29,15 +29,15 @@ function Frame({ children }) {
         {/* Links have to be in shape of "#/{name}" to fit in HashRouter's need */}
         <NavLink href='#/' label='Home' leftSection={<IconHome />} />
         <NavLink href='#/Dashboard' label='Dashboard' leftSection={<IconDashboard />} />
-        <NavLink label='Sound Exercise' leftSection={<IconHeadphones />}>
-          <NavLink href='#/SoundQ1' label='Question Type 1' />
-          <NavLink href='#/SoundQ2' label='Question Type 2' />
+        <NavLink label='Synth Exercise' leftSection={<IconHeadphones />}>
+          <NavLink href='#/SoundSynth' label='Sound Synthesis' />
+          <NavLink href='#/SoundEffect' label='Effect Type' />
           <NavLink href='/#/SoundQ3' label='Question Type 3' />
         </NavLink>
-        <NavLink label='Synth Exercise' leftSection={<IconAdjustmentsAlt />}>
-          <NavLink href='#/SynthQ1' label='Question Type 1' />
-          <NavLink href='#/SynthQ2' label='Question Type 2' />
-          <NavLink href='#/SynthQ3' label='Question Type 3' />
+        <NavLink label='Mixing Exercise' leftSection={<IconAdjustmentsAlt />}>
+          <NavLink href='#/MixingEq' label='Eq1' />
+          <NavLink href='#/SynthQ2' label='Eq2' />
+          <NavLink href='#/SoundAmplitude' label='Amplitude' />
         </NavLink>
       </AppShell.Navbar>
       <AppShell.Main>
