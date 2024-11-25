@@ -1,5 +1,5 @@
 const sampling_freq = 120;
-const freq_centers = [60, 150, 400, 1000, 2200, 4800, 10000];
+const freq_centers = [60, 150, 400, 1000, 2400, 5800, 14000];
 const log_bounds = { min: 20, max: 22000 };
 const log_tick_pos = [log_bounds.min, ...freq_centers, log_bounds.max];
 

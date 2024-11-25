@@ -1,7 +1,7 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useMemo } from "react";
 import { Chart as ChartJS, LogarithmicScale } from "chart.js";
 import { Line } from "react-chartjs-2";
-import { log_tick_pos } from "./helper";
+import { log_tick_pos } from "../eq_helper";
 
 // Register necessary Chart.js components
 ChartJS.register(
@@ -46,6 +46,37 @@ const LogPlot = ({ data, params: { y_bounds: { min: y_min, max: y_max }, y_tick 
     };
   }, []);
 
+  const options = useMemo(() => ({
+    responsive: true,
+    //maintainAspectRatio: false, // Prevent aspect ratio from affecting scaling
+    scales: {
+      x: {
+        type: "logarithmic",
+        title: {
+          display: true,
+          text: "Frequency (Hz)",
+        },
+        ticks: {
+          callback: (val) => (log_tick_pos.includes(val) ? val : ""),
+        },
+      },
+      y: {
+        type: "linear",
+        title: {
+          display: true,
+          text: "Amplitude",
+        },
+        min: y_min,
+        max: y_max,
+        ticks: {
+          stepSize: y_tick,
+          callback: (value) => value.toFixed(2), // Format y-axis ticks
+        },
+      },
+    },
+  }), [y_min, y_max, y_tick]);
+
+  /*
   const options = {
     responsive: true,
     scales: {
@@ -74,6 +105,7 @@ const LogPlot = ({ data, params: { y_bounds: { min: y_min, max: y_max }, y_tick 
       },
     },
   };
+  */
   return (
     <Line ref={chartRef} data={data} options={options} />
   );

@@ -1,27 +1,39 @@
 import { useEffect, useState } from "react";
 import Frame from "../Frame";
-import MathPlot from "./partial/MathPlot";
-import { Button, Switch, Text } from "@mantine/core";
-import HSlider from "../../components/HSlider";
-import VSlider from "../../components/VSlider";
-import * as Tone from 'tone';
-import { audio1, audio2 } from '../../Music'
-import LoopPlayer from "./partial/LoopPlayer";
+import EQStatic from "./partial/EQStatic";
+import EQMenu from "./partial/EQMenu";
+import EQParametric from "./partial/EQParametric";
 import { getRandomAudio } from "../AudioPicker";
 
 function EQExercise() {
-  const [inputExpr, setInputExpr] = useState('0');
-  const [plotExpr, setPlotExpr] = useState('0');
-  // const [logScale, setLogScale] = useState(true);
-  const [sliderVal, setSliderVal] = useState(0);
+  const [inMenu, setInMenu] = useState(true);
+  const [inQMode, setInQMode] = useState(true); // true for Mode 1, false for Mode 2, for the ease of arrangement of components
+  const [audio, setAudio] = useState(null);
+
+  // On any page switch, clear audio
+  useEffect(() => {
+    setAudio(null);
+  }, [inMenu, inQMode]);
+
+  // On Mode 1 or Mode 2 being selected
+  const onSelect = (mode) => {
+    // Set page to be displayed
+    setInMenu(false);
+    setInQMode(mode);
+    // Get random audio
+    const random_audio = getRandomAudio();
+    console.log(random_audio);
+    setAudio(random_audio);
+  }
 
   return (
     <Frame>
-      <MathPlot expr={plotExpr} x_bounds={{ min: 0, max: 22000 }} y_bounds={{ min: -1, max: 1 }} x_tick={2000} y_tick={0.5} curve_name="Frequency Response" log_scale={true} />
-      {/* <TextInput label="Expression" placeholder="Enter expression" onChange={(event) => setInputExpr(event.target.value)} />
-      <Button onClick={() => setPlotExpr(inputExpr)}>Click me</Button>
-      <Switch checked={logScale} onChange={(event) => setLogScale(event.currentTarget.checked)} /> */}
-      <LoopPlayer audioFile={getRandomAudio()} />
+      {inMenu ?
+        <EQMenu onSelect={onSelect} /> :
+        inQMode ?
+          <EQStatic audioFile={audio} /> :
+          <EQParametric audioFile={audio} />
+      }
     </Frame>
   )
 }

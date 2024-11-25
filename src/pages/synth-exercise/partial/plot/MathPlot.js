@@ -2,7 +2,7 @@ import * as math from "mathjs";
 import { Flex } from "@mantine/core";
 import LinearPlot from "./LinearPlot";
 import LogPlot from "./LogPlot";
-import { sampling_freq, generateLogSamples, log_tick_pos } from "./helper";
+import { sampling_freq, generateLogSamples, log_tick_pos } from "../eq_helper";
 
 // x_bounds must be divisible by x_tick
 function MathPlot({ expr = '0', x_bounds = { min: 0, max: 5 }, y_bounds = { min: 0, max: 1 }, x_tick = 1, y_tick = 1, curve_name = 'curve', log_scale = false }) {
