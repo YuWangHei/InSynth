@@ -365,7 +365,7 @@ function EffectExercise() {
               <Button
                 onClick={generateNewEffect}
                 disabled={!showFeedback}
-                rightSection={<IconArrowRight size={20} />}
+                rightSection={score.total >= TotalScore ? <IconRefresh size={20} /> : <IconArrowRight size={20} />}
                 variant="light"
                 fullWidth
               >
