@@ -8,7 +8,7 @@ import EffectExercise from './pages/sound-exercise/EffectExercise';
 import SynthExercise from './pages/synth-exercise/SynthExercise';
 import AmplitudeExercise from './pages/sound-exercise/AmplitudeExercise';
 import EQExercise from './pages/synth-exercise/EQExercise';
-
+import PanningExercise from './pages/synth-exercise/PanningExercise';
 function App() {
   const router = [
     {
@@ -42,6 +42,10 @@ function App() {
     {
       path: '/SoundAmplitude',
       element: <AmplitudeExercise />
+    },
+    {
+      path: '/TrackPanning',
+      element: <PanningExercise />
     }
   ];
 
