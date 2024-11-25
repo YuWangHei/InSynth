@@ -6,6 +6,7 @@ import Home from './pages/home/Home';
 import Dashboard from './pages/dashboard/Dashboard';
 import SoundExercise from './pages/sound-exercise/SoundExercise';
 import SynthExercise from './pages/synth-exercise/SynthExercise';
+import AmplitudeExercise from './pages/sound-exercise/AmplitudeExercise';
 
 function App() {
   const router = [
@@ -23,7 +24,7 @@ function App() {
     },
     {
       path: '/SoundQ2',
-      element: <SoundExercise />
+      element: <AmplitudeExercise />
     },
     {
       path: '/SoundQ3',
