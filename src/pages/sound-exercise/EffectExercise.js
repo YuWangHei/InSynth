@@ -13,9 +13,8 @@ import {
 } from '@mantine/core';
 import { IconPlayerPlay, IconVolume, IconRefresh, IconMusicOff, IconArrowRight, IconPlayerPlayFilled, IconPlayerPauseFilled, IconPlayerPause } from '@tabler/icons-react';
 import Frame from '../Frame';
-import {audio1, audio2} from '../../Music';
+import { getRandomAudio } from '../AudioPicker';
 
-const audioFiles = [audio1, audio2];
 const TotalScore = 10;
 // Set up sound effects
 const effects = [
@@ -114,12 +113,6 @@ function EffectExercise() {
       }
     };
   }, []);
-
-  const getRandomAudio = () => {
-    const randomIndex = Math.floor(Math.random() * audioFiles.length);
-    return audioFiles[randomIndex]; 
-  };
-  
 
   const generateNewEffect = () => {
     stopCurrentSound();
@@ -261,7 +254,7 @@ function EffectExercise() {
     <Frame>
       <Container size="md" px="md">
         <Stack spacing="lg">
-          <Title order={1}>Effect Exercise</Title>
+          <Title order={1} align='center'>Effect Exercise</Title>
 
           <Card shadow="sm" p="lg" radius="md" withBorder>
             <Stack spacing="md">
