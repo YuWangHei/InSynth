@@ -39,7 +39,7 @@ function AmplitudeExercise() {
         source.buffer = audioBuffer;
 
         // Connect source to gain nodes
-        source.connect();
+        source.connect(audioContext.destination);
         source.connect(gainNodeRight);
 
         // Set different amplitudes for left and right channels
