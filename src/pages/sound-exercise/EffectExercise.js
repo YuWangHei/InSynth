@@ -11,7 +11,7 @@ import {
   Container,
   RingProgress,
 } from '@mantine/core';
-import { IconPlayerPlay, IconVolume, IconRefresh, IconMusicOff } from '@tabler/icons-react';
+import { IconPlayerPlay, IconVolume, IconRefresh, IconMusicOff, IconArrowRight, IconPlayerPlayFilled, IconPlayerPauseFilled, IconPlayerPause } from '@tabler/icons-react';
 import Frame from '../Frame';
 import {audio1, audio2} from '../../Music';
 
@@ -131,7 +131,7 @@ function EffectExercise() {
       setShowFeedback(false);
     } else {
       setCurrentEffect(null);
-      setShowFeedback(true);
+      setShowFeedback(false);
     }
   };
 
@@ -270,17 +270,19 @@ function EffectExercise() {
                     <Button
                     onClick={playOriginalSound}
                     disabled={isPlayingOriginal}
-                    leftIcon={isPlayingOriginal ? <IconVolume size={20} /> : <IconMusicOff size={20} />}
+                    rightSection={isPlayingOriginal ? <IconVolume size={20} /> : <IconPlayerPlayFilled size={20} />}
                     variant="filled"
                     color="green"
+                    size='lg'
                   >
                     {isPlayingOriginal ? 'Playing Original...' : 'Play Original'}
                   </Button>
                   <Button
                     onClick={handlePlay}
                     disabled={isPlaying}
-                    leftIcon={isPlaying ? <IconVolume size={20} /> : <IconPlayerPlay size={20} />}
+                    rightSection={isPlaying ? <IconVolume size={20} /> : <IconPlayerPlayFilled size={20} />}
                     color="indigo"
+                    size='lg'
                   >
                     {isPlaying ? 'Playing Effect...' : 'Play with Effect'}
                   </Button>
@@ -288,6 +290,8 @@ function EffectExercise() {
                     onClick={stopCurrentSound}
                     variant="filled"
                     color="rgba(255, 18, 18, 1)"
+                    size='lg'
+                    rightSection={!isPlaying && !isPlayingOriginal ? <IconPlayerPauseFilled size={20} /> : <IconPlayerPause size={20} />}
                   >
                     {"Pause"}
                   </Button>
@@ -298,18 +302,15 @@ function EffectExercise() {
                 </Group>
                 <RingProgress
                     label={
-                        <Text size="xs" ta="center">
-                        Score: {score.correct}/{score.total}
+                        <Text size="lg" ta="center">
+                        {score.total}/{TotalScore}
                         </Text>
                     }
                     sections={[
-                        { value: score.total, color: 'green' },
-                        { value: score.total - score.correct, color: 'red' },
+                        { value: (score.correct / TotalScore)*100, color: 'green' },
+                        { value: ((score.total - score.correct) / TotalScore)*100, color: 'red' },
                     ]}
-                    />
-                <Text size="sm" weight={500}>
-                  Score: {score.correct}/{score.total}
-                </Text>
+                />
               </Group>
 
               <Grid>
@@ -331,7 +332,7 @@ function EffectExercise() {
                         },
                       }}
                     >
-                      <Text size="lg" weight={500}>{effect.name}</Text>
+                      <Text size="lg" weight={500} fw={700}>{effect.name}</Text>
                       {/* <Text size="xs" mt={4} c="dimmed">
                         {effect.description}
                       </Text> */}
@@ -354,22 +355,21 @@ function EffectExercise() {
               {score.total >= TotalScore && (
                 <Alert
                   color="green"
-                  title={selectedEffect?.name === currentEffect?.name ? "Correct!" : "Not quite!"}
+                  title={"Finished!"}
                 >
-                  The effect was {currentEffect?.name}.
-                  {selectedEffect?.name !== currentEffect?.name && 
-                    ` Listen for ${currentEffect?.description.toLowerCase()}`}
+                  All {TotalScore} Questions are finished.
+                  Your score is {score.correct}/{score.total}!!!
                 </Alert>
               )}
 
               <Button
                 onClick={generateNewEffect}
                 disabled={!showFeedback}
-                leftIcon={<IconRefresh size={20} />}
+                rightSection={<IconArrowRight size={20} />}
                 variant="light"
                 fullWidth
               >
-                Next Sound
+                {score.total >= TotalScore ? "Start Over" : "Next Sound"}
               </Button>
             </Stack>
           </Card>
