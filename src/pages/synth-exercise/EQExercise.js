@@ -2,14 +2,16 @@ import { useEffect, useState } from "react";
 import Frame from "../Frame";
 import MathPlot from "./partial/MathPlot";
 import { Button, Switch, Text } from "@mantine/core";
-import { VSlider, HSlider } from "../../components/Slider";
+import HSlider from "../../components/HSlider";
+import VSlider from "../../components/VSlider";
 import * as Tone from 'tone';
 import { audio1, audio2 } from '../../Music'
 import LoopPlayer from "./partial/LoopPlayer";
+import { getRandomAudio } from "../AudioPicker";
 
 function EQExercise() {
-  const [inputExpr, setInputExpr] = useState('sin(x)');
-  const [plotExpr, setPlotExpr] = useState('sin(x)');
+  const [inputExpr, setInputExpr] = useState('0');
+  const [plotExpr, setPlotExpr] = useState('0');
   // const [logScale, setLogScale] = useState(true);
   const [sliderVal, setSliderVal] = useState(0);
 
@@ -19,8 +21,7 @@ function EQExercise() {
       {/* <TextInput label="Expression" placeholder="Enter expression" onChange={(event) => setInputExpr(event.target.value)} />
       <Button onClick={() => setPlotExpr(inputExpr)}>Click me</Button>
       <Switch checked={logScale} onChange={(event) => setLogScale(event.currentTarget.checked)} /> */}
-      <VSlider value={sliderVal} onChange={(event) => setSliderVal(event.target.value)} />
-      <LoopPlayer />
+      <LoopPlayer audioFile={getRandomAudio()} />
     </Frame>
   )
 }
