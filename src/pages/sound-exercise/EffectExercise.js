@@ -9,13 +9,14 @@ import {
   Grid,
   Alert,
   Container,
+  RingProgress,
 } from '@mantine/core';
-import { IconPlayerPlay, IconVolume, IconRefresh } from '@tabler/icons-react';
+import { IconPlayerPlay, IconVolume, IconRefresh, IconMusicOff } from '@tabler/icons-react';
 import Frame from '../Frame';
 import {audio1, audio2} from '../../Music';
 
 const audioFiles = [audio1, audio2];
-
+const TotalScore = 10;
 // Set up sound effects
 const effects = [
   { 
@@ -87,10 +88,12 @@ function EffectExercise() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [score, setScore] = useState({ correct: 0, total: 0 });
   const [selectedEffect, setSelectedEffect] = useState(null);
+  const [isPlayingOriginal, setIsPlayingOriginal] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
   
   const audioContextRef = useRef(null);
   const audioBufferRef = useRef(null);
+  const currentSourceRef = useRef(null);
 
   useEffect(() => {
     generateNewEffect();
@@ -119,24 +122,94 @@ function EffectExercise() {
   
 
   const generateNewEffect = () => {
-    const randomEffect = effects[Math.floor(Math.random() * effects.length)];
-    setCurrentEffect(randomEffect);
-    setSelectedEffect(null);
-    setShowFeedback(false);
+    stopCurrentSound();
+
+    if (score.total <= TotalScore) {
+      const randomEffect = effects[Math.floor(Math.random() * effects.length)];
+      setCurrentEffect(randomEffect);
+      setSelectedEffect(null);
+      setShowFeedback(false);
+    } else {
+      setCurrentEffect(null);
+      setShowFeedback(true);
+    }
   };
 
-  const handlePlay = async () => {
+  const stopCurrentSound = () => {
+    if (currentSourceRef.current) {
+      try {
+        currentSourceRef.current.stop();
+      } catch (e) {
+        console.log('Error stopping source:', e);
+      }
+      currentSourceRef.current.disconnect();
+      currentSourceRef.current = null;
+    }
+    setIsPlaying(false);
+    setIsPlayingOriginal(false);
+  };
+
+  
+  const playOriginalSound = async () => {
     if (!audioContextRef.current || !audioBufferRef.current) return;
+    
+    // If already playing original sound, stop it
+    if (isPlayingOriginal) {
+        stopCurrentSound();
+        return;
+    }
+    
+    // Stop any currently playing sound
+    stopCurrentSound();
     
     if (audioContextRef.current.state === 'suspended') {
       await audioContextRef.current.resume();
     }
 
+    setIsPlayingOriginal(true);
+    setIsPlaying(false);
+
+    const source = audioContextRef.current.createBufferSource();
+    source.buffer = audioBufferRef.current;
+    currentSourceRef.current = source;
+
+    const gainNode = audioContextRef.current.createGain();
+    gainNode.gain.value = 0.7;
+
+    source.connect(gainNode);
+    gainNode.connect(audioContextRef.current.destination);
+
+    source.start(0);
+    // source.onended = () => {
+    //   setIsPlayingOriginal(false);
+    //   currentSourceRef.current = null;
+    // };
+  };
+
+  const handlePlay = async () => {
+    if (!audioContextRef.current || !audioBufferRef.current) return;
+    
+    // If already playing effected sound, stop it
+    if (isPlaying) {
+        stopCurrentSound();
+        return;
+    }
+
+    stopCurrentSound();
+
+    if (audioContextRef.current.state === 'suspended') {
+        await audioContextRef.current.resume();
+    }
+
     setIsPlaying(true);
+    setIsPlayingOriginal(false);
+
 
     // Create audio source
     const source = audioContextRef.current.createBufferSource();
     source.buffer = audioBufferRef.current;
+    currentSourceRef.current = source;
+
 
     // Create gain node for final output
     const gainNode = audioContextRef.current.createGain();
@@ -153,12 +226,17 @@ function EffectExercise() {
 
       // Play the sound
       source.start(0);
-      source.onended = () => {
-        setIsPlaying(false);
-      };
+
+      // Stop the sound when it ends
+    //   source.onended = () => {
+    //     setIsPlaying(false);
+    //     currentSourceRef.current = null;
+
+    //   };
     } catch (error) {
       console.error('Error setting up audio effect:', error);
       setIsPlaying(false);
+      currentSourceRef.current = null;
     }
   };
 
@@ -187,16 +265,48 @@ function EffectExercise() {
 
           <Card shadow="sm" p="lg" radius="md" withBorder>
             <Stack spacing="md">
-              <Group position="apart" align="center">
-                <Button
-                  onClick={handlePlay}
-                  disabled={isPlaying}
-                  leftIcon={isPlaying ? <IconVolume size={20} /> : <IconPlayerPlay size={20} />}
-                  color="blue"
-                >
-                  {isPlaying ? 'Playing...' : 'Play Sound'}
-                </Button>
-                
+              <Group position="apart" justify="space-between" align="center">
+                  <Group>
+                    <Button
+                    onClick={playOriginalSound}
+                    disabled={isPlayingOriginal}
+                    leftIcon={isPlayingOriginal ? <IconVolume size={20} /> : <IconMusicOff size={20} />}
+                    variant="filled"
+                    color="green"
+                  >
+                    {isPlayingOriginal ? 'Playing Original...' : 'Play Original'}
+                  </Button>
+                  <Button
+                    onClick={handlePlay}
+                    disabled={isPlaying}
+                    leftIcon={isPlaying ? <IconVolume size={20} /> : <IconPlayerPlay size={20} />}
+                    color="indigo"
+                  >
+                    {isPlaying ? 'Playing Effect...' : 'Play with Effect'}
+                  </Button>
+                  <Button
+                    onClick={stopCurrentSound}
+                    variant="filled"
+                    color="rgba(255, 18, 18, 1)"
+                  >
+                    {"Pause"}
+                  </Button>
+                  {/* Text for Debugging */}
+                  {/* <Text size="sm" c="dimmed">
+                      (isPlaying: {isPlaying.toString()}, isPlayingOriginal: {isPlayingOriginal.toString()})
+                </Text> */}
+                </Group>
+                <RingProgress
+                    label={
+                        <Text size="xs" ta="center">
+                        Score: {score.correct}/{score.total}
+                        </Text>
+                    }
+                    sections={[
+                        { value: score.total, color: 'green' },
+                        { value: score.total - score.correct, color: 'red' },
+                    ]}
+                    />
                 <Text size="sm" weight={500}>
                   Score: {score.correct}/{score.total}
                 </Text>
@@ -208,7 +318,8 @@ function EffectExercise() {
                     <Button
                       onClick={() => handleEffectGuess(effect)}
                       disabled={showFeedback}
-                      variant={selectedEffect?.name === effect.name ? "filled" : "light"}
+                      variant="outline"
+                      radius="lg"
                       color="blue"
                       fullWidth
                       h={100}
@@ -221,9 +332,9 @@ function EffectExercise() {
                       }}
                     >
                       <Text size="lg" weight={500}>{effect.name}</Text>
-                      <Text size="xs" mt={4} color="dimmed">
+                      {/* <Text size="xs" mt={4} c="dimmed">
                         {effect.description}
-                      </Text>
+                      </Text> */}
                     </Button>
                   </Grid.Col>
                 ))}
@@ -232,6 +343,17 @@ function EffectExercise() {
               {showFeedback && (
                 <Alert
                   color={selectedEffect?.name === currentEffect?.name ? "green" : "red"}
+                  title={selectedEffect?.name === currentEffect?.name ? "Correct!" : "Not quite!"}
+                >
+                  The effect was {currentEffect?.name}.
+                  {selectedEffect?.name !== currentEffect?.name && 
+                    ` Listen for ${currentEffect?.description.toLowerCase()}`}
+                </Alert>
+              )}
+
+              {score.total >= TotalScore && (
+                <Alert
+                  color="green"
                   title={selectedEffect?.name === currentEffect?.name ? "Correct!" : "Not quite!"}
                 >
                   The effect was {currentEffect?.name}.
