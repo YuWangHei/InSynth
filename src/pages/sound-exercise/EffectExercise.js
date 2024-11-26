@@ -291,7 +291,7 @@ function EffectExercise() {
                     size='lg'
                     rightSection={!isPlaying && !isPlayingOriginal ? <IconPlayerPauseFilled size={20} /> : <IconPlayerPause size={20} />}
                   >
-                    {"Pause"}
+                    {"Stop"}
                   </Button>
                   {/* Text for Debugging */}
                   {/* <Text size="sm" c="dimmed">

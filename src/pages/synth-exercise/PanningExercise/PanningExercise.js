@@ -372,7 +372,7 @@ export default function PanningExercise() {
                             size='lg'
                             rightSection={!isPlaying && !isPlayingOriginal ? <IconPlayerPauseFilled size={20} /> : <IconPlayerPause size={20} />}
                         >   
-                            {"Pause"}
+                            {"Stop"}
                         </Button>
                         <Text size="xs" mt={4} c="dimmed">
                         {currentPan}
