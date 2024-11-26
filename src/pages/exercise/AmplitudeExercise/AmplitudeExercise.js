@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Alert, Button, Container, Group, Paper, Stack, Switch, Text } from '@mantine/core';
 import { IconRefresh, IconArrowRight } from '@tabler/icons-react';
-import Frame from '../Frame';
+import Frame from '../../Frame';
 import audioFile from '../../Music/Mineral_cropped.wav'
 
 function AmplitudeExercise() {
@@ -17,7 +17,7 @@ function AmplitudeExercise() {
     const audioContextRef = useRef(new (window.AudioContext || window.webkitAudioContext)());
     const gainNodeRef = useRef(audioContextRef.current.createGain());
     const [result, setResult] = useState(0);
-    
+
     const [score, setScore] = useState({ correct: 0, total: 0 });
     const MAX_SCORE = maxQuestions;
     const generateRandomGain = () => {
@@ -27,7 +27,7 @@ function AmplitudeExercise() {
         // Apply the new gain value
         const amplification = Math.pow(10, randomGain / 20);
         gainNodeRef.current.gain.setValueAtTime(amplification, audioContextRef.current.currentTime);
-        
+
         return randomGain;
     };
 
@@ -44,10 +44,10 @@ function AmplitudeExercise() {
         difference = (Math.random() < 0.5) ? difference : -difference;
         if (random < 0.5) {
             setAnswer1(answer);
-            setAnswer2(answer+difference);
+            setAnswer2(answer + difference);
         } else {
             setAnswer2(answer);
-            setAnswer1(answer+difference);
+            setAnswer1(answer + difference);
         }
     };
 
@@ -63,7 +63,7 @@ function AmplitudeExercise() {
         let source;
         const context = new (window.AudioContext || window.webkitAudioContext)();
         const gain = context.createGain();
-        
+
         // Only create and connect the source when audio starts playing
         const setupAudio = () => {
             if (!source) {
@@ -76,9 +76,9 @@ function AmplitudeExercise() {
 
         // Add event listener for the first play
         audioRef.current.addEventListener('play', setupAudio, { once: true });
-        
+
         nextQuestion();
-        
+
         return () => {
             if (source) {
                 source.disconnect();
@@ -111,10 +111,10 @@ function AmplitudeExercise() {
             setHasAnswered(true);
             if (answer === gainValue) {
                 setResult(1);
-                setScore({correct: score.correct + 1, total: score.total + 1});
+                setScore({ correct: score.correct + 1, total: score.total + 1 });
             } else {
                 setResult(0);
-                setScore({...score, total: score.total + 1});
+                setScore({ ...score, total: score.total + 1 });
             }
             if (isPlaying) {
                 togglePlay();
@@ -131,7 +131,7 @@ function AmplitudeExercise() {
             gainNodeRef.current.gain.setValueAtTime(amplification, audioContextRef.current.currentTime);
         }
     };
-    
+
     const startOver = () => {
         navigate('/AmplitudeExercise/setup');
     }
@@ -140,8 +140,8 @@ function AmplitudeExercise() {
         <Frame>
             <Container size="lg" mt="xl">
                 <Paper shadow="md" p="xl" radius="md" align="center">
-                    <audio ref={audioRef} src={audioFile} loop/>
-                    <Stack style={{width: '50%'}}>
+                    <audio ref={audioRef} src={audioFile} loop />
+                    <Stack style={{ width: '50%' }}>
                         <Button onClick={togglePlay}>
                             {isPlaying ? 'Pause' : 'Play'}
                         </Button>
@@ -149,19 +149,19 @@ function AmplitudeExercise() {
                             <Button onClick={() => handleAnswer(answer1)}>{answer1}</Button>
                             <Button onClick={() => handleAnswer(answer2)}>{answer2}</Button>
                         </Group>
-                    {/* </Stack>
+                        {/* </Stack>
 
                     <Stack> */}
                         {hasAnswered && (
-                        <Alert
-                        color={result ? "green" : "red"}
-                        title={<Text fw={700} size="lg">{result ? "Correct!" : "Not quite!"}</Text>}
-                        >
-                            {/* <Text fw={500} size="md" mt={4}>
+                            <Alert
+                                color={result ? "green" : "red"}
+                                title={<Text fw={700} size="lg">{result ? "Correct!" : "Not quite!"}</Text>}
+                            >
+                                {/* <Text fw={500} size="md" mt={4}>
                                 {!correct && 
                                     ` The sound was panned to ${currentPan}.`}
                             </Text> */}
-                        </Alert>
+                            </Alert>
                         )}
 
                         {score.total >= MAX_SCORE && (
@@ -175,16 +175,16 @@ function AmplitudeExercise() {
                                 </Text>
                             </Alert>
                         )}
-                    
-                    <Button
-                        onClick={score.total >= MAX_SCORE ? startOver : nextQuestion}
-                        disabled={!hasAnswered}
-                        rightSection={score.total >= MAX_SCORE ? <IconRefresh size={20} /> : <IconArrowRight size={20} />}
-                        variant={score.total < MAX_SCORE ? "light" : "filled"}
-                        fullWidth
-                    >
-                        {score.total >= MAX_SCORE ? "Start Over" : "Next Stage"}
-                    </Button>
+
+                        <Button
+                            onClick={score.total >= MAX_SCORE ? startOver : nextQuestion}
+                            disabled={!hasAnswered}
+                            rightSection={score.total >= MAX_SCORE ? <IconRefresh size={20} /> : <IconArrowRight size={20} />}
+                            variant={score.total < MAX_SCORE ? "light" : "filled"}
+                            fullWidth
+                        >
+                            {score.total >= MAX_SCORE ? "Start Over" : "Next Stage"}
+                        </Button>
                     </Stack>
                     {/* {hasAnswered && <Button onClick={nextQuestion}>Next Question</Button>} */}
                     <Switch
@@ -204,6 +204,6 @@ function AmplitudeExercise() {
             </Container>
         </Frame>
     );
-  }
+}
 
 export default AmplitudeExercise;
