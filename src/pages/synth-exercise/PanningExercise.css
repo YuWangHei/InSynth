@@ -68,7 +68,7 @@
 }
 
 .hover-marker::after {
-    content: attr(style);
+    content: attr(title);
     position: absolute;
     top: 50%;
     left: 50%;
@@ -79,4 +79,15 @@
     border-radius: 4px;
     font-size: 12px;
     white-space: nowrap;
+}
+
+.answer-marker {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background-color: red;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    color: white;
 }
