@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Button, Container, Paper, Slider } from '@mantine/core';
+import { Button, Container, Group, Paper, Slider, Stack, Switch } from '@mantine/core';
 import Frame from '../Frame';
 import audioFile from '../../Music/Mineral_cropped.wav'
 
@@ -7,6 +7,7 @@ function AmplitudeExercise() {
     const audioRef = useRef(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [gainValue, setGainValue] = useState(0);
+    const [isOriginal, setIsOriginal] = useState(false);
 
     const audioContextRef = useRef(new (window.AudioContext || window.webkitAudioContext)());
     const gainNodeRef = useRef(audioContextRef.current.createGain());
@@ -46,11 +47,10 @@ function AmplitudeExercise() {
                 gain: context.createGain(),
                 media: audioRef.current,
             };
-        result.source.connect(result.gain);
-        result.gain.connect(context.destination);
         
-        const initialAmplification = Math.pow(10, gainValue / 20);
-        result.gain.gain.setValueAtTime(initialAmplification, context.currentTime);
+        result.source.connect(result.gain);
+        result.source.connect(context.destination);
+        result.gain.connect(context.destination);
         
         gainNodeRef.current = result.gain;
         return () => {
@@ -85,15 +85,47 @@ function AmplitudeExercise() {
         }
     };
 
+    const toggleOriginal = (gain) => {
+        setIsOriginal(!isOriginal);
+        if (!isOriginal) {
+            gainNodeRef.current.gain.setValueAtTime(1, audioContextRef.current.currentTime);
+        } else {
+            const amplification = Math.pow(10, gain / 20);
+            gainNodeRef.current.gain.setValueAtTime(amplification, audioContextRef.current.currentTime);
+        }
+    };
+
     return (
         <Frame>
-            <audio ref={audioRef} src={audioFile} loop/>
-            <button onClick={togglePlay}>
-                {isPlaying ? 'Pause' : 'Play'}
-            </button>
-            <button onClick={() => correctAnswer(answer1)}>{answer1}</button>
-            <button onClick={() => correctAnswer(answer2)}>{answer2}</button>
-            <p>{result}</p>
+            <Container size="lg" mt="xl">
+                <Paper shadow="md" p="xl" radius="md" align="center">
+                    <audio ref={audioRef} src={audioFile} loop/>
+                    <Stack style={{width: '50%'}}>
+                    <Button onClick={togglePlay}>
+                        {isPlaying ? 'Pause' : 'Play'}
+                    </Button>
+                    <Group justify="center" grow wrap="nowrap">
+                        <Button onClick={() => correctAnswer(answer1)}>{answer1}</Button>
+                        <Button onClick={() => correctAnswer(answer2)}>{answer2}</Button>
+                    </Group>
+                    
+                    </Stack>
+                    <p>{result}</p>
+                    <Switch
+                        checked={isOriginal}
+                        onChange={() => toggleOriginal(gainValue)}
+                        label={isOriginal ? "Original" : "Edited"}
+                        color="blue"
+                        size="md"
+                        styles={{
+                            label: {
+                                color: 'var(--mantine-color-text)',
+                                fontWeight: 500
+                            }
+                        }}
+                    />
+                </Paper>
+            </Container>
         </Frame>
     );
   }
