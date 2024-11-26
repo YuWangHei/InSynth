@@ -1,19 +1,39 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Frame from "../Frame";
-import MathPlot from "./partial/MathPlot";
-import { Button, Switch, TextInput } from "@mantine/core";
+import EQStatic from "./partial/EQStatic";
+import EQMenu from "./partial/EQMenu";
+import EQParametric from "./partial/EQParametric";
+import { getRandomAudio } from "../AudioPicker";
 
 function EQExercise() {
-  const [inputExpr, setInputExpr] = useState('0');
-  const [plotExpr, setPlotExpr] = useState('0');
-  const [logScale, setLogScale] = useState(false);
+  const [inMenu, setInMenu] = useState(true);
+  const [inQMode, setInQMode] = useState(true); // true for Mode 1, false for Mode 2, for the ease of arrangement of components
+  const [audio, setAudio] = useState(null);
+
+  // On any page switch, clear audio
+  useEffect(() => {
+    setAudio(null);
+  }, [inMenu, inQMode]);
+
+  // On Mode 1 or Mode 2 being selected
+  const onSelect = (mode) => {
+    // Set page to be displayed
+    setInMenu(false);
+    setInQMode(mode);
+    // Get random audio
+    const random_audio = getRandomAudio();
+    console.log(random_audio);
+    setAudio(random_audio);
+  }
 
   return (
     <Frame>
-      <MathPlot expr={plotExpr} x_bounds={{ a: -1, b: 11 }} y_bounds={{ a: -10, b: 10 }} curve_name="Frequency Response" log_scale={logScale} />
-      <TextInput label="Expression" placeholder="Enter expression" onChange={(event) => setInputExpr(event.target.value)} />
-      <Button onClick={() => setPlotExpr(inputExpr)}>Click me</Button>
-      <Switch checked={logScale} onChange={(event) => setLogScale(event.currentTarget.checked)} />
+      {inMenu ?
+        <EQMenu onSelect={onSelect} /> :
+        inQMode ?
+          <EQStatic audioFile={audio} /> :
+          <EQParametric audioFile={audio} />
+      }
     </Frame>
   )
 }
