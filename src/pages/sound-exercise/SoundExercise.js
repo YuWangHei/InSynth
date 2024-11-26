@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Button, Group, Text, Container, Paper, RingProgress, Grid} from '@mantine/core';
-import { IconPlayerPlay, IconVolume, IconRefresh, IconMusicOff, IconArrowRight, IconPlayerPlayFilled, IconPlayerPauseFilled, IconPlayerPause } from '@tabler/icons-react';
+import { Button, Group, Text, Container, Paper, RingProgress, Grid, Alert} from '@mantine/core';
+import { IconPlayerPlayFilled} from '@tabler/icons-react';
 import Frame from '../Frame';
 import * as Tone from 'tone';
 
@@ -13,6 +13,9 @@ const waves = [
   },
   { 
     name: 'Sine Wave', 
+  },
+  { 
+    name: 'Triangle Wave', 
   }
 ];
 
@@ -23,6 +26,9 @@ function SoundExercise() {
   const [showWaveform, setShowWaveform] = useState(false);
   const [score, setScore] = useState({ correct: 0, total: 0 });
   const [isPlayed, setIsPlayed] = useState(false);
+  const [isGuessed, setIsGuessed] = useState(false);
+  const [showFeedback, setShowFeedback] = useState(false);
+
   const canvasRef = useRef(null);
   const waveformCanvasRef = useRef(null);
   const analyzerRef = useRef(null);
@@ -43,11 +49,16 @@ function SoundExercise() {
   }, []);
 
   const initializeAudio = async () => {
-    await Tone.start();
-    // Create analyzer nodes only after audio context is started
-    analyzerRef.current = new Tone.Analyser('fft', 2048);
-    waveformAnalyzerRef.current = new Tone.Analyser('waveform', 1024);
-    analyzerRef.current.smoothing = 0;
+    try {
+      await Tone.start();
+      if (!analyzerRef.current) {
+        analyzerRef.current = new Tone.Analyser('fft', 2048);
+        waveformAnalyzerRef.current = new Tone.Analyser('waveform', 1024);
+        analyzerRef.current.smoothing = 0;
+      }
+    } catch (error) {
+      console.error('Failed to initialize audio:', error);
+    }
   };
 
   const drawWaveform = () => {
@@ -120,71 +131,85 @@ function SoundExercise() {
     animationRef.current = requestAnimationFrame(drawSpectrum);
   };
 
-  const playWaveform = (type) => {
-    // Translate display names to oscillator types
+  const playWaveform = async (type) => {
+    if (!analyzerRef.current || !waveformAnalyzerRef.current) {
+      await initializeAudio();
+    }
+    
     const waveformMap = {
-        'Sine Wave': 'sine',
-        'Square Wave': 'square',
-        'Sawtooth Wave': 'sawtooth'
+      'Sine Wave': 'sine',
+      'Square Wave': 'square',
+      'Sawtooth Wave': 'sawtooth'
     };
     
     const oscillatorType = waveformMap[type] || type;
-
+    
     const synth = new Tone.Synth({
-        oscillator: { type: oscillatorType },
-        envelope: {
-            attack: 0.1,
-            decay: 0.2,
-            sustain: 0.5,
-            release: 0.8
-        }
+      oscillator: { type: oscillatorType },
+      envelope: {
+        attack: 0.1,
+        decay: 0.2,
+        sustain: 0.5,
+        release: 0.8
+      }
     }).chain(analyzerRef.current, waveformAnalyzerRef.current, Tone.Destination);
-
-    // Start visualizations
+  
     drawSpectrum();
     drawWaveform();
-    
-    // Play note
     synth.triggerAttackRelease('A4', '1');
   };
+  
+  
 
   const handlePlayRandomWaveform = async () => {
-    // Initialize audio if not already initialized
-    if (Tone.context.state !== "running") {
-      await initializeAudio();
+    try {
+      // Ensure audio context is started
+      if (!Tone.context || Tone.context.state !== "running") {
+        await initializeAudio();
+      }
+      
+      if (score.total >= TotalScore) {
+        setResult("Start Next Round!");
+        return;
+      }
+      
+      const waveforms = ['Sine Wave', 'Square Wave', 'Sawtooth Wave'];
+      const randomWaveform = waveforms[Math.floor(Math.random() * waveforms.length)];
+      setIsPlayed(true);
+      setCurrentWaveform(randomWaveform);
+      playWaveform(randomWaveform);
+      setResult('');
+    } catch (error) {
+      console.error('Failed to play waveform:', error);
+      setResult('Failed to start audio. Please try again.');
     }
-    if (score.total > TotalScore) {
-      setResult("Start Next Round!")
-      return;
-    }
-    const waveforms = ['Sine Wave', 'Square Wave', 'Sawtooth Wave'];
-    const randomWaveform = waveforms[Math.floor(Math.random() * waveforms.length)];
-    setIsPlayed(true)
-    setCurrentWaveform(randomWaveform);
-    playWaveform(randomWaveform);
-    setResult('');
   };
 
   // Function to handle user's guess
   const handleGuess = (guess) => {
     if (!currentWaveform || !isPlayed) {
+      setIsGuessed(false);
+      setShowFeedback(true);
       setResult('Please click "Play" first!');
       return;
     }
 
     if (guess === currentWaveform) {
       setResult('Correct! You identified the waveform.');
+      setIsGuessed(true);
       setScore(prev => ({
         correct: prev.correct + 1,
         total: prev.total + 1
       }));
     } else {
       setResult(`Incorrect! The correct answer was ${currentWaveform}.`);
+      setIsGuessed(false);
       setScore(prev => ({
         ...prev,
         total: prev.total + 1
       }));
     }
+    setShowFeedback(true);
     setIsPlayed(false);
   };
 
@@ -194,10 +219,33 @@ return (
       <Paper shadow="md" p="xl" radius="md" align="center">
         <h1>Sound Exercise</h1>
         
-        <Text size="lg" weight={500} align="center" mb="md">
-          {result}
-        </Text>
+        {showFeedback && (
+                  <Alert 
+                  color={
+                    function() {
 
+                      if (isGuessed) {
+                        return 'green';
+                      }
+                      return 'red';
+                    }()
+                  }
+                >
+                  {result}
+                </Alert>
+        )}
+        <br></br>
+
+        {score.total >= TotalScore && (
+                <Alert
+                  color="green"
+                  title={"Finished!"}
+                >
+                  All {TotalScore} Questions are finished.
+                  Your score is {score.correct}/{score.total}!!!
+                </Alert>
+              )}
+        <br></br>
         {/* Main content area with flex layout */}
         <div style={{ 
           display: 'flex', 
