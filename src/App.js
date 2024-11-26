@@ -41,7 +41,11 @@ function App() {
       element: <SynthExercise />
     },
     {
-      path: '/SoundAmplitude',
+      path: '/AmplitudeExercise/setup',
+      element: <AmplitudeExerciseSetup />
+    },
+    {
+      path: '/AmplitudeExercise/play',
       element: <AmplitudeExercise />
     },
     {
