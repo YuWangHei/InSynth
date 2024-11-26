@@ -10,6 +10,7 @@ import AmplitudeExercise from './pages/sound-exercise/AmplitudeExercise';
 import EQExercise from './pages/synth-exercise/EQExercise';
 import PanningExercise from './pages/synth-exercise/PanningExercise/PanningExercise';
 import PanningExerciseSetup from './pages/synth-exercise/PanningExercise/PanningExerciseSetup';
+import AmplitudeExerciseSetup from './pages/sound-exercise/AmplitudeExerciseSetup';
 function App() {
   const router = [
     {
@@ -41,7 +42,11 @@ function App() {
       element: <SynthExercise />
     },
     {
-      path: '/SoundAmplitude',
+      path: '/AmplitudeExercise/setup',
+      element: <AmplitudeExerciseSetup />
+    },
+    {
+      path: '/AmplitudeExercise/play',
       element: <AmplitudeExercise />
     },
     {

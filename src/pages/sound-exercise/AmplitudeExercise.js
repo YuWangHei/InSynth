@@ -1,10 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Alert, Button, Container, Group, Paper, Stack, Switch, Text } from '@mantine/core';
 import { IconRefresh, IconArrowRight } from '@tabler/icons-react';
 import Frame from '../Frame';
 import audioFile from '../../Music/Mineral_cropped.wav'
 
 function AmplitudeExercise() {
+    const navigate = useNavigate();
+    const location = useLocation();
+    const { difficulty, maxQuestions } = location.state || {};
     const audioRef = useRef(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [gainValue, setGainValue] = useState(0);
@@ -15,7 +19,7 @@ function AmplitudeExercise() {
     const [result, setResult] = useState(0);
     
     const [score, setScore] = useState({ correct: 0, total: 0 });
-    const MAX_SCORE = 3;
+    const MAX_SCORE = maxQuestions;
     const generateRandomGain = () => {
         const randomGain = Math.floor(Math.random() * 41) - 20; // Random number between -20 and 20
         setGainValue(randomGain);
@@ -31,34 +35,55 @@ function AmplitudeExercise() {
     const [answer2, setAnswer2] = useState(0);
     const generateAnswer = (answer) => {
         const random = Math.random();
-        let difficulty = Math.floor(Math.random() * 5) + 1;
-        difficulty = (Math.random() < 0.5) ? difficulty : -difficulty;
+        let difference = 0;
+        if (difficulty === 'Easy') {
+            difference = Math.floor(Math.random() * 2) + 4;
+        } else {
+            difference = Math.floor(Math.random() * 5) + 1;
+        }
+        difference = (Math.random() < 0.5) ? difference : -difference;
         if (random < 0.5) {
             setAnswer1(answer);
-            setAnswer2(answer+difficulty);
+            setAnswer2(answer+difference);
         } else {
             setAnswer2(answer);
-            setAnswer1(answer+difficulty);
+            setAnswer1(answer+difference);
+        }
+    };
+
+    const nextQuestion = () => {
+        generateAnswer(generateRandomGain());
+        setHasAnswered(false);
+        if (isPlaying) {
+            togglePlay();
         }
     };
 
     useEffect(() => {
-        var context = new (window.AudioContext || window.webkitAudioContext),
-            result = {
-                context: context,
-                source: context.createMediaElementSource(audioRef.current),
-                gain: context.createGain(),
-                media: audioRef.current,
-            };
+        let source;
+        const context = new (window.AudioContext || window.webkitAudioContext)();
+        const gain = context.createGain();
         
-        result.source.connect(result.gain);
-        result.source.connect(context.destination);
-        result.gain.connect(context.destination);
+        // Only create and connect the source when audio starts playing
+        const setupAudio = () => {
+            if (!source) {
+                source = context.createMediaElementSource(audioRef.current);
+                source.connect(gain);
+                gain.connect(context.destination);
+                gainNodeRef.current = gain;
+            }
+        };
+
+        // Add event listener for the first play
+        audioRef.current.addEventListener('play', setupAudio, { once: true });
         
-        gainNodeRef.current = result.gain;
+        nextQuestion();
+        
         return () => {
-            result.source.disconnect();
-            result.gain.disconnect();
+            if (source) {
+                source.disconnect();
+                gain.disconnect();
+            }
         };
     }, []);
 
@@ -70,14 +95,11 @@ function AmplitudeExercise() {
         gainNodeRef.current.gain.setValueAtTime(amplification, audioContextRef.current.currentTime);
     };
 
-    const togglePlay = () => {
+    const togglePlay = async () => {
         if (isPlaying) {
             audioRef.current.pause();
         } else {
-            // if (hasAnswered) {
-            //     generateAnswer(generateRandomGain());
-            //     setHasAnswered(false);     // Generate answers based on the new gain
-            // }
+            await audioContextRef.current.resume();
             audioRef.current.play();
         }
         setIsPlaying(!isPlaying);
@@ -109,11 +131,10 @@ function AmplitudeExercise() {
             gainNodeRef.current.gain.setValueAtTime(amplification, audioContextRef.current.currentTime);
         }
     };
-
-    const nextQuestion = () => {
-        generateAnswer(generateRandomGain());
-        setHasAnswered(false);
-    };
+    
+    const startOver = () => {
+        navigate('/AmplitudeExercise/setup');
+    }
 
     return (
         <Frame>
@@ -156,7 +177,7 @@ function AmplitudeExercise() {
                         )}
                     
                     <Button
-                        onClick={nextQuestion}
+                        onClick={score.total >= MAX_SCORE ? startOver : nextQuestion}
                         disabled={!hasAnswered}
                         rightSection={score.total >= MAX_SCORE ? <IconRefresh size={20} /> : <IconArrowRight size={20} />}
                         variant={score.total < MAX_SCORE ? "light" : "filled"}
