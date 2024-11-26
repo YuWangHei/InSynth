@@ -4,81 +4,97 @@ import Frame from '../Frame';
 import audioFile from '../../Music/Mineral_cropped.wav'
 
 function AmplitudeExercise() {
-    const [value, setValue] = useState(0); // Initial value
-    const audioRef = useRef(null); // Create a ref to the audio element
-    const [audioContext, setAudioContext] = useState(null);
-    const [gainNodeLeft, setGainNodeLeft] = useState(null);
-    const [gainNodeRight, setGainNodeRight] = useState(null);
+    const audioRef = useRef(null);
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [gainValue, setGainValue] = useState(0);
+
+    const audioContextRef = useRef(new (window.AudioContext || window.webkitAudioContext)());
+    const gainNodeRef = useRef(audioContextRef.current.createGain());
+    const [result, setResult] = useState('');
+    
+    const generateRandomGain = () => {
+        const randomGain = Math.floor(Math.random() * 41) - 20; // Random number between -20 and 20
+        setGainValue(randomGain);
+        console.log(randomGain);
+        // Apply the new gain value
+        const amplification = Math.pow(10, randomGain / 20);
+        gainNodeRef.current.gain.setValueAtTime(amplification, audioContextRef.current.currentTime);
+        
+        return randomGain;
+    };
+
+    const [answer1, setAnswer1] = useState(0);
+    const [answer2, setAnswer2] = useState(0);
+    const generateAnswer = (answer) => {
+        const random = Math.random();
+        let difficulty = Math.floor(Math.random() * 5) + 1;
+        difficulty = (Math.random() < 0.5) ? difficulty : -difficulty;
+        if (random < 0.5) {
+            setAnswer1(answer);
+            setAnswer2(answer+difficulty);
+        } else {
+            setAnswer2(answer);
+            setAnswer1(answer+difficulty);
+        }
+    };
 
     useEffect(() => {
-        const context = new (window.AudioContext || window.webkitAudioContext)();
-        setAudioContext(context);
-
-        const leftGain = context.createGain();
-        const rightGain = context.createGain();
-        setGainNodeLeft(leftGain);
-        setGainNodeRight(rightGain);
-
-        // Connect the gain nodes to the audio context destination
-        leftGain.connect(context.destination);
-        rightGain.connect(context.destination);
+        var context = new (window.AudioContext || window.webkitAudioContext),
+            result = {
+                context: context,
+                source: context.createMediaElementSource(audioRef.current),
+                gain: context.createGain(),
+                media: audioRef.current,
+            };
+        result.source.connect(result.gain);
+        result.gain.connect(context.destination);
         
+        const initialAmplification = Math.pow(10, gainValue / 20);
+        result.gain.gain.setValueAtTime(initialAmplification, context.currentTime);
+        
+        gainNodeRef.current = result.gain;
         return () => {
-        context.close(); // Clean up the audio context on unmount
+            result.source.disconnect();
+            result.gain.disconnect();
         };
     }, []);
 
-    const playSong = async () => {
-        if (!audioContext) return;
-
-        const response = await fetch({audioFile}); // Replace with your audio file
-        const arrayBuffer = await response.arrayBuffer();
-        const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-
-        const source = audioContext.createBufferSource();
-        source.buffer = audioBuffer;
-
-        // Connect source to gain nodes
-        source.connect(audioContext.destination);
-        source.connect(gainNodeRight);
-
-        // Set different amplitudes for left and right channels
-        gainNodeLeft.gain.setValueAtTime(1, audioContext.currentTime); // Left channel amplitude
-        gainNodeRight.gain.setValueAtTime(0.5, audioContext.currentTime); // Right channel amplitude
-
-        source.start();
+    const handleGainChange = (event) => {
+        const newGainValue = event.target.value;
+        setGainValue(newGainValue);
+        // Convert the slider value to an amplification factor
+        const amplification = Math.pow(10, newGainValue / 20); // Convert to exponential scaling
+        gainNodeRef.current.gain.setValueAtTime(amplification, audioContextRef.current.currentTime);
     };
 
-    // const playSong = () => {
-    //     if (audioRef.current) {
-    //         audioRef.current.play(); // Play the audio
-    //     }
-    // };
-  
+    const togglePlay = () => {
+        if (isPlaying) {
+            audioRef.current.pause();
+        } else {
+            generateAnswer(generateRandomGain());     // Generate answers based on the new gain
+            audioRef.current.play();
+        }
+        setIsPlaying(!isPlaying);
+    };
+
+    const correctAnswer = (answer) => {
+        if (answer === gainValue) {
+            setResult('Correct!');
+        } else {
+            setResult('Incorrect!');
+        }
+    };
+
     return (
-      <Frame>   <Container style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '50px' }}>
-        <Paper shadow="md" p="xl" radius="md" style={{width: '600px'}}>
-        <h2>Value: {value}</h2>
-        <audio ref={audioRef} src={audioFile} preload="auto" />
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-            <Button onClick={playSong} variant="gradient" gradient={{ from: 'indigo', to: 'cyan' }}>
-            Play
-            </Button>
-        </div>
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-            <span>Left</span>
-            <Slider
-                value={value}
-                onChange={setValue}
-                min={-100}
-                max={100}
-                step={1}
-                style={{ flex: 1, margin: '0 10px' }} // Set a width for the slider
-            />
-            <span>Right</span>
-        </div>
-        </Paper></Container>
-      </Frame>
+        <Frame>
+            <audio ref={audioRef} src={audioFile} loop/>
+            <button onClick={togglePlay}>
+                {isPlaying ? 'Pause' : 'Play'}
+            </button>
+            <button onClick={() => correctAnswer(answer1)}>{answer1}</button>
+            <button onClick={() => correctAnswer(answer2)}>{answer2}</button>
+            <p>{result}</p>
+        </Frame>
     );
   }
 
