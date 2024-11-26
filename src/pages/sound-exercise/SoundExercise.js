@@ -162,96 +162,141 @@ function SoundExercise() {
     }
   };
 
-  return (
-    <Frame>
-      <Container size="lg" mt="xl">
-        <Paper shadow="md" p="xl" radius="md" align="center">
-          <h1>Sound Exercise</h1>
-          
-          <Text size="lg" weight={500} align="center" mb="md">
-            {result}
-          </Text>
-  
-          {/* Main content area with flex layout */}
+return (
+  <Frame>
+    <Container size="lg" mt="xl">
+      <Paper shadow="md" p="xl" radius="md" align="center">
+        <h1>Sound Exercise</h1>
+        
+        <Text size="lg" weight={500} align="center" mb="md">
+          {result}
+        </Text>
+
+        {/* Main content area with flex layout */}
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'flex-start',
+          width: '100%',
+          marginBottom: '2rem' 
+        }}>
+          {/* Left side with buttons */}
           <div style={{ 
+              width: '50%', 
             display: 'flex', 
-            justifyContent: 'center', 
-            alignItems: 'center', 
-            marginBottom: '2rem' 
+            flexDirection: 'column', 
+            gap: '2rem' 
           }}>
-            {/* Left side with Play button and wave buttons */}
-            <div style={{ flex: '2', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            {/* Play button */}
+            <Button 
+              onClick={handlePlayRandomWaveform} 
+                disabled={score.total >= 10} 
+              variant="gradient" 
+              gradient={{ from: 'indigo', to: 'cyan' }}
+              size="xl"
+              sx={{ width: '300px', alignSelf: 'center' }}
+            >
+              Play
+            </Button>
+
+            {/* Wave buttons */}
+            <Group position="center" spacing="md" sx={{ width: '100%' }}>
               <Button 
-                onClick={handlePlayRandomWaveform} 
-                variant="gradient" 
-                gradient={{ from: 'indigo', to: 'cyan' }}
-                size="xl"
-                mb={30}
+                onClick={() => handleGuess('square')} 
+                disabled={score.total >= 10} 
+                color="blue"
+                size="lg"
+                sx={{ width: '200px' }}
               >
-                Play
+                Square Wave
               </Button>
-  
-              <Group spacing="md">
-                <Button onClick={() => handleGuess('square')} disabled={score.total >= 10} color="blue">
-                  Square Wave
-                </Button>
-                <Button onClick={() => handleGuess('sawtooth')} disabled={score.total >= 10} color="orange">
-                  Sawtooth Wave
-                </Button>
-                <Button onClick={() => handleGuess('sine')} disabled={score.total >= 10} color="green">
-                  Sine Wave
-                </Button>
-              </Group>
-            </div>
-  
-            {/* Right side with RingProgress */}
-            <div style={{ flex: '1' }}>
-              <RingProgress
-                size={150}
-                label={
-                  <Text size="lg" ta="center">
-                    {score.total}/{TotalScore}
-                  </Text>
-                }
-                sections={[
-                  { value: (score.correct / TotalScore)*100, color: 'green' },
-                  { value: ((score.total - score.correct) / TotalScore)*100, color: 'red' },
-                ]}
+              <Button 
+                onClick={() => handleGuess('sawtooth')} 
+                disabled={score.total >= 10} 
+                color="orange"
+                size="lg"
+                sx={{ width: '200px' }}
+              >
+                Sawtooth Wave
+              </Button>
+              <Button 
+                onClick={() => handleGuess('sine')} 
+                disabled={score.total >= 10} 
+                color="green"
+                size="lg"
+                sx={{ width: '200px' }}
+              >
+                Sine Wave
+              </Button>
+            </Group>
+
+            {/* Visualization controls */}
+            <Group position="center" spacing="md" sx={{ width: '100%' }}>
+              <Button 
+                onClick={() => setShowSpectrum(!showSpectrum)} 
+                color="teal"
+                size="lg"
+                sx={{ width: '200px' }}
+              >
+                {showSpectrum ? 'Hide Spectrum' : 'Show Spectrum'}
+              </Button>
+              <Button 
+                onClick={() => setShowWaveform(!showWaveform)} 
+                color="teal"
+                size="lg"
+                sx={{ width: '200px' }}
+              >
+                {showWaveform ? 'Hide Waveform' : 'Show Waveform'}
+              </Button>
+            </Group>
+          </div>
+
+          {/* Right side with RingProgress */}
+          <div style={{ width: '30%', display: 'flex', justifyContent: 'center' }}>
+            <RingProgress
+              size={150}
+              label={
+                <Text size="lg" ta="center">
+                  {score.total}/{TotalScore}
+                </Text>
+              }
+              sections={[
+                { value: (score.correct / TotalScore)*100, color: 'green' },
+                { value: ((score.total - score.correct) / TotalScore)*100, color: 'red' },
+              ]}
+            />
+          </div>
+        </div>
+
+        {/* Visualizations */}
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '20px' }}>
+          {showSpectrum && (
+            <div>
+              <Text weight={500} mb="sm">Spectrum</Text>
+              <canvas 
+                ref={canvasRef} 
+                width="400" 
+                height="200" 
+                style={{ backgroundColor: '#1a1a1a', borderRadius: '8px' }} 
               />
             </div>
-          </div>
-  
-          {/* Visualization controls */}
-          <Group position="center" mb="xl" align="center">
-            <Button onClick={() => setShowSpectrum(!showSpectrum)} color="teal">
-              {showSpectrum ? 'Hide Spectrum' : 'Show Spectrum'}
-            </Button>
-            <Button onClick={() => setShowWaveform(!showWaveform)} color="grape">
-              {showWaveform ? 'Hide Waveform' : 'Show Waveform'}
-            </Button>
-          </Group>
-  
-          {/* Visualizations */}
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '20px' }}>
-            {showSpectrum && (
-              <div>
-                <Text weight={500} mb="sm">Spectrum</Text>
-                <canvas ref={canvasRef} width="400" height="200" 
-                  style={{ backgroundColor: '#1a1a1a', borderRadius: '8px' }} />
-              </div>
-            )}
-            {showWaveform && (
-              <div>
-                <Text weight={500} mb="sm">Waveform</Text>
-                <canvas ref={waveformCanvasRef} width="400" height="200" 
-                  style={{ backgroundColor: '#1a1a1a', borderRadius: '8px' }} />
-              </div>
-            )}
-          </div>
-        </Paper>
-      </Container>
-    </Frame>
-  );
+          )}
+          {showWaveform && (
+            <div>
+              <Text weight={500} mb="sm">Waveform</Text>
+              <canvas 
+                ref={waveformCanvasRef} 
+                width="400" 
+                height="200" 
+                style={{ backgroundColor: '#1a1a1a', borderRadius: '8px' }} 
+              />
+            </div>
+          )}
+        </div>
+      </Paper>
+    </Container>
+  </Frame>
+);
 }
 
 export default SoundExercise;
