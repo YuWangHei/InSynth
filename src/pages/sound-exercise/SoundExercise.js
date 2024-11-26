@@ -1,6 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Button, Group, Text, Container, Paper, RingProgress, Grid, Alert} from '@mantine/core';
-import { IconPlayerPlayFilled} from '@tabler/icons-react';
+import {
+  Title,
+  Button,
+  Group,
+  Stack,
+  Card,
+  Text,
+  Grid,
+  Alert,
+  Container,
+  RingProgress,
+} from '@mantine/core';
+import { IconVolume, IconRefresh, IconArrowRight, IconPlayerPlayFilled, IconPlayerPauseFilled, IconPlayerPause } from '@tabler/icons-react';
 import Frame from '../Frame';
 import * as Tone from 'tone';
 
@@ -36,6 +47,7 @@ function SoundExercise() {
   const animationRef = useRef(null);
   const waveformAnimationRef = useRef(null);
   const TotalScore = 10;
+  let currentSynth = null; // Store current synth instance
 
   useEffect(() => {
     return () => {
@@ -63,105 +75,95 @@ function SoundExercise() {
 
   const drawWaveform = () => {
     const canvas = waveformCanvasRef.current;
-    if (!canvas) return; // Add this check
-
+    if (!canvas || !waveformAnalyzerRef.current) return; // Ensure analyzer is ready
     const ctx = canvas.getContext('2d');
-    const width = canvas.width;
-    const height = canvas.height;
     
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear before drawing
     const values = waveformAnalyzerRef.current.getValue();
-    
-    ctx.clearRect(0, 0, width, height);
+
     ctx.beginPath();
     ctx.lineWidth = 2;
     ctx.strokeStyle = '#00ff00';
     
-    ctx.moveTo(0, height / 2);
     values.forEach((value, i) => {
-      const x = (width * i) / values.length;
-      const y = ((value + 1) / 2) * height;
-      ctx.lineTo(x, y);
+        const x = (canvas.width * i) / values.length;
+        const y = ((value + 1) / 2) * canvas.height;
+        ctx.lineTo(x, y);
     });
     
     ctx.stroke();
-    waveformAnimationRef.current = requestAnimationFrame(drawWaveform);
-  };
-
-  const drawSpectrum = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return; // Add this check
-
-    const ctx = canvas.getContext('2d');
-    const width = canvas.width;
-    const height = canvas.height;
     
+    waveformAnimationRef.current = requestAnimationFrame(drawWaveform);
+};
+
+const drawSpectrum = () => {
+    const canvas = canvasRef.current;
+    if (!canvas || !analyzerRef.current) return; // Ensure analyzer is ready
+    const ctx = canvas.getContext('2d');
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear before drawing
     const values = analyzerRef.current.getValue();
     
-    // Clear canvas
-    ctx.clearRect(0, 0, width, height);
-    
-    // Number of bars to display
     const barCount = 32;
-    const barWidth = (width / barCount) * 0.8; // Leave 20% gap between bars
-    const gap = (width / barCount) * 0.2;
-    
-    // Draw frequency bars
-    ctx.fillStyle = '#00ff00';
+    const barWidth = (canvas.width / barCount) * 0.8;
     
     for (let i = 0; i < barCount; i++) {
-      // Average several FFT values for each bar
-      const startIndex = Math.floor((i / barCount) * values.length);
-      const endIndex = Math.floor(((i + 1) / barCount) * values.length);
-      let sum = 0;
-      
-      for (let j = startIndex; j < endIndex; j++) {
-        sum += values[j];
-      }
-      
-      const average = sum / (endIndex - startIndex);
-      
-      // Convert dB value to height
-      const barHeight = ((average + 140) * height / 140);
-      
-      // Draw bar
-      const x = i * (barWidth + gap);
-      ctx.fillRect(x, height - barHeight, barWidth, barHeight);
+        let sum = 0;
+        for (let j = (i / barCount) * values.length; j < ((i + 1) / barCount) * values.length; j++) {
+            sum += values[j];
+        }
+        
+        const average = sum / (values.length / barCount);
+        const barHeight = ((average + 140) * canvas.height / 140);
+        
+        ctx.fillStyle = '#00ff00';
+        ctx.fillRect(i * (barWidth + (canvas.width / barCount) * 0.2), canvas.height - barHeight, barWidth, barHeight);
     }
     
     animationRef.current = requestAnimationFrame(drawSpectrum);
-  };
+};
 
   const playWaveform = async (type) => {
     if (!analyzerRef.current || !waveformAnalyzerRef.current) {
-      await initializeAudio();
+        await initializeAudio();
     }
-    
+
     const waveformMap = {
-      'Sine Wave': 'sine',
-      'Square Wave': 'square',
-      'Sawtooth Wave': 'sawtooth'
+        'Sine Wave': 'sine',
+        'Square Wave': 'square',
+        'Sawtooth Wave': 'sawtooth',
+        'Triangle Wave': 'triangle'
     };
-    
+
     const oscillatorType = waveformMap[type] || type;
-    
-    const synth = new Tone.Synth({
-      oscillator: { type: oscillatorType },
-      envelope: {
-        attack: 0.1,
-        decay: 0.2,
-        sustain: 0.5,
-        release: 0.8
-      }
+
+    // Stop the previous synth if it exists
+    if (currentSynth) {
+        currentSynth.triggerRelease(); // Release any currently playing notes
+    }
+
+    // Create a new synth instance
+    currentSynth = new Tone.Synth({
+        oscillator: { type: oscillatorType },
+        envelope: {
+            attack: 0.1,
+            decay: 0.2,
+            sustain: 0.5,
+            release: 0.8
+        }
     }).chain(analyzerRef.current, waveformAnalyzerRef.current, Tone.Destination);
-  
+    currentSynth.triggerAttackRelease('A4', '1');
+
     drawSpectrum();
     drawWaveform();
-    synth.triggerAttackRelease('A4', '1');
-  };
+    
+    // Trigger the note
+};
   
   
 
   const handlePlayRandomWaveform = async () => {
+    setShowFeedback(false);
     try {
       // Ensure audio context is started
       if (!Tone.context || Tone.context.state !== "running") {
@@ -173,7 +175,7 @@ function SoundExercise() {
         return;
       }
       
-      const waveforms = ['Sine Wave', 'Square Wave', 'Sawtooth Wave'];
+      const waveforms = ['Sine Wave', 'Square Wave', 'Sawtooth Wave', 'Triangle Wave'];
       const randomWaveform = waveforms[Math.floor(Math.random() * waveforms.length)];
       setIsPlayed(true);
       setCurrentWaveform(randomWaveform);
@@ -185,12 +187,23 @@ function SoundExercise() {
     }
   };
 
+  const startOver = () => {
+    setScore({ correct: 0, total: 0 });
+    handlePlayRandomWaveform();
+  };
+
+  const handleHearAgain = () => {
+    if (currentWaveform) {
+        playWaveform(currentWaveform);
+    }
+};
+
   // Function to handle user's guess
   const handleGuess = (guess) => {
     if (!currentWaveform || !isPlayed) {
       setIsGuessed(false);
       setShowFeedback(true);
-      setResult('Please click "Play" first!');
+      setResult('Pick a new sound first!');
       return;
     }
 
@@ -213,68 +226,58 @@ function SoundExercise() {
     setIsPlayed(false);
   };
 
-return (
-  <Frame>
-    <Container size="lg" mt="xl">
-      <Paper shadow="md" p="xl" radius="md" align="center">
-        <h1>Sound Exercise</h1>
-        
-        {showFeedback && (
-                  <Alert 
-                  color={
-                    function() {
+  return (
+    <Frame>
+      <Container size="md" px="md">
+        <Stack spacing="lg">
+          <Title order={1} align='center'>Sound Exercise</Title>
 
-                      if (isGuessed) {
-                        return 'green';
-                      }
-                      return 'red';
-                    }()
+          <Card shadow="sm" p="lg" radius="md" withBorder>
+            <Stack spacing="md">
+              <Group position="apart" justify="space-between" align="center">
+                  <Group>
+                  <Button 
+                    onClick={handlePlayRandomWaveform} 
+                    disabled={score.total >= 10 || isPlayed} 
+                    rightSection={ <IconPlayerPlayFilled size={20} />}
+                    variant="gradient" 
+                    gradient={{ from: 'indigo', to: 'cyan' }}
+                    size="xl"
+                    sx={{ width: '300px', alignSelf: 'center' }}
+                  >
+                    New Sound
+                  </Button>
+                  <Button 
+                  onClick={handleHearAgain} 
+                    disabled={!currentWaveform || !isPlayed} 
+                    rightSection={ <IconPlayerPlayFilled size={20} />}
+                    variant="gradient" 
+                    gradient={{ from: 'indigo', to: 'cyan' }}
+                    size="xl"
+                    sx={{ width: '300px', alignSelf: 'center', marginLeft: '10px' }}>
+                      Hear Again
+                  </Button>
+                  {/* Text for Debugging */}
+                  {/* <Text size="sm" c="dimmed">
+                      (isPlaying: {isPlaying.toString()}, isPlayingOriginal: {isPlayingOriginal.toString()})
+                </Text> */}
+                </Group>
+                    <RingProgress
+                  size={150}
+                  label={
+                    <Text size="lg" ta="center">
+                      {score.total}/{TotalScore}
+                    </Text>
                   }
-                >
-                  {result}
-                </Alert>
-        )}
-        <br></br>
+                  sections={[
+                    { value: (score.correct / TotalScore)*100, color: 'green' },
+                    { value: ((score.total - score.correct) / TotalScore)*100, color: 'red' },
+                  ]}
+                />
 
-        {score.total >= TotalScore && (
-                <Alert
-                  color="green"
-                  title={"Finished!"}
-                >
-                  All {TotalScore} Questions are finished.
-                  Your score is {score.correct}/{score.total}!!!
-                </Alert>
-              )}
-        <br></br>
-        {/* Main content area with flex layout */}
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'flex-start',
-          width: '100%',
-          marginBottom: '2rem' 
-        }}>
-          {/* Left side with buttons */}
-          <div style={{ 
-              width: '50%', 
-            display: 'flex', 
-            flexDirection: 'column', 
-            gap: '2rem' 
-          }}>
-            {/* Play button */}
-            <Button 
-              onClick={handlePlayRandomWaveform} 
-              disabled={score.total >= 10 && isPlayed} 
-              rightSection={ <IconPlayerPlayFilled size={20} />}
-              variant="gradient" 
-              gradient={{ from: 'indigo', to: 'cyan' }}
-              size="xl"
-              sx={{ width: '300px', alignSelf: 'center' }}
-            >
-              Play
-            </Button>
+              </Group>
 
-            <Grid>
+              <Grid>
                 {waves.map((wave) => (
                   <Grid.Col key={waves.name} span={6}>
                     <Button
@@ -302,7 +305,43 @@ return (
                 ))}
               </Grid>
 
-            {/* Visualization controls */}
+              {showFeedback && (
+                  <Alert 
+                  color={
+                    function() {
+
+                      if (isGuessed) {
+                        return 'green';
+                      }
+                      return 'red';
+                    }()
+                  }
+                >
+                  {result}
+                </Alert>
+        )}
+
+
+              {score.total >= TotalScore && (
+                      <Alert
+                        color="green"
+                        title={"Finished!"}
+                      >
+                        All {TotalScore} Questions are finished.
+                        Your score is {score.correct}/{score.total}!!!
+                      </Alert>
+                    )}
+              <Button
+                onClick={score.total < TotalScore ? handlePlayRandomWaveform : startOver}
+                disabled={!showFeedback}
+                rightSection={score.total >= TotalScore ? <IconRefresh size={20} /> : <IconArrowRight size={20} />}
+                variant={score.total < TotalScore ? "light" : "filled"}
+                fullWidth
+              >
+                {score.total >= TotalScore ? "Start Over" : "Next Sound"}
+              </Button>
+
+               {/* Visualization controls */}
             <Group position="center" spacing="md" sx={{ width: '100%' }}>
               <Button 
                 onClick={() => setShowSpectrum(!showSpectrum)} 
@@ -321,54 +360,37 @@ return (
                 {showWaveform ? 'Hide Waveform' : 'Show Waveform'}
               </Button>
             </Group>
-          </div>
-
-          {/* Right side with RingProgress */}
-          <div style={{ width: '30%', display: 'flex', justifyContent: 'center' }}>
-            <RingProgress
-              size={150}
-              label={
-                <Text size="lg" ta="center">
-                  {score.total}/{TotalScore}
-                </Text>
-              }
-              sections={[
-                { value: (score.correct / TotalScore)*100, color: 'green' },
-                { value: ((score.total - score.correct) / TotalScore)*100, color: 'red' },
-              ]}
-            />
-          </div>
-        </div>
-
-        {/* Visualizations */}
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '20px' }}>
-          {showSpectrum && (
-            <div>
-              <Text weight={500} mb="sm">Spectrum</Text>
-              <canvas 
-                ref={canvasRef} 
-                width="400" 
-                height="200" 
-                style={{ backgroundColor: '#1a1a1a', borderRadius: '8px' }} 
-              />
-            </div>
-          )}
-          {showWaveform && (
-            <div>
-              <Text weight={500} mb="sm">Waveform</Text>
-              <canvas 
-                ref={waveformCanvasRef} 
-                width="400" 
-                height="200" 
-                style={{ backgroundColor: '#1a1a1a', borderRadius: '8px' }} 
-              />
-            </div>
-          )}
-        </div>
-      </Paper>
-    </Container>
-  </Frame>
-);
+          
+                      
+              <div style={{ display: 'flex', justifyContent: 'center', gap: '20px' }}>
+                {showSpectrum && (
+                  <div>
+                    <Text weight={500} mb="sm">Spectrum</Text>
+                    <canvas 
+                      ref={canvasRef} 
+                      width="400" 
+                      height="200" 
+                      style={{ backgroundColor: '#1a1a1a', borderRadius: '8px' }} 
+                    />
+                  </div>
+                )}
+                {showWaveform && (
+                  <div>
+                    <Text weight={500} mb="sm">Waveform</Text>
+                    <canvas 
+                      ref={waveformCanvasRef} 
+                      width="400" 
+                      height="200" 
+                      style={{ backgroundColor: '#1a1a1a', borderRadius: '8px' }} 
+                    />
+                  </div>
+                )}
+              </div>
+            </Stack>
+          </Card>
+        </Stack>
+      </Container>
+    </Frame>
+  );
 }
-
 export default SoundExercise;
