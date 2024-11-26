@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Button, Container, Group, Paper, Slider, Stack, Switch } from '@mantine/core';
+import { Alert, Button, Container, Group, Paper, Stack, Switch, Text } from '@mantine/core';
+import { IconRefresh, IconArrowRight } from '@tabler/icons-react';
 import Frame from '../Frame';
 import audioFile from '../../Music/Mineral_cropped.wav'
 
@@ -11,8 +12,10 @@ function AmplitudeExercise() {
 
     const audioContextRef = useRef(new (window.AudioContext || window.webkitAudioContext)());
     const gainNodeRef = useRef(audioContextRef.current.createGain());
-    const [result, setResult] = useState('');
+    const [result, setResult] = useState(0);
     
+    const [score, setScore] = useState({ correct: 0, total: 0 });
+    const MAX_SCORE = 3;
     const generateRandomGain = () => {
         const randomGain = Math.floor(Math.random() * 41) - 20; // Random number between -20 and 20
         setGainValue(randomGain);
@@ -71,17 +74,29 @@ function AmplitudeExercise() {
         if (isPlaying) {
             audioRef.current.pause();
         } else {
-            generateAnswer(generateRandomGain());     // Generate answers based on the new gain
+            // if (hasAnswered) {
+            //     generateAnswer(generateRandomGain());
+            //     setHasAnswered(false);     // Generate answers based on the new gain
+            // }
             audioRef.current.play();
         }
         setIsPlaying(!isPlaying);
     };
 
-    const correctAnswer = (answer) => {
-        if (answer === gainValue) {
-            setResult('Correct!');
-        } else {
-            setResult('Incorrect!');
+    const [hasAnswered, setHasAnswered] = useState(false);
+    const handleAnswer = (answer) => {
+        if (!hasAnswered) {
+            setHasAnswered(true);
+            if (answer === gainValue) {
+                setResult(1);
+                setScore({correct: score.correct + 1, total: score.total + 1});
+            } else {
+                setResult(0);
+                setScore({...score, total: score.total + 1});
+            }
+            if (isPlaying) {
+                togglePlay();
+            }
         }
     };
 
@@ -95,22 +110,62 @@ function AmplitudeExercise() {
         }
     };
 
+    const nextQuestion = () => {
+        generateAnswer(generateRandomGain());
+        setHasAnswered(false);
+    };
+
     return (
         <Frame>
             <Container size="lg" mt="xl">
                 <Paper shadow="md" p="xl" radius="md" align="center">
                     <audio ref={audioRef} src={audioFile} loop/>
                     <Stack style={{width: '50%'}}>
-                    <Button onClick={togglePlay}>
-                        {isPlaying ? 'Pause' : 'Play'}
-                    </Button>
-                    <Group justify="center" grow wrap="nowrap">
-                        <Button onClick={() => correctAnswer(answer1)}>{answer1}</Button>
-                        <Button onClick={() => correctAnswer(answer2)}>{answer2}</Button>
-                    </Group>
+                        <Button onClick={togglePlay}>
+                            {isPlaying ? 'Pause' : 'Play'}
+                        </Button>
+                        <Group justify="center" grow wrap="nowrap">
+                            <Button onClick={() => handleAnswer(answer1)}>{answer1}</Button>
+                            <Button onClick={() => handleAnswer(answer2)}>{answer2}</Button>
+                        </Group>
+                    {/* </Stack>
+
+                    <Stack> */}
+                        {hasAnswered && (
+                        <Alert
+                        color={result ? "green" : "red"}
+                        title={<Text fw={700} size="lg">{result ? "Correct!" : "Not quite!"}</Text>}
+                        >
+                            {/* <Text fw={500} size="md" mt={4}>
+                                {!correct && 
+                                    ` The sound was panned to ${currentPan}.`}
+                            </Text> */}
+                        </Alert>
+                        )}
+
+                        {score.total >= MAX_SCORE && (
+                            <Alert
+                                color="green"
+                                title={<Text fw={700} size="lg">Finished!</Text>}
+                            >
+                                <Text fw={500} size="md" mt={4}>
+                                    All {MAX_SCORE} Questions are finished.
+                                    Your score is {score.correct}/{score.total}!!!
+                                </Text>
+                            </Alert>
+                        )}
                     
+                    <Button
+                        onClick={nextQuestion}
+                        disabled={!hasAnswered}
+                        rightSection={score.total >= MAX_SCORE ? <IconRefresh size={20} /> : <IconArrowRight size={20} />}
+                        variant={score.total < MAX_SCORE ? "light" : "filled"}
+                        fullWidth
+                    >
+                        {score.total >= MAX_SCORE ? "Start Over" : "Next Stage"}
+                    </Button>
                     </Stack>
-                    <p>{result}</p>
+                    {/* {hasAnswered && <Button onClick={nextQuestion}>Next Question</Button>} */}
                     <Switch
                         checked={isOriginal}
                         onChange={() => toggleOriginal(gainValue)}
