@@ -1,13 +1,28 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Button, Group, Text, Container, Paper, RingProgress} from '@mantine/core';
+import { Button, Group, Text, Container, Paper, RingProgress, Grid} from '@mantine/core';
+import { IconPlayerPlay, IconVolume, IconRefresh, IconMusicOff, IconArrowRight, IconPlayerPlayFilled, IconPlayerPauseFilled, IconPlayerPause } from '@tabler/icons-react';
 import Frame from '../Frame';
 import * as Tone from 'tone';
+
+const waves = [
+  { 
+    name: 'Square Wave', 
+  },
+  { 
+    name: 'Sawtooth Wave', 
+  },
+  { 
+    name: 'Sine Wave', 
+  }
+];
+
 function SoundExercise() {
   const [result, setResult] = useState('');
   const [currentWaveform, setCurrentWaveform] = useState(null);
   const [showSpectrum, setShowSpectrum] = useState(false);
   const [showWaveform, setShowWaveform] = useState(false);
   const [score, setScore] = useState({ correct: 0, total: 0 });
+  const [isPlayed, setIsPlayed] = useState(false);
   const canvasRef = useRef(null);
   const waveformCanvasRef = useRef(null);
   const analyzerRef = useRef(null);
@@ -15,6 +30,7 @@ function SoundExercise() {
   const animationRef = useRef(null);
   const waveformAnimationRef = useRef(null);
   const TotalScore = 10;
+
   useEffect(() => {
     return () => {
       if (animationRef.current) {
@@ -105,14 +121,23 @@ function SoundExercise() {
   };
 
   const playWaveform = (type) => {
+    // Translate display names to oscillator types
+    const waveformMap = {
+        'Sine Wave': 'sine',
+        'Square Wave': 'square',
+        'Sawtooth Wave': 'sawtooth'
+    };
+    
+    const oscillatorType = waveformMap[type] || type;
+
     const synth = new Tone.Synth({
-      oscillator: { type },
-      envelope: {
-        attack: 0.1,
-        decay: 0.2,
-        sustain: 0.5,
-        release: 0.8
-      }
+        oscillator: { type: oscillatorType },
+        envelope: {
+            attack: 0.1,
+            decay: 0.2,
+            sustain: 0.5,
+            release: 0.8
+        }
     }).chain(analyzerRef.current, waveformAnalyzerRef.current, Tone.Destination);
 
     // Start visualizations
@@ -132,9 +157,9 @@ function SoundExercise() {
       setResult("Start Next Round!")
       return;
     }
-    const waveforms = ['sine', 'square', 'sawtooth'];
+    const waveforms = ['Sine Wave', 'Square Wave', 'Sawtooth Wave'];
     const randomWaveform = waveforms[Math.floor(Math.random() * waveforms.length)];
-    
+    setIsPlayed(true)
     setCurrentWaveform(randomWaveform);
     playWaveform(randomWaveform);
     setResult('');
@@ -142,7 +167,7 @@ function SoundExercise() {
 
   // Function to handle user's guess
   const handleGuess = (guess) => {
-    if (!currentWaveform) {
+    if (!currentWaveform || !isPlayed) {
       setResult('Please click "Play" first!');
       return;
     }
@@ -160,6 +185,7 @@ function SoundExercise() {
         total: prev.total + 1
       }));
     }
+    setIsPlayed(false);
   };
 
 return (
@@ -190,7 +216,8 @@ return (
             {/* Play button */}
             <Button 
               onClick={handlePlayRandomWaveform} 
-                disabled={score.total >= 10} 
+              disabled={score.total >= 10 && isPlayed} 
+              rightSection={ <IconPlayerPlayFilled size={20} />}
               variant="gradient" 
               gradient={{ from: 'indigo', to: 'cyan' }}
               size="xl"
@@ -199,36 +226,33 @@ return (
               Play
             </Button>
 
-            {/* Wave buttons */}
-            <Group position="center" spacing="md" sx={{ width: '100%' }}>
-              <Button 
-                onClick={() => handleGuess('square')} 
-                disabled={score.total >= 10} 
-                color="blue"
-                size="lg"
-                sx={{ width: '200px' }}
-              >
-                Square Wave
-              </Button>
-              <Button 
-                onClick={() => handleGuess('sawtooth')} 
-                disabled={score.total >= 10} 
-                color="orange"
-                size="lg"
-                sx={{ width: '200px' }}
-              >
-                Sawtooth Wave
-              </Button>
-              <Button 
-                onClick={() => handleGuess('sine')} 
-                disabled={score.total >= 10} 
-                color="green"
-                size="lg"
-                sx={{ width: '200px' }}
-              >
-                Sine Wave
-              </Button>
-            </Group>
+            <Grid>
+                {waves.map((wave) => (
+                  <Grid.Col key={waves.name} span={6}>
+                    <Button
+                      onClick={() => handleGuess(wave.name)}
+                      disabled={score.total >= 10 && !isPlayed} 
+                      variant="outline"
+                      radius="lg"
+                      color="blue"
+                      fullWidth
+                      h={100}
+                      styles={{
+                        inner: {
+                          flexDirection: 'column',
+                          height: '100%',
+                          justifyContent: 'center',
+                        },
+                      }}
+                    >
+                      <Text size="lg" weight={500} fw={700}>{wave.name}</Text>
+                      {/* <Text size="xs" mt={4} c="dimmed">
+                        {effect.description}
+                      </Text> */}
+                    </Button>
+                  </Grid.Col>
+                ))}
+              </Grid>
 
             {/* Visualization controls */}
             <Group position="center" spacing="md" sx={{ width: '100%' }}>
