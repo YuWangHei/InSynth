@@ -8,7 +8,8 @@ import EffectExercise from './pages/sound-exercise/EffectExercise';
 import SynthExercise from './pages/synth-exercise/SynthExercise';
 import AmplitudeExercise from './pages/sound-exercise/AmplitudeExercise';
 import EQExercise from './pages/synth-exercise/EQExercise';
-
+import PanningExercise from './pages/synth-exercise/PanningExercise/PanningExercise';
+import PanningExerciseSetup from './pages/synth-exercise/PanningExercise/PanningExerciseSetup';
 function App() {
   const router = [
     {
@@ -42,14 +43,22 @@ function App() {
     {
       path: '/SoundAmplitude',
       element: <AmplitudeExercise />
+    },
+    {
+      path: "/PanningExercise/setup",
+      element: <PanningExerciseSetup />
+    },
+    {
+      path: "/PanningExercise/play",
+      element: <PanningExercise />
     }
   ];
 
   return (
     <Routes>
-      {router.map(item => {
+      {router.map((item, idx) => {
         return (
-          <Route path={item.path} element={item.element} />
+          <Route path={item.path} element={item.element} key={idx} />
         )
       })}
     </Routes>
