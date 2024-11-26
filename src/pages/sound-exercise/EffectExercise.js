@@ -11,7 +11,7 @@ import {
   Container,
   RingProgress,
 } from '@mantine/core';
-import { IconPlayerPlay, IconVolume, IconRefresh, IconMusicOff, IconArrowRight, IconPlayerPlayFilled, IconPlayerPauseFilled, IconPlayerPause } from '@tabler/icons-react';
+import { IconVolume, IconRefresh, IconArrowRight, IconPlayerPlayFilled, IconPlayerPauseFilled, IconPlayerPause } from '@tabler/icons-react';
 import Frame from '../Frame';
 import { getRandomAudio } from '../AudioPicker';
 
@@ -126,6 +126,11 @@ function EffectExercise() {
       setCurrentEffect(null);
       setShowFeedback(false);
     }
+  };
+
+  const startOver = () => {
+    setScore({ correct: 0, total: 0 });
+    generateNewEffect();
   };
 
   const stopCurrentSound = () => {
@@ -337,29 +342,33 @@ function EffectExercise() {
               {showFeedback && (
                 <Alert
                   color={selectedEffect?.name === currentEffect?.name ? "green" : "red"}
-                  title={selectedEffect?.name === currentEffect?.name ? "Correct!" : "Not quite!"}
+                  title={<Text fw={700} size="lg">{selectedEffect?.name === currentEffect?.name ? "Correct!" : "Not quite!"}</Text>}
                 >
-                  The effect was {currentEffect?.name}.
-                  {selectedEffect?.name !== currentEffect?.name && 
-                    ` Listen for ${currentEffect?.description.toLowerCase()}`}
+                    <Text fw={500} size="md" mt={4}>
+                        The effect was {currentEffect?.name}.
+                        {selectedEffect?.name !== currentEffect?.name && 
+                            ` Listen for ${currentEffect?.description.toLowerCase()}`}
+                    </Text>
                 </Alert>
               )}
 
               {score.total >= TotalScore && (
                 <Alert
                   color="green"
-                  title={"Finished!"}
+                  title={<Text fw={700} size="lg">Finished!</Text>}
                 >
-                  All {TotalScore} Questions are finished.
-                  Your score is {score.correct}/{score.total}!!!
+                    <Text fw={500} size="md" mt={4}>
+                        All {TotalScore} Questions are finished.
+                        Your score is {score.correct}/{score.total}!!!
+                    </Text>
                 </Alert>
               )}
 
               <Button
-                onClick={generateNewEffect}
+                onClick={score.total < TotalScore ? generateNewEffect : startOver}
                 disabled={!showFeedback}
                 rightSection={score.total >= TotalScore ? <IconRefresh size={20} /> : <IconArrowRight size={20} />}
-                variant="light"
+                variant={score.total < TotalScore ? "light" : "filled"}
                 fullWidth
               >
                 {score.total >= TotalScore ? "Start Over" : "Next Sound"}
