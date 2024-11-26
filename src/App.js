@@ -7,7 +7,7 @@ import SoundExercise from './pages/sound-exercise/SoundExercise';
 import EffectExercise from './pages/sound-exercise/EffectExercise';
 import SynthExercise from './pages/synth-exercise/SynthExercise';
 import AmplitudeExercise from './pages/sound-exercise/AmplitudeExercise';
-import EQExercise from './pages/synth-exercise/EQExercise';
+import EQExercise from './pages/synth-exercise/EQExercise/EQExercise.js';
 import PanningExercise from './pages/synth-exercise/PanningExercise/PanningExercise';
 import PanningExerciseSetup from './pages/synth-exercise/PanningExercise/PanningExerciseSetup';
 function App() {
