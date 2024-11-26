@@ -2,7 +2,7 @@ import * as math from "mathjs";
 import { Flex } from "@mantine/core";
 import LinearPlot from "./LinearPlot";
 import LogPlot from "./LogPlot";
-import { sampling_freq, generateLogSamples, log_tick_pos } from "./helper";
+import { sampling_freq, generateLogSamples, log_tick_pos } from "../eq_helper";
 
 // x_bounds must be divisible by x_tick
 function MathPlot({ expr = '0', x_bounds = { min: 0, max: 5 }, y_bounds = { min: 0, max: 1 }, x_tick = 1, y_tick = 1, curve_name = 'curve', log_scale = false }) {
@@ -12,7 +12,7 @@ function MathPlot({ expr = '0', x_bounds = { min: 0, max: 5 }, y_bounds = { min:
   const sample_size = sampling_freq * x_intervals;
   const x_values = log_scale ? generateLogSamples() : Array.from({ length: sample_size }, (val, idx) => (x_bounds.min + idx * x_intervals * x_tick / sample_size)); // generate linear scale and log scale samples separately
   const y_values = x_values.map(x => math.evaluate(expr, { x }));
-  console.log(x_values);
+  // console.log(x_values);
   // Create data separately
   const linear_data = {
     datasets: [
