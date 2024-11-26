@@ -38,7 +38,7 @@ function Frame({ children }) {
           <NavLink href='#/MixingEq' label='Eq1' />
           <NavLink href='#/SynthQ2' label='Eq2' />
           <NavLink href='#/SoundAmplitude' label='Amplitude' />
-          <NavLink href='#/TrackPanning' label='Panning' />
+          <NavLink href='#/PanningExercise/setup' label='Panning' />
         </NavLink>
       </AppShell.Navbar>
       <AppShell.Main>

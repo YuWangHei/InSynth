@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import Frame from '../Frame';
+import { useNavigate, useLocation } from 'react-router-dom';
+import Frame from '../../Frame';
 import {
     Title,
     Button,
@@ -10,11 +11,24 @@ import {
     Alert,
     Space
 } from '@mantine/core';
-import { IconVolume, IconPlayerPlayFilled, IconPlayerPauseFilled, IconPlayerPause, IconRefresh, IconArrowRight } from '@tabler/icons-react';
+import { IconVolume, IconPlayerPlayFilled, IconPlayerPauseFilled, IconPlayerPause, IconRefresh, IconArrowRight, IconMusic } from '@tabler/icons-react';
 import './PanningExercise.css';
-import { getRandomAudio } from '../AudioPicker';
+import { getRandomAudio } from '../../AudioPicker';
 
 export default function PanningExercise() {
+    const navigate = useNavigate();
+    const location = useLocation();
+    // Get parameters from navigation state, with fallback defaults
+    const { 
+        difficulty = 'Easy', 
+        maxQuestions = 3 
+    } = location.state || {};
+
+    const DIFFICULTY_CONFIG = {
+        'Easy': 0.2,
+        'Hard': 0.15
+    };
+
     const [currentPan, setCurrentPan] = useState(0);
     const [isPlayingOriginal, setIsPlayingOriginal] = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
@@ -28,11 +42,17 @@ export default function PanningExercise() {
     const [showAnswer, setShowAnswer] = useState(false);
     const [correct, setCorrect] = useState(null);
 
-  
-    const RANGE_WIDTH = 0.17;
-    const MAX_SCORE = 3;
+    
+    const RANGE_WIDTH = DIFFICULTY_CONFIG[difficulty];
+    const MAX_SCORE = maxQuestions;
 
+    
     useEffect(() => {
+        // Return to setup if no parameters passed
+        if (!location.state) {
+            navigate('/panning-exercise/setup');
+        }
+
         generateNewPanning();
         // Initialize audio context and load sample
         const initAudio = async () => {
@@ -50,7 +70,7 @@ export default function PanningExercise() {
             audioContextRef.current.close();
           }
         };
-      }, []);
+      }, [location.state, navigate]);
 
     const generateNewPanning = () => {
         // Stop any existing audio source
@@ -227,13 +247,22 @@ export default function PanningExercise() {
         setHoverPosition(null);
     };
 
+    const handleBackToSetup = () => {
+        navigate('/PanningExercise/setup');
+    };
+
     return (
         <Frame>
             <Container size="md" px="md">
                 <Stack spacing="lg" align='center'>
-                    <Title order={1} align='center'>Panning Exercise</Title>
-                    <div className="panning-exercise">
-                        <div className="header">
+                    <Title order={1} align='center'>
+                        Panning Exercise 
+                        <Text size="md" fs={700} c="dimmed">
+                            {difficulty} Mode | {MAX_SCORE} Questions
+                        </Text>
+                    </Title>
+                        <div className="panning-exercise">
+                            <div className="header">
                             <div ></div>
                             <div className="score"><Text fw={700} size="lg" mt={4}>SCORE: {score.total} / {MAX_SCORE}</Text>  </div>
                         </div>
@@ -349,7 +378,6 @@ export default function PanningExercise() {
                         {currentPan}
                       </Text>
                     </Group>
-                    
                 </Stack>
                 <Space h="xl" />
                 <Stack align='stretch'>
@@ -384,6 +412,14 @@ export default function PanningExercise() {
                         fullWidth
                     >
                         {score.total >= MAX_SCORE ? "Start Over" : "Next Stage"}
+                    </Button>
+                    <Button 
+                        onClick={handleBackToSetup}
+                        color="blue"
+                        variant="light"
+                        rightSection={<IconMusic size={20} />}
+                    >
+                        Change Settings
                     </Button>
                 </Stack>
             </Container>
