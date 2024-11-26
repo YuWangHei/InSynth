@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Frame from '../Frame';
 import styled from 'styled-components';
-import { getRandomAudio } from '../AudioPicker';
+import { getRandomAudio } from '../../Music/AudioPicker';
 import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,

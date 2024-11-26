@@ -13,15 +13,15 @@ import {
 } from '@mantine/core';
 import { IconVolume, IconPlayerPlayFilled, IconPlayerPauseFilled, IconPlayerPause, IconRefresh, IconArrowRight, IconMusic } from '@tabler/icons-react';
 import './PanningExercise.css';
-import { getRandomAudio } from '../../AudioPicker';
+import { getRandomAudio } from '../../../Music/AudioPicker';
 
 export default function PanningExercise() {
     const navigate = useNavigate();
     const location = useLocation();
     // Get parameters from navigation state, with fallback defaults
-    const { 
-        difficulty = 'Easy', 
-        maxQuestions = 3 
+    const {
+        difficulty = 'Easy',
+        maxQuestions = 3
     } = location.state || {};
 
     const DIFFICULTY_CONFIG = {
@@ -42,11 +42,11 @@ export default function PanningExercise() {
     const [showAnswer, setShowAnswer] = useState(false);
     const [correct, setCorrect] = useState(null);
 
-    
+
     const RANGE_WIDTH = DIFFICULTY_CONFIG[difficulty];
     const MAX_SCORE = maxQuestions;
 
-    
+
     useEffect(() => {
         // Return to setup if no parameters passed
         if (!location.state) {
@@ -56,21 +56,21 @@ export default function PanningExercise() {
         generateNewPanning();
         // Initialize audio context and load sample
         const initAudio = async () => {
-          audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
-    
-          const audioFile = getRandomAudio();
-          const response = await fetch(audioFile);
-          const arrayBuffer = await response.arrayBuffer();
-          audioBufferRef.current = await audioContextRef.current.decodeAudioData(arrayBuffer);
+            audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
+
+            const audioFile = getRandomAudio();
+            const response = await fetch(audioFile);
+            const arrayBuffer = await response.arrayBuffer();
+            audioBufferRef.current = await audioContextRef.current.decodeAudioData(arrayBuffer);
         };
         initAudio();
-    
+
         return () => {
-          if (audioContextRef.current) {
-            audioContextRef.current.close();
-          }
+            if (audioContextRef.current) {
+                audioContextRef.current.close();
+            }
         };
-      }, [location.state, navigate]);
+    }, [location.state, navigate]);
 
     const generateNewPanning = () => {
         // Stop any existing audio source
@@ -99,138 +99,138 @@ export default function PanningExercise() {
 
     const stopCurrentSound = () => {
         if (currentSourceRef.current) {
-          try {
-            currentSourceRef.current.stop();
-          } catch (e) {
-            console.log('Error stopping source:', e);
-          }
-          currentSourceRef.current.disconnect();
-          currentSourceRef.current = null;
+            try {
+                currentSourceRef.current.stop();
+            } catch (e) {
+                console.log('Error stopping source:', e);
+            }
+            currentSourceRef.current.disconnect();
+            currentSourceRef.current = null;
         }
         setIsPlaying(false);
         setIsPlayingOriginal(false);
-      };
+    };
 
-      const playOriginalSound = async () => {
+    const playOriginalSound = async () => {
         if (!audioContextRef.current || !audioBufferRef.current) return;
-        
+
         // If already playing original sound, stop it
         if (isPlayingOriginal) {
             stopCurrentSound();
             return;
         }
-        
+
         // Stop any currently playing sound
         stopCurrentSound();
-        
+
         if (audioContextRef.current.state === 'suspended') {
-          await audioContextRef.current.resume();
+            await audioContextRef.current.resume();
         }
-    
+
         setIsPlayingOriginal(true);
         setIsPlaying(false);
-    
+
         const source = audioContextRef.current.createBufferSource();
         source.buffer = audioBufferRef.current;
         currentSourceRef.current = source;
-    
+
         const gainNode = audioContextRef.current.createGain();
         gainNode.gain.value = 0.7;
-    
+
         source.connect(gainNode);
         gainNode.connect(audioContextRef.current.destination);
-    
-        source.start(0);
-      };
 
-      const handlePlay = async () => {
+        source.start(0);
+    };
+
+    const handlePlay = async () => {
         if (!audioContextRef.current || !audioBufferRef.current) return;
-        
+
         // If already playing effected sound, stop it
         if (isPlaying) {
             stopCurrentSound();
             return;
         }
-    
+
         stopCurrentSound();
-    
+
         if (audioContextRef.current.state === 'suspended') {
             await audioContextRef.current.resume();
         }
-    
+
         setIsPlaying(true);
         setIsPlayingOriginal(false);
-    
-    
+
+
         // Create audio source
         const source = audioContextRef.current.createBufferSource();
         source.buffer = audioBufferRef.current;
         currentSourceRef.current = source;
-    
-    
+
+
         // Create gain node for final output
         const gainNode = audioContextRef.current.createGain();
         gainNode.gain.value = 0.7; // Prevent clipping
-    
+
         // Create and play new audio source with panning
         try {
             // Create a stereo panner node
             const pannerNode = audioContextRef.current.createStereoPanner();
-            
+
             // Set the pan value (-1 for full left, 0 for center, 1 for full right)
             pannerNode.pan.value = currentPan; // Assuming currentPan is your pan value state
-        
+
             // Connect the audio nodes
             source.connect(pannerNode);
             pannerNode.connect(gainNode);
             gainNode.connect(audioContextRef.current.destination);
-        
+
             // Play the sound
             source.start(0);
-        
+
             // Optional: Store the panner node reference if you need to modify it later
             currentPannerRef.current = pannerNode;
-        
+
         } catch (error) {
             console.error('Error setting up audio panning:', error);
             setIsPlaying(false);
             currentSourceRef.current = null;
         }
-        
-      };
-    
+
+    };
+
 
     const handlePanningGuess = (event) => {
         const container = event.currentTarget;
         const rect = container.getBoundingClientRect();
         const x = event.clientX - rect.left;
         const width = rect.width;
-        
+
         const panValue = (x / width) * 2 - 1;
         setUserGuess(panValue);
         setShowAnswer(true);
-        
+
         // Score based on accuracy
         // points is earned if panValue is within RANGE_WIDTH of currentPan
-        const isWithinRange = 
-            currentPan >= panValue - RANGE_WIDTH && 
+        const isWithinRange =
+            currentPan >= panValue - RANGE_WIDTH &&
             currentPan <= panValue + RANGE_WIDTH;
-        
+
         const pointsEarned = isWithinRange ? 1 : 0;
 
         if (isWithinRange) {
             setScore(prev => ({
-              correct: prev.correct + 1,
-              total: prev.total + 1
+                correct: prev.correct + 1,
+                total: prev.total + 1
             }));
             setCorrect(true);
-          } else {
+        } else {
             setScore(prev => ({
-              ...prev,
-              total: prev.total + 1
+                ...prev,
+                total: prev.total + 1
             }));
             setCorrect(false);
-          }
+        }
 
     };
 
@@ -256,19 +256,19 @@ export default function PanningExercise() {
             <Container size="md" px="md">
                 <Stack spacing="lg" align='center'>
                     <Title order={1} align='center'>
-                        Panning Exercise 
+                        Panning Exercise
                         <Text size="md" fs={700} c="dimmed">
                             {difficulty} Mode | {MAX_SCORE} Questions
                         </Text>
                     </Title>
-                        <div className="panning-exercise">
-                            <div className="header">
+                    <div className="panning-exercise">
+                        <div className="header">
                             <div ></div>
                             <div className="score"><Text fw={700} size="lg" mt={4}>SCORE: {score.total} / {MAX_SCORE}</Text>  </div>
                         </div>
 
-                        <div 
-                            className="panning-container" 
+                        <div
+                            className="panning-container"
                             onClick={userGuess === null ? handlePanningGuess : undefined}
                             onMouseMove={userGuess === null ? handleMouseMove : undefined}
                             onMouseLeave={handleMouseLeave}
@@ -281,7 +281,7 @@ export default function PanningExercise() {
 
                             {userGuess !== null && (
                                 <>
-                                    <div 
+                                    <div
                                         className="guess-range"
                                         style={{
                                             position: 'absolute',
@@ -292,7 +292,7 @@ export default function PanningExercise() {
                                             pointerEvents: 'none'
                                         }}
                                     />
-                                    <div 
+                                    <div
                                         className="guess-marker"
                                         style={{ left: `${((userGuess + 1) / 2) * 100}%` }}
                                     >
@@ -303,41 +303,41 @@ export default function PanningExercise() {
 
                             {showAnswer && (
                                 <>
-                                    <div 
+                                    <div
                                         className="answer-marker"
-                                    style={{ 
-                                        left: `${((currentPan + 1) / 2) * 100}%`,
-                                        backgroundColor: correct? 'rgba(48, 254, 32, 1)' : "red"
-                                    }}
+                                        style={{
+                                            left: `${((currentPan + 1) / 2) * 100}%`,
+                                            backgroundColor: correct ? 'rgba(48, 254, 32, 1)' : "red"
+                                        }}
                                     >
                                         {currentPan.toFixed(3)}
                                     </div>
                                 </>
-                                )}
+                            )}
 
-                        {hoverPosition !== null && userGuess === null && score.total < MAX_SCORE && (
-                            <> 
-                                <div 
-                                    className="guess-range"
-                                    style={{
-                                        position: 'absolute',
-                                        left: `${((hoverPosition - RANGE_WIDTH + 1) / 2) * 100}%`,
-                                        width: `${RANGE_WIDTH * 100}%`,
-                                        height: '100%',
-                                        backgroundColor: 'rgba(180, 180, 180, 0.2)',
-                                        pointerEvents: 'none'
-                                    }}
-                                />
-                                <div 
-                                    className="hover-marker"
-                                    style={{ 
-                                        left: `${((hoverPosition + 1) / 2) * 100}%` 
-                                    }}
-                                    title={hoverPosition.toFixed(3)}
-                                >
-                                </div>
-                            </>
-                        )}
+                            {hoverPosition !== null && userGuess === null && score.total < MAX_SCORE && (
+                                <>
+                                    <div
+                                        className="guess-range"
+                                        style={{
+                                            position: 'absolute',
+                                            left: `${((hoverPosition - RANGE_WIDTH + 1) / 2) * 100}%`,
+                                            width: `${RANGE_WIDTH * 100}%`,
+                                            height: '100%',
+                                            backgroundColor: 'rgba(180, 180, 180, 0.2)',
+                                            pointerEvents: 'none'
+                                        }}
+                                    />
+                                    <div
+                                        className="hover-marker"
+                                        style={{
+                                            left: `${((hoverPosition + 1) / 2) * 100}%`
+                                        }}
+                                        title={hoverPosition.toFixed(3)}
+                                    >
+                                    </div>
+                                </>
+                            )}
                         </div>
 
                         <div className="panning-labels">
@@ -353,7 +353,7 @@ export default function PanningExercise() {
                             variant="filled"
                             color="green"
                             size='lg'
-                        >   
+                        >
                             {isPlayingOriginal ? 'Playing Original...' : 'Play Original'}
                         </Button>
                         <Button
@@ -371,23 +371,23 @@ export default function PanningExercise() {
                             color="rgba(255, 18, 18, 1)"
                             size='lg'
                             rightSection={!isPlaying && !isPlayingOriginal ? <IconPlayerPauseFilled size={20} /> : <IconPlayerPause size={20} />}
-                        >   
+                        >
                             {"Pause"}
                         </Button>
                         <Text size="xs" mt={4} c="dimmed">
-                        {currentPan}
-                      </Text>
+                            {currentPan}
+                        </Text>
                     </Group>
                 </Stack>
                 <Space h="xl" />
                 <Stack align='stretch'>
                     {showAnswer && (
                         <Alert
-                        color={correct? "green" : "red"}
-                        title={<Text fw={700} size="lg">{correct? "Correct!" : "Not quite!"}</Text>}
+                            color={correct ? "green" : "red"}
+                            title={<Text fw={700} size="lg">{correct ? "Correct!" : "Not quite!"}</Text>}
                         >
                             <Text fw={500} size="md" mt={4}>
-                                {!correct && 
+                                {!correct &&
                                     ` The sound was panned to ${currentPan}.`}
                             </Text>
                         </Alert>
@@ -413,7 +413,7 @@ export default function PanningExercise() {
                     >
                         {score.total >= MAX_SCORE ? "Start Over" : "Next Stage"}
                     </Button>
-                    <Button 
+                    <Button
                         onClick={handleBackToSetup}
                         color="blue"
                         variant="light"

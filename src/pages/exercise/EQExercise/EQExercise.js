@@ -3,7 +3,7 @@ import Frame from "../../Frame";
 import EQStatic from "./partial/EQStatic";
 import EQMenu from "./partial/EQMenu";
 import EQParametric from "./partial/EQParametric";
-import { getRandomAudio } from "../../AudioPicker";
+import { getRandomAudio } from "../../../Music/AudioPicker";
 
 function EQExercise() {
   const [inMenu, setInMenu] = useState(true);
