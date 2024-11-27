@@ -1,14 +1,15 @@
 {
   "files": {
-    "main.css": "/InSynth/static/css/main.84ef1392.css",
-    "main.js": "/InSynth/static/js/main.1bba7d37.js",
-    "static/media/NokiaRingTone.mp3": "/InSynth/static/media/NokiaRingTone.96f7a0f9a914c53155fd.mp3",
+    "main.css": "/InSynth/static/css/main.6fdc1da0.css",
+    "main.js": "/InSynth/static/js/main.f87985a8.js",
+    "static/media/Bad_Chick_cropped.wav": "/InSynth/static/media/Bad_Chick_cropped.7430cbcd4603e547c3fd.wav",
+    "static/media/Mineral_cropped.wav": "/InSynth/static/media/Mineral_cropped.b9286d73b0221e738cc0.wav",
     "index.html": "/InSynth/index.html",
-    "main.84ef1392.css.map": "/InSynth/static/css/main.84ef1392.css.map",
-    "main.1bba7d37.js.map": "/InSynth/static/js/main.1bba7d37.js.map"
+    "main.6fdc1da0.css.map": "/InSynth/static/css/main.6fdc1da0.css.map",
+    "main.f87985a8.js.map": "/InSynth/static/js/main.f87985a8.js.map"
   },
   "entrypoints": [
-    "static/css/main.84ef1392.css",
-    "static/js/main.1bba7d37.js"
+    "static/css/main.6fdc1da0.css",
+    "static/js/main.f87985a8.js"
   ]
 }
