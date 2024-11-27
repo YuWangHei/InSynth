@@ -88,7 +88,7 @@ export default function PanningExerciseSetup() {
                         <Title order={4} mb="md">Exercise Instructions</Title>
                         <Text>
                             • Listen to the original and panned audio<br />
-                            • Click on the panning container to guess the pan position<br />
+                            • Click on the panning panel to guess the pan position<br />
                             • Get points for guesses within the selected difficulty range
                         </Text>
                     </Card>

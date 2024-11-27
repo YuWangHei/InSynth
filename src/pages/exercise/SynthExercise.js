@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Frame from '../Frame';
 import styled from 'styled-components';
-import music from './SoundSample/NokiaRingTone.mp3';
+import { getRandomAudio } from '../../Music/AudioPicker';
 import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -86,7 +86,7 @@ function SynthExercise() {
   const audioContext = useRef(null);
   const audioElement = useRef(null);
   const filters = useRef([]);
-  
+
   // Target EQ audio context and elements
   const targetAudioContext = useRef(null);
   const targetAudioElement = useRef(null);
@@ -95,11 +95,11 @@ function SynthExercise() {
   const chartRef = useRef(null);
   const isDragging = useRef(false);
   const currentDragPoint = useRef(null);
-  
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [isPlayingTarget, setIsPlayingTarget] = useState(false);
   const [isPlayingOriginal, setIsPlayingOriginal] = useState(false);
-  
+
   const frequencies = [32, 64, 125, 250, 500, 1000, 2000, 4000, 8000, 16000];
   const [eqValues, setEqValues] = useState({
     32: 0, 64: 0, 125: 0, 250: 0, 500: 0,
@@ -108,17 +108,19 @@ function SynthExercise() {
   const [targetEQ, setTargetEQ] = useState({});
   const [score, setScore] = useState(0);
 
+  const music = getRandomAudio();
+
   useEffect(() => {
     // Setup main audio context
     audioContext.current = new (window.AudioContext || window.webkitAudioContext)();
     audioElement.current = new Audio(music);
     const source = audioContext.current.createMediaElementSource(audioElement.current);
-    
+
     // Setup target audio context
     targetAudioContext.current = new (window.AudioContext || window.webkitAudioContext)();
     targetAudioElement.current = new Audio(music);
     const targetSource = targetAudioContext.current.createMediaElementSource(targetAudioElement.current);
-    
+
     // Setup main filters
     filters.current = frequencies.map(freq => {
       const filter = audioContext.current.createBiquadFilter();
@@ -169,8 +171,8 @@ function SynthExercise() {
   const calculateDbFromY = (y, rect) => {
     const height = rect.height;
     const relativeY = y - rect.top;
-    const value = Math.round(24 * (1 - relativeY / height) - 12);
-    return Math.max(-12, Math.min(12, value));
+    const value = Math.round(48 * (1 - relativeY / height) - 24);
+    return Math.max(-24, Math.min(24, value));
   };
 
   const handleEQChange = (freq, value) => {
@@ -178,7 +180,7 @@ function SynthExercise() {
       ...prev,
       [freq]: value
     }));
-    
+
     const filterIndex = frequencies.indexOf(Number(freq));
     if (filterIndex !== -1 && filters.current[filterIndex]) {
       filters.current[filterIndex].gain.value = value;
@@ -192,7 +194,7 @@ function SynthExercise() {
 
       const rect = chart.canvas.getBoundingClientRect();
       const newValue = calculateDbFromY(e.clientY, rect);
-      
+
       const freq = frequencies[currentDragPoint.current];
       handleEQChange(freq, newValue);
     }
@@ -232,8 +234,8 @@ function SynthExercise() {
     maintainAspectRatio: false,
     scales: {
       y: {
-        min: -12,
-        max: 12,
+        min: -24,
+        max: 24,
         grid: {
           color: '#444'
         },
@@ -289,7 +291,7 @@ function SynthExercise() {
     if (isPlaying) {
       await stopMain();
     }
-    
+
     if (!isPlayingOriginal) {
       if (targetAudioContext.current.state === 'suspended') {
         await targetAudioContext.current.resume();
@@ -313,7 +315,7 @@ function SynthExercise() {
     if (isPlaying) {
       await stopMain();
     }
-    
+
     if (!isPlayingTarget) {
       if (targetAudioContext.current.state === 'suspended') {
         await targetAudioContext.current.resume();
@@ -355,7 +357,7 @@ function SynthExercise() {
     if (isPlayingTarget) {
       await stopTarget();
     }
-    
+
     if (!isPlaying) {
       if (audioContext.current.state === 'suspended') {
         await audioContext.current.resume();
@@ -371,7 +373,7 @@ function SynthExercise() {
   const generateTargetEQ = () => {
     const newTargetEQ = {};
     frequencies.forEach(freq => {
-      newTargetEQ[freq] = Math.round((Math.random() * 24) - 12);
+      newTargetEQ[freq] = Math.round((Math.random() * 48) - 24);
     });
     setTargetEQ(newTargetEQ);
   };
@@ -382,7 +384,7 @@ function SynthExercise() {
     <Frame>
       <EQContainer>
         <h1>EQ Training Exercise</h1>
-        
+
         <GraphContainer>
           <Line ref={chartRef} data={chartData} options={chartOptions} />
         </GraphContainer>

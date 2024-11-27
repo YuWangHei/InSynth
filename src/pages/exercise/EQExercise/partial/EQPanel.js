@@ -1,10 +1,10 @@
 import { Flex, Group, Stack, Text } from "@mantine/core";
 import { freq_centers } from "./eq_helper";
-import VSlider from "../../../components/VSlider";
+import VSlider from "../../../../components/VSlider";
 import { useState } from "react";
 
 function EQPanel({ onChange }) {
-  const [sliderValues, setSliderValues] = useState(freq_centers.map((val, idx) => 0));
+  const [sliderValues, setSliderValues] = useState(freq_centers.map(() => 0));
 
   // Edit sliderValues onSlide
   const onSlide = (newVal, index) => {

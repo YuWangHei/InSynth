@@ -1,5 +1,5 @@
 import { Text, Button, Group } from "@mantine/core";
-import CustomContainer from "../../../components/CustomContainer";
+import CustomContainer from "../../../../components/CustomContainer";
 
 function EQMenu({ onSelect }) {
   return (
@@ -8,7 +8,7 @@ function EQMenu({ onSelect }) {
       <Text>Mode 2: Adjust the given filters to simulate the target.</Text>
       <Group>
         <Button onClick={() => onSelect(true)}>Start Mode 1!</Button>
-        <Button onClick={() => onSelect(false)}>Start Mode 2!</Button>
+        <Button disabled={true} onClick={() => onSelect(false)}>Coming Soon!</Button>
       </Group>
     </CustomContainer>
   )

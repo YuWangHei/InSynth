@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Container, Stack, Select, Card, Title, Text } from '@mantine/core';
 import { IconArrowRight } from '@tabler/icons-react';
-import Frame from '../Frame';
+import Frame from '../../Frame';
 
 function AmplitudeExerciseSetup() {
     const [difficulty, setDifficulty] = useState('Easy');
@@ -10,11 +10,11 @@ function AmplitudeExerciseSetup() {
     const navigate = useNavigate();
 
     const handleStartExercise = () => {
-        navigate('/AmplitudeExercise/play', { 
-            state: { 
-                difficulty, 
-                maxQuestions 
-            } 
+        navigate('/AmplitudeExercise/play', {
+            state: {
+                difficulty,
+                maxQuestions
+            }
         });
     };
 
@@ -23,12 +23,12 @@ function AmplitudeExerciseSetup() {
             <Container size="sm" px="md">
                 <Stack spacing="lg" align='center'>
                     <Title order={1} align='center'>Amplitude Exercise Setup</Title>
-                    
-                    <Card 
-                        shadow="sm" 
-                        padding="lg" 
-                        radius="md" 
-                        withBorder 
+
+                    <Card
+                        shadow="sm"
+                        padding="lg"
+                        radius="md"
+                        withBorder
                         style={{ width: '100%' }}
                     >
                         <Stack>
@@ -55,10 +55,10 @@ function AmplitudeExerciseSetup() {
                                 ]}
                             />
 
-                            <Button 
+                            <Button
                                 onClick={handleStartExercise}
-                                fullWidth 
-                                mt="md" 
+                                fullWidth
+                                mt="md"
                                 rightSection={<IconArrowRight size={20} />}
                                 color="green"
                             >
@@ -67,11 +67,11 @@ function AmplitudeExerciseSetup() {
                         </Stack>
                     </Card>
 
-                    <Card 
-                        shadow="sm" 
-                        padding="lg" 
-                        radius="md" 
-                        withBorder 
+                    <Card
+                        shadow="sm"
+                        padding="lg"
+                        radius="md"
+                        withBorder
                         style={{ width: '100%' }}
                     >
                         <Title order={4} mb="md">Exercise Instructions</Title>

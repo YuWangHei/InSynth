@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import Frame from "../Frame";
+import Frame from "../../Frame";
 import EQStatic from "./partial/EQStatic";
 import EQMenu from "./partial/EQMenu";
 import EQParametric from "./partial/EQParametric";
-import { getRandomAudio } from "../AudioPicker";
+import { getRandomAudio } from "../../../Music/AudioPicker";
 
 function EQExercise() {
   const [inMenu, setInMenu] = useState(true);
@@ -22,7 +22,6 @@ function EQExercise() {
     setInQMode(mode);
     // Get random audio
     const random_audio = getRandomAudio();
-    console.log(random_audio);
     setAudio(random_audio);
   }
 

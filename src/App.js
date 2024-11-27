@@ -3,14 +3,14 @@ import '@mantine/core/styles.css'
 import { Route, Routes } from 'react-router-dom';
 import Home from './pages/home/Home';
 import Dashboard from './pages/dashboard/Dashboard';
-import SoundExercise from './pages/sound-exercise/SoundExercise';
-import EffectExercise from './pages/sound-exercise/EffectExercise';
-import SynthExercise from './pages/synth-exercise/SynthExercise';
-import AmplitudeExercise from './pages/sound-exercise/AmplitudeExercise';
-import EQExercise from './pages/synth-exercise/EQExercise';
-import PanningExercise from './pages/synth-exercise/PanningExercise/PanningExercise';
-import PanningExerciseSetup from './pages/synth-exercise/PanningExercise/PanningExerciseSetup';
-import AmplitudeExerciseSetup from './pages/sound-exercise/AmplitudeExerciseSetup';
+import SoundExercise from './pages/exercise/SoundExercise.js';
+import EffectExercise from './pages/exercise/EffectExercise.js';
+import SynthExercise from './pages/exercise/SynthExercise.js';
+import AmplitudeExercise from './pages/exercise/AmplitudeExercise/AmplitudeExercise.js';
+import AmplitudeExerciseSetup from './pages/exercise/AmplitudeExercise/AmplitudeExerciseSetup.js';
+import EQExercise from './pages/exercise/EQExercise/EQExercise.js';
+import PanningExercise from './pages/exercise/PanningExercise/PanningExercise.js';
+import PanningExerciseSetup from './pages/exercise/PanningExercise/PanningExerciseSetup.js';
 function App() {
   const router = [
     {
