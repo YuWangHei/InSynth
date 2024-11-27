@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { Button, Group, Text, FileButton, Container , Switch, Title} from '@mantine/core';
+import { Button, Group, Text, FileButton, Container , Switch, Title, Slider} from '@mantine/core';
 import Frame from '../Frame';
 
 function Playground() {
@@ -7,6 +7,10 @@ function Playground() {
   const [audioUrl, setAudioUrl] = useState(null);
   const audioRef = useRef(null);
   const [isInfiniteLoop, setIsInfiniteLoop] = useState(false);
+  const [gainValue, setGainValue] = useState(0);
+  const gainNodeRef = useRef(null);
+  const audioContextRef = useRef(null);
+
   const handleFileSelect = (selectedFile) => {
     if (selectedFile) {
       // Cleanup previous URL if exists
@@ -34,6 +38,15 @@ function Playground() {
       }
     };
   }, [audioUrl]);
+
+  const handleGainChange = (value) => {
+    setGainValue(value);
+    // Convert the slider value to an amplification factor
+    const amplification = Math.pow(10, value / 20); // Convert to exponential scaling
+    if (gainNodeRef.current) {
+      gainNodeRef.current.gain.setValueAtTime(amplification, audioContextRef.current.currentTime);
+    }
+  };
 
   return (
     <Frame>
@@ -84,7 +97,22 @@ function Playground() {
               {/* Add your audio processing controls */}
             </Group>
           )}
+          
         </Group>
+        <Slider
+            label="Gain"
+            min={-20}
+            max={20}
+            step={1}
+            value={gainValue}
+            onChange={handleGainChange}
+            marks={[
+              { value: -20, label: '-20dB' },
+              { value: 0, label: '0dB' },
+              { value: 20, label: '+20dB' },
+            ]}
+            styles={{ mark: { cursor: 'pointer' } }}
+          />
       </Container>
     </Frame>
   );
