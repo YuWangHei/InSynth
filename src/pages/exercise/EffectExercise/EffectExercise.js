@@ -10,26 +10,50 @@ import {
   Alert,
   Container,
   RingProgress,
+  ActionIcon
 } from '@mantine/core';
-import { IconVolume, IconRefresh, IconArrowRight, IconPlayerPlayFilled, IconPlayerPauseFilled, IconPlayerPause } from '@tabler/icons-react';
-import Frame from '../Frame';
-import { getRandomAudio } from '../../Music/AudioPicker';
+import { IconVolume, IconRefresh, IconArrowRight, IconPlayerPlayFilled, IconPlayerPauseFilled, IconPlayerPause, IconSettings } from '@tabler/icons-react';
+import Frame from '../../Frame';
+import { getRandomAudio } from '../../../Music/AudioPicker';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const TotalScore = 10;
-// Set up sound effects
+// Set up sound effects for different difficulty
+const DIFFICULTY_CONFIG = {
+  'Easy': {
+    effectStrength: 1,
+    parameterMultipliers: {
+      'Reverb': { length: 1.5, decay: 1.5 },
+      'Delay': { delayTime: 1.5, feedback: 1.5 },
+      'Compression': { threshold: 1.5, ratio: 1.5 },
+      'Distortion': { amount: 1.5 }
+    }
+  },
+  'Hard': {
+    effectStrength: 0.5,
+    parameterMultipliers: {
+      'Reverb': { length: 0.5, decay: 0.5 },
+      'Delay': { delayTime: 0.5, feedback: 0.5 },
+      'Compression': { threshold: 0.5, ratio: 0.5 },
+      'Distortion': { amount: 0.5 }
+    }
+  }
+};
+
 const effects = [
   {
     name: 'Reverb',
     description: 'Adds space and depth to the sound',
-    setup: async (audioContext) => {
+    setup: async (audioContext, difficulty) => {
+      const config = DIFFICULTY_CONFIG[difficulty];
       const convolver = audioContext.createConvolver();
-      // Create impulse response
-      const length = audioContext.sampleRate * 2; // 2 seconds
+      const length = audioContext.sampleRate * (2 * config.parameterMultipliers['Reverb'].length);
       const impulse = audioContext.createBuffer(2, length, audioContext.sampleRate);
+      
       for (let channel = 0; channel < 2; channel++) {
         const channelData = impulse.getChannelData(channel);
         for (let i = 0; i < length; i++) {
-          channelData[i] = (Math.random() * 2 - 1) * Math.exp(-i / (length / 6));
+          channelData[i] = (Math.random() * 2 - 1) * Math.exp(-i / (length / (6 * config.parameterMultipliers['Reverb'].decay)));
         }
       }
       convolver.buffer = impulse;
@@ -39,11 +63,12 @@ const effects = [
   {
     name: 'Delay',
     description: 'Creates echoing repeats of the sound',
-    setup: (audioContext) => {
+    setup: (audioContext, difficulty) => {
+      const config = DIFFICULTY_CONFIG[difficulty];
       const delay = audioContext.createDelay();
       const feedback = audioContext.createGain();
-      delay.delayTime.value = 0.3;
-      feedback.gain.value = 0.4;
+      delay.delayTime.value = 0.3 * config.parameterMultipliers['Delay'].delayTime;
+      feedback.gain.value = 0.4 * config.parameterMultipliers['Delay'].feedback;
       delay.connect(feedback);
       feedback.connect(delay);
       return delay;
@@ -52,22 +77,25 @@ const effects = [
   {
     name: 'Compression',
     description: 'Controls dynamic range',
-    setup: (audioContext) => {
+    setup: (audioContext, difficulty) => {
+      const config = DIFFICULTY_CONFIG[difficulty];
       const compressor = audioContext.createDynamicsCompressor();
-      compressor.threshold.value = -24;
-      compressor.knee.value = 30;
-      compressor.ratio.value = 12;
-      compressor.attack.value = 0.003;
-      compressor.release.value = 0.25;
+      compressor.threshold.value = -24 * config.parameterMultipliers['Compression'].threshold;
+      compressor.knee.value = 30 * config.parameterMultipliers['Compression'].knee;
+      compressor.ratio.value = 12 * config.parameterMultipliers['Compression'].ratio;
+      compressor.attack.value = 0.003 * config.parameterMultipliers['Compression'].attack;
+      compressor.release.value = 0.25 * config.parameterMultipliers['Compression'].release;
       return compressor;
     }
   },
   {
     name: 'Distortion',
     description: 'Adds harmonic saturation and grit',
-    setup: (audioContext) => {
+    setup: (audioContext, difficulty ) => {
+      const config = DIFFICULTY_CONFIG[difficulty];
       const distortion = audioContext.createWaveShaper();
-      function makeDistortionCurve(amount = 50) {
+      const amount = 50 * config.parameterMultipliers['Distortion'].amount;
+      function makeDistortionCurve(amount) {
         const n_samples = 44100;
         const curve = new Float32Array(n_samples);
         for (let i = 0; i < n_samples; ++i) {
@@ -83,6 +111,13 @@ const effects = [
 ];
 
 function EffectExercise() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { 
+    difficulty = 'Easy', 
+    maxQuestions = 10 
+  } = location.state || {};
+
   const [currentEffect, setCurrentEffect] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [score, setScore] = useState({ correct: 0, total: 0 });
@@ -95,8 +130,13 @@ function EffectExercise() {
   const currentSourceRef = useRef(null);
 
   useEffect(() => {
+    if (!location.state) {
+      navigate('/EffectExercise/setup');
+      return;
+    }
+
     generateNewEffect();
-    // Initialize audio context and load sample
+    
     const initAudio = async () => {
       audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
 
@@ -112,7 +152,7 @@ function EffectExercise() {
         audioContextRef.current.close();
       }
     };
-  }, []);
+  }, [location.state, navigate]);
 
   const generateNewEffect = () => {
     stopCurrentSound();
@@ -215,7 +255,7 @@ function EffectExercise() {
 
     // Set up effect chain
     try {
-      const effectNode = await currentEffect.setup(audioContextRef.current);
+      const effectNode = await currentEffect.setup(audioContextRef.current, difficulty);
 
       // Connect the audio nodes
       source.connect(effectNode);
@@ -255,11 +295,20 @@ function EffectExercise() {
     }
   };
 
+  const handleBackToSetup = () => {
+    navigate('/EffectExercise/setup');
+  };
+
   return (
     <Frame>
       <Container size="md" px="md">
         <Stack spacing="lg">
-          <Title order={1} align='center'>Effect Exercise</Title>
+          <Title order={1} align='center'>
+              Effect Exercise
+              <Text size="md" fs={700} c="dimmed">
+                {difficulty} Mode | {maxQuestions} Questions
+              </Text>
+            </Title>
 
           <Card shadow="sm" p="lg" radius="md" withBorder>
             <Stack spacing="md">
@@ -291,25 +340,34 @@ function EffectExercise() {
                     size='lg'
                     rightSection={!isPlaying && !isPlayingOriginal ? <IconPlayerPauseFilled size={20} /> : <IconPlayerPause size={20} />}
                   >
-                    {"Pause"}
+                    {"Stop"}
                   </Button>
+                  <ActionIcon
+                    onClick={handleBackToSetup}
+                    color="Grey"
+                    variant="filled"
+                    size='xl'
+                  >
+                    <IconSettings size={30} />
+                  </ActionIcon>
                   {/* Text for Debugging */}
                   {/* <Text size="sm" c="dimmed">
                       (isPlaying: {isPlaying.toString()}, isPlayingOriginal: {isPlayingOriginal.toString()})
                 </Text> */}
                 </Group>
                 <RingProgress
+                  size={100}
                   label={
                     <Text size="lg" ta="center">
                       {score.total}/{TotalScore}
                     </Text>
                   }
                   sections={[
-                    { value: (score.correct / TotalScore) * 100, color: 'green' },
                     { value: ((score.total - score.correct) / TotalScore) * 100, color: 'red' },
+                    { value: (score.correct / TotalScore) * 100, color: 'green' }
                   ]}
                 />
-              </Group>
+                </Group>
 
               <Grid>
                 {effects.map((effect) => (
@@ -365,14 +423,14 @@ function EffectExercise() {
               )}
 
               <Button
-                onClick={score.total < TotalScore ? generateNewEffect : startOver}
+                onClick={score.total < maxQuestions ? generateNewEffect : startOver}
                 disabled={!showFeedback}
-                rightSection={score.total >= TotalScore ? <IconRefresh size={20} /> : <IconArrowRight size={20} />}
-                variant={score.total < TotalScore ? "light" : "filled"}
+                rightSection={score.total >= maxQuestions ? <IconRefresh size={20} /> : <IconArrowRight size={20} />}
+                variant={score.total < maxQuestions ? "light" : "filled"}
                 fullWidth
               >
-                {score.total >= TotalScore ? "Start Over" : "Next Sound"}
-              </Button>
+                {score.total >= maxQuestions ? "Start Over" : "Next Sound"}
+          </Button>
             </Stack>
           </Card>
         </Stack>

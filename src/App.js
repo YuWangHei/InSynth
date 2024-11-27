@@ -4,13 +4,15 @@ import { Route, Routes } from 'react-router-dom';
 import Home from './pages/home/Home';
 import Dashboard from './pages/dashboard/Dashboard';
 import SoundExercise from './pages/exercise/SoundExercise.js';
-import EffectExercise from './pages/exercise/EffectExercise.js';
+import EffectExercise from './pages/exercise/EffectExercise/EffectExercise.js';
+import EffectExerciseSetup from './pages/exercise/EffectExercise/EffectExerciseSetup.js';
 import SynthExercise from './pages/exercise/SynthExercise.js';
 import AmplitudeExercise from './pages/exercise/AmplitudeExercise/AmplitudeExercise.js';
 import AmplitudeExerciseSetup from './pages/exercise/AmplitudeExercise/AmplitudeExerciseSetup.js';
 import EQExercise from './pages/exercise/EQExercise/EQExercise.js';
 import PanningExercise from './pages/exercise/PanningExercise/PanningExercise.js';
 import PanningExerciseSetup from './pages/exercise/PanningExercise/PanningExerciseSetup.js';
+import Playground from './pages/playground/Playground.js';
 function App() {
   const router = [
     {
@@ -22,6 +24,10 @@ function App() {
       element: <Dashboard />
     },
     {
+      path: '/Playground',
+      element: <Playground />
+    },
+    {
       path: '/SoundSynth',
       element: <SoundExercise />
     },
@@ -30,7 +36,11 @@ function App() {
       element: <SoundExercise />
     },
     {
-      path: '/SoundEffect',
+      path: '/EffectExercise/setup',
+      element: <EffectExerciseSetup />
+    },
+    {
+      path: '/EffectExercise/play',
       element: <EffectExercise />
     },
     {

@@ -1,35 +1,27 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Alert, Button, Container, Group, Paper, Stack, Switch, Text } from '@mantine/core';
-import { IconRefresh, IconArrowRight } from '@tabler/icons-react';
+import { Alert, Button, Card, Container, Group, Stack, Switch, Text, Title, RingProgress } from '@mantine/core';
+import { IconRefresh, IconArrowRight, IconPlayerPlayFilled, IconPlayerPauseFilled } from '@tabler/icons-react';
 import Frame from '../../Frame';
-import audioFile from '../../../Music/Mineral_cropped.wav'
+import { getRandomAudio } from '../../../Music/AudioPicker';
 
 function AmplitudeExercise() {
     const navigate = useNavigate();
     const location = useLocation();
     const { difficulty, maxQuestions } = location.state || {};
-    const audioRef = useRef(null);
+    const [startPlaying, setStartPlaying] = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
     const [gainValue, setGainValue] = useState(0);
     const [isOriginal, setIsOriginal] = useState(false);
 
-    const audioContextRef = useRef(new (window.AudioContext || window.webkitAudioContext)());
-    const gainNodeRef = useRef(audioContextRef.current.createGain());
+    const audioContextRef = useRef(null);
+    const audioBufferRef = useRef(null);
+    const gainNodeRef = useRef(null);
+    const sourceRef = useRef(null);
     const [result, setResult] = useState(0);
 
     const [score, setScore] = useState({ correct: 0, total: 0 });
     const MAX_SCORE = maxQuestions;
-    const generateRandomGain = () => {
-        const randomGain = Math.floor(Math.random() * 41) - 20; // Random number between -20 and 20
-        setGainValue(randomGain);
-        console.log(randomGain);
-        // Apply the new gain value
-        const amplification = Math.pow(10, randomGain / 20);
-        gainNodeRef.current.gain.setValueAtTime(amplification, audioContextRef.current.currentTime);
-
-        return randomGain;
-    };
 
     const [answer1, setAnswer1] = useState(0);
     const [answer2, setAnswer2] = useState(0);
@@ -60,32 +52,56 @@ function AmplitudeExercise() {
     };
 
     useEffect(() => {
-        let source;
-        const context = new (window.AudioContext || window.webkitAudioContext)();
-        const gain = context.createGain();
+        let source = null;
+        audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
+        gainNodeRef.current = audioContextRef.current.createGain();
 
         // Only create and connect the source when audio starts playing
-        const setupAudio = () => {
-            if (!source) {
-                source = context.createMediaElementSource(audioRef.current);
-                source.connect(gain);
-                gain.connect(context.destination);
-                gainNodeRef.current = gain;
-            }
+        const setupAudio = async () => {
+            const audioFile = getRandomAudio();
+            
+            const response = await  fetch(audioFile);
+            const arrayBuffer = await response.arrayBuffer();
+            audioBufferRef.current = await audioContextRef.current.decodeAudioData(arrayBuffer);
+            sourceRef.current = audioContextRef.current.createBufferSource();
+            sourceRef.current.buffer = audioBufferRef.current;
+
+            sourceRef.current.loop = true;
+            sourceRef.current.loopStart = 0;
+            sourceRef.current.loopEnd = audioBufferRef.current.duration;
+
+            sourceRef.current.connect(gainNodeRef.current);
+            gainNodeRef.current.connect(audioContextRef.current.destination);
+            // source = context.createMediaElementSource(audioRef.current);
+                // source.connect(gain);
+                // gain.connect(context.destination);
+                // gainNodeRef.current = gain;
         };
+        setupAudio();
 
         // Add event listener for the first play
-        audioRef.current.addEventListener('play', setupAudio, { once: true });
+        // audioRef.current.addEventListener('play', setupAudio, { once: true });
 
         nextQuestion();
 
         return () => {
-            if (source) {
-                source.disconnect();
-                gain.disconnect();
+            if (audioContextRef.current) {
+                audioContextRef.current.close();
             }
         };
     }, []);
+
+    const generateRandomGain = () => {
+        const randomGain = Math.floor(Math.random() * 41) - 20; // Random number between -20 and 20
+        setGainValue(randomGain);
+        console.log(randomGain);
+        // Apply the new gain value
+        const amplification = Math.pow(10, randomGain / 20);
+        // gainNodeRef.current.gain.setValueAtTime(amplification, audioContextRef.current.currentTime);
+        gainNodeRef.current.gain.setValueAtTime(amplification, audioContextRef.current.currentTime);
+
+        return randomGain;
+    };
 
     const handleGainChange = (event) => {
         const newGainValue = event.target.value;
@@ -96,11 +112,22 @@ function AmplitudeExercise() {
     };
 
     const togglePlay = async () => {
+        if (!startPlaying) {
+            setStartPlaying(true);
+            sourceRef.current.start(0);
+        }
         if (isPlaying) {
-            audioRef.current.pause();
+            // audioRef.current.pause();
+            gainNodeRef.current.gain.setValueAtTime(0, audioContextRef.current.currentTime);
         } else {
-            await audioContextRef.current.resume();
-            audioRef.current.play();
+            // await audioContextRef.current.resume();
+            // audioRef.current.play();
+            if (!isOriginal) {
+                const amplification = Math.pow(10, gainValue / 20);
+                gainNodeRef.current.gain.setValueAtTime(amplification, audioContextRef.current.currentTime);
+            } else {
+                gainNodeRef.current.gain.setValueAtTime(1, audioContextRef.current.currentTime);
+            }
         }
         setIsPlaying(!isPlaying);
     };
@@ -138,29 +165,61 @@ function AmplitudeExercise() {
 
     return (
         <Frame>
-            <Container size="lg" mt="xl">
-                <Paper shadow="md" p="xl" radius="md" align="center">
-                    <audio ref={audioRef} src={audioFile} loop />
-                    <Stack style={{ width: '50%' }}>
-                        <Button onClick={togglePlay}>
-                            {isPlaying ? 'Pause' : 'Play'}
-                        </Button>
-                        <Group justify="center" grow wrap="nowrap">
-                            <Button onClick={() => handleAnswer(answer1)}>{answer1}</Button>
-                            <Button onClick={() => handleAnswer(answer2)}>{answer2}</Button>
-                        </Group>
-                        {/* </Stack>
+            <Container size="md" mt="md">
+                <Stack spacing="lg" >
+                    <Title order={1} align='center'>Amplitude Exercise</Title>
+                    <Card shadow="md" p="lg" radius="md" withBorder>
+                        
+                        <Stack spacing="md">
+                            <Group position="apart" justify="space-between" align="center">
+                                <Button 
+                                    onClick={togglePlay}
+                                    rightSection={isPlaying ? <IconPlayerPauseFilled size={20} /> : <IconPlayerPlayFilled size={20} />}
+                                    size='lg'
+                                    color={isPlaying ? 'red' : 'green'}
+                                >
+                                    {isPlaying ? 'Pause' : 'Play'}
+                                </Button>
+                                <RingProgress
+                                    size={100}
+                                    label={
+                                        <Text size="lg" ta="center">
+                                        {score.total}/{MAX_SCORE}
+                                        </Text>
+                                    }
+                                    sections={[
+                                        { value: ((score.total - score.correct) / MAX_SCORE) * 100, color: 'red' },
+                                    { value: (score.correct / MAX_SCORE) * 100, color: 'green' }
+                                ]}
+                            />
+                            </Group>
+                            
+                            <Group justify="center" grow wrap="nowrap">
+                                <Button 
+                                    onClick={() => handleAnswer(answer1)} 
+                                    variant="outline" 
+                                    color="blue" 
+                                    radius="lg"
+                                    h={100}
+                                >
+                                    <Text size="xl" weight={500} fw={700}>{answer1 + " dB"}</Text>
+                                </Button>
+                                <Button 
+                                    onClick={() => handleAnswer(answer2)} 
+                                    variant="outline" 
+                                    color="blue" 
+                                    radius="lg" 
+                                    h={100}
+                                >
+                                    <Text size="xl" weight={500} fw={700}>{answer2 + " dB"}</Text>
+                                </Button>
+                            </Group>
 
-                    <Stack> */}
                         {hasAnswered && (
                             <Alert
                                 color={result ? "green" : "red"}
                                 title={<Text fw={700} size="lg">{result ? "Correct!" : "Not quite!"}</Text>}
                             >
-                                {/* <Text fw={500} size="md" mt={4}>
-                                {!correct && 
-                                    ` The sound was panned to ${currentPan}.`}
-                            </Text> */}
                             </Alert>
                         )}
 
@@ -185,7 +244,6 @@ function AmplitudeExercise() {
                         >
                             {score.total >= MAX_SCORE ? "Start Over" : "Next Stage"}
                         </Button>
-                    </Stack>
                     {/* {hasAnswered && <Button onClick={nextQuestion}>Next Question</Button>} */}
                     <Switch
                         checked={isOriginal}
@@ -200,7 +258,13 @@ function AmplitudeExercise() {
                             }
                         }}
                     />
-                </Paper>
+                    {/* Text for Debugging */}
+                    <Text size="sm" c="dimmed">
+                        (gainValue: {gainValue})
+                        </Text>
+                    </Stack>
+                    </Card>
+                </Stack>
             </Container>
         </Frame>
     );

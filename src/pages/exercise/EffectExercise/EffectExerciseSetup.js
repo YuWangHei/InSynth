@@ -12,14 +12,13 @@ import {
 } from '@mantine/core';
 import { IconArrowRight } from '@tabler/icons-react';
 
-// Setup Page Component
-export default function PanningExerciseSetup() {
+export default function EffectExerciseSetup() {
     const [difficulty, setDifficulty] = useState('Easy');
-    const [maxQuestions, setMaxQuestions] = useState(3);
+    const [maxQuestions, setMaxQuestions] = useState(10);
     const navigate = useNavigate();
 
     const handleStartExercise = () => {
-        navigate('/PanningExercise/play', { 
+        navigate('/EffectExercise/play', { 
             state: { 
                 difficulty, 
                 maxQuestions 
@@ -31,7 +30,7 @@ export default function PanningExerciseSetup() {
         <Frame>
             <Container size="sm" px="md">
                 <Stack spacing="lg" align='center'>
-                    <Title order={1} align='center'>Panning Exercise Setup</Title>
+                    <Title order={1} align='center'>Effect Exercise Setup</Title>
                     
                     <Card 
                         shadow="sm" 
@@ -43,26 +42,26 @@ export default function PanningExerciseSetup() {
                         <Stack>
                             <Select
                                 label="Difficulty"
-                                description="Choose how precise your panning guess needs to be"
+                                description="Choose how subtle the effect will be"
                                 value={difficulty}
                                 onChange={setDifficulty}
                                 allowDeselect={false}
                                 data={[
-                                    { value: 'Easy', label: 'Easy (Wider Range)' },
-                                    { value: 'Hard', label: 'Hard (Narrow Range)' }
+                                    { value: 'Easy', label: 'Easy (More Obvious Effects)' },
+                                    { value: 'Hard', label: 'Hard (Subtle Effects)' }
                                 ]}
                             />
 
                             <Select
                                 label="Number of Questions"
-                                description="Select how many panning challenges you want to complete"
+                                description="Select how many effect challenges you want to complete"
                                 value={maxQuestions.toString()}
                                 onChange={(value) => setMaxQuestions(Number(value))}
                                 allowDeselect={false}
                                 data={[
-                                    { value: '3', label: '3 Questions' },
-                                    { value: '5', label: '5 Questions' },
-                                    { value: '10', label: '10 Questions' }
+                                    { value: '10', label: '10 Questions' },
+                                    { value: '15', label: '15 Questions' },
+                                    { value: '20', label: '20 Questions' }
                                 ]}
                             />
 
@@ -73,7 +72,7 @@ export default function PanningExerciseSetup() {
                                 rightSection={<IconArrowRight size={20} />}
                                 color="green"
                             >
-                                Start Panning Exercise
+                                Start Effect Exercise
                             </Button>
                         </Stack>
                     </Card>
@@ -87,9 +86,9 @@ export default function PanningExerciseSetup() {
                     >
                         <Title order={4} mb="md">Exercise Instructions</Title>
                         <Text>
-                            • Listen to the original and panned audio<br />
-                            • Click on the panning panel to guess the pan position<br />
-                            • Get points for guesses within the selected difficulty range
+                            • Listen to the original and effected audio<br />
+                            • Guess which audio effect was applied<br />
+                            • Try to identify the effect by ear
                         </Text>
                     </Card>
                 </Stack>
