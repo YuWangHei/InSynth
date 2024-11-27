@@ -167,7 +167,12 @@ function AmplitudeExercise() {
         <Frame>
             <Container size="md" mt="md">
                 <Stack spacing="lg" >
-                    <Title order={1} align='center'>Amplitude Exercise</Title>
+                    <Title order={1} align='center'>
+                        Amplitude Exercise
+                        <Text size="md" fs={700} c="dimmed">
+                            {difficulty} Mode | {MAX_SCORE} Questions
+                        </Text>
+                    </Title>
                     <Card shadow="md" p="lg" radius="md" withBorder>
                         
                         <Stack spacing="md">
@@ -245,10 +250,11 @@ function AmplitudeExercise() {
                             {score.total >= MAX_SCORE ? "Start Over" : "Next Stage"}
                         </Button>
                     {/* {hasAnswered && <Button onClick={nextQuestion}>Next Question</Button>} */}
+                    <Group>
+                    <span>Original</span>
                     <Switch
                         checked={isOriginal}
                         onChange={() => toggleOriginal(gainValue)}
-                        label={isOriginal ? "Original" : "Edited"}
                         color="blue"
                         size="md"
                         styles={{
@@ -258,6 +264,8 @@ function AmplitudeExercise() {
                             }
                         }}
                     />
+                    <span>Edited</span>
+                    </Group>
                     {/* Text for Debugging */}
                     <Text size="sm" c="dimmed">
                         (gainValue: {gainValue})
