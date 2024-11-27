@@ -1,18 +1,20 @@
 {
   "files": {
     "main.css": "/InSynth/static/css/main.5710eb47.css",
-    "main.js": "/InSynth/static/js/main.d73ffe04.js",
+    "main.js": "/InSynth/static/js/main.907c307d.js",
     "static/media/Bad_Chick_cropped.wav": "/InSynth/static/media/Bad_Chick_cropped.7430cbcd4603e547c3fd.wav",
+    "static/media/Winter_cropped.wav": "/InSynth/static/media/Winter_cropped.a561e02396ddbb2a1e51.wav",
+    "static/media/Born_Free_cropped.wav": "/InSynth/static/media/Born_Free_cropped.f47edde45c7bce1a3595.wav",
     "static/media/Mineral_cropped.wav": "/InSynth/static/media/Mineral_cropped.b9286d73b0221e738cc0.wav",
     "static/media/homebg3Blurred.png": "/InSynth/static/media/homebg3Blurred.1d5f35f33a2a1a29c1dd.png",
     "static/media/homebg5.jpeg": "/InSynth/static/media/homebg5.456dd6e9079bfb39b717.jpeg",
     "static/media/homebg4.jpeg": "/InSynth/static/media/homebg4.0427b0ba56ef82185c98.jpeg",
     "index.html": "/InSynth/index.html",
     "main.5710eb47.css.map": "/InSynth/static/css/main.5710eb47.css.map",
-    "main.d73ffe04.js.map": "/InSynth/static/js/main.d73ffe04.js.map"
+    "main.907c307d.js.map": "/InSynth/static/js/main.907c307d.js.map"
   },
   "entrypoints": [
     "static/css/main.5710eb47.css",
-    "static/js/main.d73ffe04.js"
+    "static/js/main.907c307d.js"
   ]
 }
