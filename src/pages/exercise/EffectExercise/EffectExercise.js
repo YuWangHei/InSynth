@@ -81,10 +81,10 @@ const effects = [
       const config = DIFFICULTY_CONFIG[difficulty];
       const compressor = audioContext.createDynamicsCompressor();
       compressor.threshold.value = -24 * config.parameterMultipliers['Compression'].threshold;
-      compressor.knee.value = 30 * config.parameterMultipliers['Compression'].knee;
+      compressor.knee.value = 30;
       compressor.ratio.value = 12 * config.parameterMultipliers['Compression'].ratio;
-      compressor.attack.value = 0.003 * config.parameterMultipliers['Compression'].attack;
-      compressor.release.value = 0.25 * config.parameterMultipliers['Compression'].release;
+      compressor.attack.value = 0.003 ;
+      compressor.release.value = 0.25;
       return compressor;
     }
   },
@@ -104,7 +104,7 @@ const effects = [
         }
         return curve;
       }
-      distortion.curve = makeDistortionCurve();
+      distortion.curve = makeDistortionCurve(amount);
       return distortion;
     }
   }
@@ -135,17 +135,8 @@ function EffectExercise() {
       return;
     }
 
+    audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
     generateNewEffect();
-    
-    const initAudio = async () => {
-      audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
-
-      const audioFile = getRandomAudio();
-      const response = await fetch(audioFile);
-      const arrayBuffer = await response.arrayBuffer();
-      audioBufferRef.current = await audioContextRef.current.decodeAudioData(arrayBuffer);
-    };
-    initAudio();
 
     return () => {
       if (audioContextRef.current) {
@@ -162,10 +153,19 @@ function EffectExercise() {
       setCurrentEffect(randomEffect);
       setSelectedEffect(null);
       setShowFeedback(false);
+      
+      setupNewAudio();
     } else {
       setCurrentEffect(null);
       setShowFeedback(false);
     }
+  };
+
+  const setupNewAudio = async () => {
+    const audioFile = getRandomAudio();
+    const response = await fetch(audioFile);
+    const arrayBuffer = await response.arrayBuffer();
+    audioBufferRef.current = await audioContextRef.current.decodeAudioData(arrayBuffer);
   };
 
   const startOver = () => {
