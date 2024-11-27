@@ -4,7 +4,6 @@ import { Alert, Button, Container, Group, Paper, Stack, Switch, Text } from '@ma
 import { IconRefresh, IconArrowRight } from '@tabler/icons-react';
 import Frame from '../../Frame';
 import audioFile from '../../../Music/Mineral_cropped.wav'
-import { context } from 'tone';
 
 function AmplitudeExercise() {
     const navigate = useNavigate();
