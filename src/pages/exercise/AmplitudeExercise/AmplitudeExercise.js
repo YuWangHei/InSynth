@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Alert, Button, Card, Container, Group, Stack, Switch, Text, Title, RingProgress } from '@mantine/core';
+import { Alert, Button, Card, Container, Group, Stack, Switch, Text, Title, RingProgress, Paper } from '@mantine/core';
 import { IconRefresh, IconArrowRight, IconPlayerPlayFilled, IconPlayerPauseFilled } from '@tabler/icons-react';
 import Frame from '../../Frame';
 import { getRandomAudio } from '../../../Music/AudioPicker';
@@ -50,20 +50,65 @@ function AmplitudeExercise() {
         setHasAnswered(false);
     };
 
+    const [showWaveform, setShowWaveform] = useState(false);
+    const waveformCanvasRef = useRef(null);
+    const analyzerRef = useRef(null);
+    const animationFrameRef = useRef(null);
+
     useEffect(() => {
         audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
         gainNodeRef.current = audioContextRef.current.createGain();
+        analyzerRef.current = audioContextRef.current.createAnalyser();
+        analyzerRef.current.fftSize = 2048;
 
         setupAudio();
         nextQuestion();
 
         return () => {
+            if (animationFrameRef.current) {
+                cancelAnimationFrame(animationFrameRef.current);
+            }
             stopCurrentAudio();
             if (audioContextRef.current) {
                 audioContextRef.current.close();
             }
         };
     }, []);
+
+    const drawWaveform = () => {
+        const canvas = waveformCanvasRef.current;
+        if (!canvas || !analyzerRef.current) return;
+
+        const ctx = canvas.getContext('2d');
+        const bufferLength = analyzerRef.current.frequencyBinCount;
+        const dataArray = new Float32Array(bufferLength);
+        
+        analyzerRef.current.getFloatTimeDomainData(dataArray);
+        
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.beginPath();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#00ff00';
+        
+        const sliceWidth = canvas.width / bufferLength;
+        let x = 0;
+
+        for (let i = 0; i < bufferLength; i++) {
+            const v = dataArray[i];
+            const y = (v + 1) / 2 * canvas.height;
+
+            if (i === 0) {
+                ctx.moveTo(x, y);
+            } else {
+                ctx.lineTo(x, y);
+            }
+
+            x += sliceWidth;
+        }
+        
+        ctx.stroke();
+        animationFrameRef.current = requestAnimationFrame(drawWaveform);
+    };
 
     const generateRandomGain = () => {
         const randomGain = Math.floor(Math.random() * 41) - 20; // Random number between -20 and 20
@@ -91,17 +136,25 @@ function AmplitudeExercise() {
             if (sourceRef.current) {
                 try {
                     sourceRef.current.start(0);
+                    if (showWaveform) {  // Start animation if waveform is visible
+                        drawWaveform();
+                    }
                 } catch (e) {
                     console.log('Error starting source:', e);
-                    // If there's an error, try to set up audio again
                     await setupAudio();
                     sourceRef.current?.start(0);
+                    if (showWaveform) {
+                        drawWaveform();
+                    }
                 }
             }
         }
         
         if (isPlaying) {
             gainNodeRef.current.gain.setValueAtTime(0, audioContextRef.current.currentTime);
+            if (animationFrameRef.current) {
+                cancelAnimationFrame(animationFrameRef.current);
+            }
         } else {
             if (!isOriginal) {
                 const amplification = Math.pow(10, gainValue / 20);
@@ -109,9 +162,21 @@ function AmplitudeExercise() {
             } else {
                 gainNodeRef.current.gain.setValueAtTime(1, audioContextRef.current.currentTime);
             }
+            if (showWaveform) {  // Start animation if waveform is visible
+                drawWaveform();
+            }
         }
         setIsPlaying(!isPlaying);
     };
+
+    // Add useEffect to handle waveform visibility changes
+    useEffect(() => {
+        if (showWaveform && isPlaying) {
+            drawWaveform();
+        } else if (!showWaveform && animationFrameRef.current) {
+            cancelAnimationFrame(animationFrameRef.current);
+        }
+    }, [showWaveform]);
 
     const [hasAnswered, setHasAnswered] = useState(false);
     const handleAnswer = (answer) => {
@@ -163,7 +228,6 @@ function AmplitudeExercise() {
     };
 
     const setupAudio = async () => {
-        // Stop any currently playing audio
         stopCurrentAudio();
         
         const audioFile = getRandomAudio();
@@ -178,7 +242,8 @@ function AmplitudeExercise() {
         sourceRef.current.loopEnd = audioBufferRef.current.duration;
 
         sourceRef.current.connect(gainNodeRef.current);
-        gainNodeRef.current.connect(audioContextRef.current.destination);
+        gainNodeRef.current.connect(analyzerRef.current);
+        analyzerRef.current.connect(audioContextRef.current.destination);
     };
 
     return (
@@ -263,24 +328,49 @@ function AmplitudeExercise() {
                             {score.total >= MAX_SCORE ? "Start Over" : "Next Stage"}
                         </Button>
                     {/* {hasAnswered && <Button onClick={nextQuestion}>Next Question</Button>} */}
-                    <Switch
-                        checked={isOriginal}
-                        onChange={() => toggleOriginal(gainValue)}
-                        label={isOriginal ? "Original" : "Edited"}
-                        color="blue"
-                        size="md"
-                        styles={{
-                            label: {
-                                color: 'var(--mantine-color-text)',
-                                fontWeight: 500
-                            }
-                        }}
-                    />
+                    <Group position="apart" align="center">
+                        <Switch
+                            checked={isOriginal}
+                            onChange={() => toggleOriginal(gainValue)}
+                            label={isOriginal ? "Original" : "Edited"}
+                            color="blue"
+                            size="md"
+                            styles={{
+                                label: {
+                                    color: 'var(--mantine-color-text)',
+                                    fontWeight: 500
+                                }
+                            }}
+                        />
+                        <Button 
+                            onClick={() => setShowWaveform(!showWaveform)} 
+                            color="teal"
+                            size="md"
+                            variant="light"
+                        >
+                            {showWaveform ? 'Hide Waveform' : 'Show Waveform'}
+                        </Button>
+                    </Group>
                     {/* Text for Debugging */}
                     <Text size="sm" c="dimmed">
                         (gainValue: {gainValue})
                         (IsPlaying: {isPlaying.toString()}.)
                         </Text>
+                    {showWaveform && (
+                        <Paper p="xs" withBorder>
+                            <canvas 
+                                ref={waveformCanvasRef}
+                                width={800}
+                                height={200}
+                                style={{
+                                    width: '100%',
+                                    height: '200px',
+                                    backgroundColor: '#1A1B1E',
+                                    borderRadius: '4px'
+                                }}
+                            />
+                        </Paper>
+                    )}
                     </Stack>
                     </Card>
                 </Stack>
