@@ -46,6 +46,7 @@ export default function PanningExerciseSetup() {
                                 description="Choose how precise your panning guess needs to be"
                                 value={difficulty}
                                 onChange={setDifficulty}
+                                allowDeselect={false}
                                 data={[
                                     { value: 'Easy', label: 'Easy (Wider Range)' },
                                     { value: 'Hard', label: 'Hard (Narrow Range)' }
@@ -57,6 +58,7 @@ export default function PanningExerciseSetup() {
                                 description="Select how many panning challenges you want to complete"
                                 value={maxQuestions.toString()}
                                 onChange={(value) => setMaxQuestions(Number(value))}
+                                allowDeselect={false}
                                 data={[
                                     { value: '3', label: '3 Questions' },
                                     { value: '5', label: '5 Questions' },
