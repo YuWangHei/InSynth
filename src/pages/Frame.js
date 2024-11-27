@@ -15,7 +15,7 @@ function Frame({ children }) {
   const dark = colorScheme === 'dark';
 
   return (
-    <MantineProvider 
+    <MantineProvider
       theme={theme}
       defaultColorScheme="dark"
     >
@@ -53,7 +53,7 @@ function Frame({ children }) {
           <NavLink label='Exercise' leftSection={<IconAdjustmentsAlt />}>
             <NavLink href='#/SoundSynth' label='Sound Synthesis' />
             <NavLink href='#/EffectExercise/setup' label='Effect Exercise' />
-            <NavLink href='#/SoundQ3' label='Question Type 3' />
+            {/* <NavLink href='#/SoundQ3' label='Question Type 3' /> */}
             <NavLink href='#/MixingEq' label='EQ Exercise' />
             {/* <NavLink href='#/SynthQ2' label='Eq2' /> */}
             <NavLink href='#/AmplitudeExercise/setup' label='Amplitude' />
