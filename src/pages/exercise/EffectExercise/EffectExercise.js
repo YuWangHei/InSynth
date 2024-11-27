@@ -135,17 +135,8 @@ function EffectExercise() {
       return;
     }
 
+    audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
     generateNewEffect();
-    
-    const initAudio = async () => {
-      audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
-
-      const audioFile = getRandomAudio();
-      const response = await fetch(audioFile);
-      const arrayBuffer = await response.arrayBuffer();
-      audioBufferRef.current = await audioContextRef.current.decodeAudioData(arrayBuffer);
-    };
-    initAudio();
 
     return () => {
       if (audioContextRef.current) {
@@ -162,10 +153,19 @@ function EffectExercise() {
       setCurrentEffect(randomEffect);
       setSelectedEffect(null);
       setShowFeedback(false);
+      
+      setupNewAudio();
     } else {
       setCurrentEffect(null);
       setShowFeedback(false);
     }
+  };
+
+  const setupNewAudio = async () => {
+    const audioFile = getRandomAudio();
+    const response = await fetch(audioFile);
+    const arrayBuffer = await response.arrayBuffer();
+    audioBufferRef.current = await audioContextRef.current.decodeAudioData(arrayBuffer);
   };
 
   const startOver = () => {

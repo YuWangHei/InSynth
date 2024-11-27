@@ -55,12 +55,29 @@ function Playground() {
 
   const handleFileSelect = (selectedFile) => {
     if (selectedFile) {
+      // Check file type
+      const fileType = selectedFile.name.toLowerCase().split('.').pop();
+      if (!['mp3', 'wav'].includes(fileType)) {
+        alert('Please select an MP3 or WAV file only');
+        return;
+      }
+
+      // Check file size (20MB = 20 * 1024 * 1024 bytes)
+      const maxSize = 20 * 1024 * 1024; // 20MB in bytes
+      if (selectedFile.size > maxSize) {
+        alert('File size must be less than 20MB');
+        return;
+      }
+
       const reader = new FileReader();
       reader.onload = (e) => {
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
         audioContext.decodeAudioData(e.target.result, (audioBuffer) => {
           createAudioGraph(audioBuffer);
           setFile(selectedFile);
+        }).catch(error => {
+          alert('Error loading audio file. Please try another file.');
+          console.error('Error decoding audio data:', error);
         });
       };
       reader.readAsArrayBuffer(selectedFile);
@@ -162,12 +179,15 @@ function Playground() {
           <Text size="md" fs={700}>
             Upload and manipulate your audio files
           </Text>
+          <Text size="sm" c="dimmed">
+            Accepts MP3 and WAV files under 20MB
+          </Text>
         </Title>
         <Container size="lg">
           <Stack position="center" direction="column" spacing="lg">
             <FileButton
               onChange={handleFileSelect}
-              accept="audio/*"
+              accept=".mp3,.wav"
               color="green"
               fullWidth={false}
             >
