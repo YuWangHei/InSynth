@@ -261,6 +261,7 @@ function AmplitudeExercise() {
                     {/* Text for Debugging */}
                     <Text size="sm" c="dimmed">
                         (gainValue: {gainValue})
+                        (IsPlaying: {isPlaying.toString()}.)
                         </Text>
                     </Stack>
                     </Card>

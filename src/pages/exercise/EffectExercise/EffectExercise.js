@@ -81,10 +81,10 @@ const effects = [
       const config = DIFFICULTY_CONFIG[difficulty];
       const compressor = audioContext.createDynamicsCompressor();
       compressor.threshold.value = -24 * config.parameterMultipliers['Compression'].threshold;
-      compressor.knee.value = 30 * config.parameterMultipliers['Compression'].knee;
+      compressor.knee.value = 30;
       compressor.ratio.value = 12 * config.parameterMultipliers['Compression'].ratio;
-      compressor.attack.value = 0.003 * config.parameterMultipliers['Compression'].attack;
-      compressor.release.value = 0.25 * config.parameterMultipliers['Compression'].release;
+      compressor.attack.value = 0.003 ;
+      compressor.release.value = 0.25;
       return compressor;
     }
   },
@@ -104,7 +104,7 @@ const effects = [
         }
         return curve;
       }
-      distortion.curve = makeDistortionCurve();
+      distortion.curve = makeDistortionCurve(amount);
       return distortion;
     }
   }
