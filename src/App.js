@@ -12,6 +12,7 @@ import AmplitudeExerciseSetup from './pages/exercise/AmplitudeExercise/Amplitude
 import EQExercise from './pages/exercise/EQExercise/EQExercise.js';
 import PanningExercise from './pages/exercise/PanningExercise/PanningExercise.js';
 import PanningExerciseSetup from './pages/exercise/PanningExercise/PanningExerciseSetup.js';
+import Playground from './pages/playground/Playground.js';
 function App() {
   const router = [
     {
@@ -21,6 +22,10 @@ function App() {
     {
       path: '/Dashboard',
       element: <Dashboard />
+    },
+    {
+      path: '/Playground',
+      element: <Playground />
     },
     {
       path: '/SoundSynth',
