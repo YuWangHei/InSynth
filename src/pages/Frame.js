@@ -1,13 +1,19 @@
-import { AppShell, NavLink, Burger, Group, Text } from '@mantine/core';
+import { AppShell, NavLink, Burger, Group, Text, MantineProvider, createTheme } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IconDashboard, IconHome, IconBrandDeezer, IconAdjustmentsAlt } from '@tabler/icons-react';
 import React from 'react';
+
+const theme = createTheme({
+  fontFamily: 'Open Sans, sans-serif',
+  primaryColor: 'cyan',
+});
 
 function Frame({ children }) {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
 
   return (
+    <MantineProvider defaultColorScheme="dark"> 
       <AppShell
         header={{ height: 60 }}
       navbar={{
@@ -44,7 +50,7 @@ function Frame({ children }) {
         {children}
         </AppShell.Main>
       </AppShell>
-    
+    </MantineProvider>
   );
 }
 
