@@ -32,7 +32,7 @@ function Frame({ children }) {
         <NavLink href='#/Playground' label='Playground' leftSection={<IconBrandDeezer />} />
         <NavLink label='Exercise' leftSection={<IconAdjustmentsAlt />}>
           <NavLink href='#/SoundSynth' label='Sound Synthesis' />
-          <NavLink href='#/SoundEffect' label='Effect Exercise' />
+          <NavLink href='#/EffectExercise/setup' label='Effect Exercise' />
           <NavLink href='/#/SoundQ3' label='Question Type 3' />
           <NavLink href='#/MixingEq' label='Eq1' />
           <NavLink href='#/SynthQ2' label='Eq2' />
