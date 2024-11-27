@@ -9,9 +9,11 @@ import {
     Container,
     Stack,
     Alert,
-    Space
+    RingProgress,
+    Space,
+    ActionIcon
 } from '@mantine/core';
-import { IconVolume, IconPlayerPlayFilled, IconPlayerPauseFilled, IconPlayerPause, IconRefresh, IconArrowRight, IconMusic } from '@tabler/icons-react';
+import { IconVolume, IconPlayerPlayFilled, IconPlayerPauseFilled, IconPlayerPause, IconRefresh, IconArrowRight, IconSettings } from '@tabler/icons-react';
 import './PanningExercise.css';
 import { getRandomAudio } from '../../../Music/AudioPicker';
 
@@ -216,8 +218,6 @@ export default function PanningExercise() {
             currentPan >= panValue - RANGE_WIDTH &&
             currentPan <= panValue + RANGE_WIDTH;
 
-        const pointsEarned = isWithinRange ? 1 : 0;
-
         if (isWithinRange) {
             setScore(prev => ({
                 correct: prev.correct + 1,
@@ -254,13 +254,68 @@ export default function PanningExercise() {
     return (
         <Frame>
             <Container size="md" px="md">
-                <Stack spacing="lg" align='center'>
+                <Stack spacing="lg" >
                     <Title order={1} align='center'>
                         Panning Exercise
                         <Text size="md" fs={700} c="dimmed">
                             {difficulty} Mode | {MAX_SCORE} Questions
                         </Text>
                     </Title>
+                    <Group position='apart' justify='space-between' align='center'>
+                        <Group>
+                            <Button
+                                onClick={playOriginalSound}
+                                disabled={isPlayingOriginal}
+                                rightSection={isPlayingOriginal ? <IconVolume size={20} /> : <IconPlayerPlayFilled size={20} />}
+                                variant="filled"
+                                color="green"
+                                size='lg'
+                            >
+                                {isPlayingOriginal ? 'Playing Original...' : 'Play Original'}
+                            </Button>
+                            <Button
+                                onClick={handlePlay}
+                                disabled={isPlaying}
+                                rightSection={isPlaying ? <IconVolume size={20} /> : <IconPlayerPlayFilled size={20} />}
+                                color="indigo"
+                                size='lg'
+                            >
+                                {isPlaying ? 'Playing Effect...' : 'Play with Effect'}
+                            </Button>
+                            <Button
+                                onClick={stopCurrentSound}
+                                variant="filled"
+                                color="rgba(255, 18, 18, 1)"
+                                size='lg'
+                                rightSection={!isPlaying && !isPlayingOriginal ? <IconPlayerPauseFilled size={20} /> : <IconPlayerPause size={20} />}
+                            >
+                                {"Pause"}
+                            </Button>
+                            <ActionIcon
+                                onClick={handleBackToSetup}
+                                color="Grey"
+                                variant="filled"
+                                size='xl'
+                            >
+                                <IconSettings size={30} />
+                            </ActionIcon>
+                            <Text size="xs" mt={4} c="dimmed">
+                                {currentPan}
+                            </Text>
+                        </Group>
+                        <RingProgress
+                            size={100}
+                            label={
+                                <Text size="lg" ta="center">
+                                    {score.total}/{MAX_SCORE}
+                                </Text>
+                            }
+                            sections={[
+                                { value: ((score.total - score.correct) / MAX_SCORE) * 100, color: 'red' },
+                                { value: (score.correct / MAX_SCORE) * 100, color: 'green' }
+                            ]}
+                        />
+                    </Group>
                     <div className="panning-exercise">
                         <div className="header">
                             <div ></div>
@@ -345,39 +400,6 @@ export default function PanningExercise() {
                             <span>RIGHT</span>
                         </div>
                     </div>
-                    <Group align='center'>
-                        <Button
-                            onClick={playOriginalSound}
-                            disabled={isPlayingOriginal}
-                            rightSection={isPlayingOriginal ? <IconVolume size={20} /> : <IconPlayerPlayFilled size={20} />}
-                            variant="filled"
-                            color="green"
-                            size='lg'
-                        >
-                            {isPlayingOriginal ? 'Playing Original...' : 'Play Original'}
-                        </Button>
-                        <Button
-                            onClick={handlePlay}
-                            disabled={isPlaying}
-                            rightSection={isPlaying ? <IconVolume size={20} /> : <IconPlayerPlayFilled size={20} />}
-                            color="indigo"
-                            size='lg'
-                        >
-                            {isPlaying ? 'Playing Effect...' : 'Play with Effect'}
-                        </Button>
-                        <Button
-                            onClick={stopCurrentSound}
-                            variant="filled"
-                            color="rgba(255, 18, 18, 1)"
-                            size='lg'
-                            rightSection={!isPlaying && !isPlayingOriginal ? <IconPlayerPauseFilled size={20} /> : <IconPlayerPause size={20} />}
-                        >
-                            {"Pause"}
-                        </Button>
-                        <Text size="xs" mt={4} c="dimmed">
-                            {currentPan}
-                        </Text>
-                    </Group>
                 </Stack>
                 <Space h="xl" />
                 <Stack align='stretch'>
@@ -413,14 +435,7 @@ export default function PanningExercise() {
                     >
                         {score.total >= MAX_SCORE ? "Start Over" : "Next Stage"}
                     </Button>
-                    <Button
-                        onClick={handleBackToSetup}
-                        color="blue"
-                        variant="light"
-                        rightSection={<IconMusic size={20} />}
-                    >
-                        Change Settings
-                    </Button>
+                    
                 </Stack>
             </Container>
         </Frame>

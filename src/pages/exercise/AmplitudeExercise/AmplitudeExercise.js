@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Alert, Button, Container, Group, Paper, Stack, Switch, Text } from '@mantine/core';
-import { IconRefresh, IconArrowRight } from '@tabler/icons-react';
+import { Alert, Button, Card, Container, Group, Stack, Switch, Text, Title, RingProgress } from '@mantine/core';
+import { IconRefresh, IconArrowRight, IconPlayerPlayFilled, IconPlayerPauseFilled } from '@tabler/icons-react';
 import Frame from '../../Frame';
 import audioFile from '../../../Music/Mineral_cropped.wav'
 
@@ -164,29 +164,61 @@ function AmplitudeExercise() {
 
     return (
         <Frame>
-            <Container size="lg" mt="xl">
-                <Paper shadow="md" p="xl" radius="md" align="center">
-                    {/* <audio ref={audioRef} src={audioFile} loop /> */}
-                    <Stack style={{ width: '50%' }}>
-                        <Button onClick={togglePlay}>
-                            {isPlaying ? 'Pause' : 'Play'}
-                        </Button>
-                        <Group justify="center" grow wrap="nowrap">
-                            <Button onClick={() => handleAnswer(answer1)}>{answer1}</Button>
-                            <Button onClick={() => handleAnswer(answer2)}>{answer2}</Button>
-                        </Group>
-                        {/* </Stack>
+            <Container size="md" mt="md">
+                <Stack spacing="lg" >
+                    <Title order={1} align='center'>Amplitude Exercise</Title>
+                    <Card shadow="md" p="lg" radius="md" withBorder>
+                        
+                        <Stack spacing="md">
+                            <Group position="apart" justify="space-between" align="center">
+                                <Button 
+                                    onClick={togglePlay}
+                                    rightSection={isPlaying ? <IconPlayerPauseFilled size={20} /> : <IconPlayerPlayFilled size={20} />}
+                                    size='lg'
+                                    color={isPlaying ? 'red' : 'green'}
+                                >
+                                    {isPlaying ? 'Pause' : 'Play'}
+                                </Button>
+                                <RingProgress
+                                    size={100}
+                                    label={
+                                        <Text size="lg" ta="center">
+                                        {score.total}/{MAX_SCORE}
+                                        </Text>
+                                    }
+                                    sections={[
+                                        { value: ((score.total - score.correct) / MAX_SCORE) * 100, color: 'red' },
+                                    { value: (score.correct / MAX_SCORE) * 100, color: 'green' }
+                                ]}
+                            />
+                            </Group>
+                            
+                            <Group justify="center" grow wrap="nowrap">
+                                <Button 
+                                    onClick={() => handleAnswer(answer1)} 
+                                    variant="outline" 
+                                    color="blue" 
+                                    radius="lg"
+                                    h={100}
+                                >
+                                    <Text size="xl" weight={500} fw={700}>{answer1 + " dB"}</Text>
+                                </Button>
+                                <Button 
+                                    onClick={() => handleAnswer(answer2)} 
+                                    variant="outline" 
+                                    color="blue" 
+                                    radius="lg" 
+                                    h={100}
+                                >
+                                    <Text size="xl" weight={500} fw={700}>{answer2 + " dB"}</Text>
+                                </Button>
+                            </Group>
 
-                    <Stack> */}
                         {hasAnswered && (
                             <Alert
                                 color={result ? "green" : "red"}
                                 title={<Text fw={700} size="lg">{result ? "Correct!" : "Not quite!"}</Text>}
                             >
-                                {/* <Text fw={500} size="md" mt={4}>
-                                {!correct && 
-                                    ` The sound was panned to ${currentPan}.`}
-                            </Text> */}
                             </Alert>
                         )}
 
@@ -211,7 +243,6 @@ function AmplitudeExercise() {
                         >
                             {score.total >= MAX_SCORE ? "Start Over" : "Next Stage"}
                         </Button>
-                    </Stack>
                     {/* {hasAnswered && <Button onClick={nextQuestion}>Next Question</Button>} */}
                     <Switch
                         checked={isOriginal}
@@ -229,8 +260,10 @@ function AmplitudeExercise() {
                     {/* Text for Debugging */}
                     <Text size="sm" c="dimmed">
                         (gainValue: {gainValue})
-                    </Text>
-                </Paper>
+                        </Text>
+                    </Stack>
+                    </Card>
+                </Stack>
             </Container>
         </Frame>
     );

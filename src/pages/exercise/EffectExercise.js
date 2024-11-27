@@ -299,17 +299,18 @@ function EffectExercise() {
                 </Text> */}
                 </Group>
                 <RingProgress
+                  size={100}
                   label={
                     <Text size="lg" ta="center">
                       {score.total}/{TotalScore}
                     </Text>
                   }
                   sections={[
-                    { value: (score.correct / TotalScore) * 100, color: 'green' },
                     { value: ((score.total - score.correct) / TotalScore) * 100, color: 'red' },
+                    { value: (score.correct / TotalScore) * 100, color: 'green' }
                   ]}
                 />
-              </Group>
+                </Group>
 
               <Grid>
                 {effects.map((effect) => (
