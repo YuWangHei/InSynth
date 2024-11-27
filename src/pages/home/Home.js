@@ -12,13 +12,13 @@ function Home() {
   const synthExercises = [
     {
       title: 'Sound Synthesis',
-      description: 'Learn about waveforms and their tones',
+      description: 'Get familiar with waveforms and their tones',
       path: '/SoundSynth',
       icon: '🔊' // Optional: you can use an icon or image
     },
     {
       title: 'Effect Exercise',
-      description: 'Learn about different effects and how they work',
+      description: 'Take a look at popular effects of manipulating audio',
       path: '/EffectExercise/setup',
       icon: '🎵'
     }
@@ -33,13 +33,13 @@ function Home() {
     },
     {
       title: 'Amplitude Exercise',
-      description: 'Learn about amplitude and how it works',
+      description: 'Have a feel of different amplitudes of audio',
       path: '/AmplitudeExercise/setup',
       icon: '🎶'
     },
     {
       title: 'Panning Exercise',
-      description: 'Learn about panning and how it works',
+      description: 'Train your ears and spatial awareness',
       path: '/PanningExercise/setup',
       icon: '🎧'
     }
