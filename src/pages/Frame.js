@@ -1,6 +1,6 @@
 import { AppShell, NavLink, Burger, Group, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { IconDashboard, IconHome, IconHeadphones, IconAdjustmentsAlt } from '@tabler/icons-react';
+import { IconDashboard, IconHome, IconBrandDeezer, IconAdjustmentsAlt } from '@tabler/icons-react';
 import React from 'react';
 
 function Frame({ children }) {
@@ -29,6 +29,7 @@ function Frame({ children }) {
         {/* Links have to be in shape of "#/{name}" to fit in HashRouter's need */}
         <NavLink href='#/' label='Home' leftSection={<IconHome />} />
         <NavLink href='#/Dashboard' label='Dashboard' leftSection={<IconDashboard />} />
+        <NavLink href='#/Playground' label='Playground' leftSection={<IconBrandDeezer />} />
         <NavLink label='Exercise' leftSection={<IconAdjustmentsAlt />}>
           <NavLink href='#/SoundSynth' label='Sound Synthesis' />
           <NavLink href='#/SoundEffect' label='Effect Exercise' />
