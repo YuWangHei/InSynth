@@ -1,9 +1,10 @@
 import React from 'react';
 import Frame from '../Frame';
 import { useNavigate } from 'react-router-dom';
-import { BackgroundImage, Overlay, Text, Container } from '@mantine/core';
+import { BackgroundImage, Text, Container } from '@mantine/core';
 import styles from './Home.module.css';
-import homebg from './homebg2.jpg';
+import homebg from './homebg3Blurred.png';
+import homebg2 from './homebg5.jpeg';
 
 function Home() {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ function Home() {
     {
       title: 'Effect Exercise',
       description: 'Learn about different effects and how they work',
-      path: '/SoundEffect',
+      path: '/EffectExercise/setup',
       icon: '🎵'
     }
   ];
@@ -28,19 +29,19 @@ function Home() {
       title: 'Equalizer Exercise',
       description: 'Learn about equalizer and how it works',
       path: '/MixingEq',
-      icon: '🔊' // Optional: you can use an icon or image
+      icon: '💿' // Optional: you can use an icon or image
     },
     {
       title: 'Amplitude Exercise',
       description: 'Learn about amplitude and how it works',
       path: '/AmplitudeExercise/setup',
-      icon: '🎵'
+      icon: '🎶'
     },
     {
       title: 'Panning Exercise',
       description: 'Learn about panning and how it works',
       path: '/AmplitudeExercise/setup',
-      icon: '🎵'
+      icon: '🎧'
     }
   ];
 
@@ -57,14 +58,14 @@ function Home() {
     /> */}
       <Frame>
         <BackgroundImage
-          // src={homebg}
+          src={homebg2}
           h={200}
         >
-          <Container size="lg" h="100%" style={{ position: 'relative', zIndex: 1 }} className={styles.hoverContainer}>
-            <Text size="xl" fw={700} c="#CDFF33" pt={60}>
+          <Container size="lg" h="100%" style={{ position: 'relative', zIndex: 1 }} px={2} justify="flex-end">
+            <Text size="xl" fw={700} c="#FFFFFF" pt={60}>
               Audio Learning Platform
             </Text>
-            <Text size="xl" c="#CDFF33" mt="sm">
+            <Text size="xl"  c="#FFFFFF" mt="sm">
               Master the fundamentals of audio processing and mixing
             </Text>
           </Container>

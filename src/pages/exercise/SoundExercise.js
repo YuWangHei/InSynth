@@ -263,15 +263,15 @@ const drawSpectrum = () => {
                 </Text> */}
                 </Group>
                     <RingProgress
-                  size={150}
+                  size={100}
                   label={
                     <Text size="lg" ta="center">
                       {score.total}/{TotalScore}
                     </Text>
                   }
                   sections={[
-                    { value: (score.correct / TotalScore)*100, color: 'green' },
                     { value: ((score.total - score.correct) / TotalScore)*100, color: 'red' },
+                    { value: (score.correct / TotalScore)*100, color: 'green' },
                   ]}
                 />
 
@@ -307,17 +307,12 @@ const drawSpectrum = () => {
 
               {showFeedback && (
                   <Alert 
-                  color={
-                    function() {
-
-                      if (isGuessed) {
-                        return 'green';
-                      }
-                      return 'red';
-                    }()
-                  }
+                  color={isGuessed ? 'green' : 'red'}
+                  title={<Text fw={700} size="lg">{isGuessed ? "Correct!" : "Not quite!"}</Text>}
                 >
-                  {result}
+                  <Text fw={500} size="md" mt={4}>
+                    {result}
+                  </Text>
                 </Alert>
         )}
 
@@ -325,10 +320,12 @@ const drawSpectrum = () => {
               {score.total >= TotalScore && (
                       <Alert
                         color="green"
-                        title={"Finished!"}
+                        title={<Text fw={700} size="lg">Finished!</Text>}
                       >
-                        All {TotalScore} Questions are finished.
-                        Your score is {score.correct}/{score.total}!!!
+                        <Text fw={500} size="md" mt={4}>
+                          All {TotalScore} Questions are finished.
+                          Your score is {score.correct}/{score.total}!!!
+                        </Text>
                       </Alert>
                     )}
               <Button
