@@ -9,27 +9,19 @@ function AmplitudeExercise() {
     const navigate = useNavigate();
     const location = useLocation();
     const { difficulty, maxQuestions } = location.state || {};
-    const audioRef = useRef(null);
+    const [startPlaying, setStartPlaying] = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
     const [gainValue, setGainValue] = useState(0);
     const [isOriginal, setIsOriginal] = useState(false);
 
-    const audioContextRef = useRef(new (window.AudioContext || window.webkitAudioContext)());
-    const gainNodeRef = useRef(audioContextRef.current.createGain());
+    const audioContextRef = useRef(null);
+    const audioBufferRef = useRef(null);
+    const gainNodeRef = useRef(null);
+    const sourceRef = useRef(null);
     const [result, setResult] = useState(0);
 
     const [score, setScore] = useState({ correct: 0, total: 0 });
     const MAX_SCORE = maxQuestions;
-    const generateRandomGain = () => {
-        const randomGain = Math.floor(Math.random() * 41) - 20; // Random number between -20 and 20
-        setGainValue(randomGain);
-        console.log(randomGain);
-        // Apply the new gain value
-        const amplification = Math.pow(10, randomGain / 20);
-        gainNodeRef.current.gain.setValueAtTime(amplification, audioContextRef.current.currentTime);
-
-        return randomGain;
-    };
 
     const [answer1, setAnswer1] = useState(0);
     const [answer2, setAnswer2] = useState(0);
@@ -60,32 +52,55 @@ function AmplitudeExercise() {
     };
 
     useEffect(() => {
-        let source;
-        const context = new (window.AudioContext || window.webkitAudioContext)();
-        const gain = context.createGain();
+        let source = null;
+        audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
+        gainNodeRef.current = audioContextRef.current.createGain();
 
         // Only create and connect the source when audio starts playing
-        const setupAudio = () => {
-            if (!source) {
-                source = context.createMediaElementSource(audioRef.current);
-                source.connect(gain);
-                gain.connect(context.destination);
-                gainNodeRef.current = gain;
-            }
+        const setupAudio = async () => {
+            
+            const response = await  fetch(audioFile);
+            const arrayBuffer = await response.arrayBuffer();
+            audioBufferRef.current = await audioContextRef.current.decodeAudioData(arrayBuffer);
+            sourceRef.current = audioContextRef.current.createBufferSource();
+            sourceRef.current.buffer = audioBufferRef.current;
+
+            sourceRef.current.loop = true;
+            sourceRef.current.loopStart = 0;
+            sourceRef.current.loopEnd = audioBufferRef.current.duration;
+
+            sourceRef.current.connect(gainNodeRef.current);
+            gainNodeRef.current.connect(audioContextRef.current.destination);
+            // source = context.createMediaElementSource(audioRef.current);
+                // source.connect(gain);
+                // gain.connect(context.destination);
+                // gainNodeRef.current = gain;
         };
+        setupAudio();
 
         // Add event listener for the first play
-        audioRef.current.addEventListener('play', setupAudio, { once: true });
+        // audioRef.current.addEventListener('play', setupAudio, { once: true });
 
         nextQuestion();
 
         return () => {
-            if (source) {
-                source.disconnect();
-                gain.disconnect();
+            if (audioContextRef.current) {
+                audioContextRef.current.close();
             }
         };
     }, []);
+
+    const generateRandomGain = () => {
+        const randomGain = Math.floor(Math.random() * 41) - 20; // Random number between -20 and 20
+        setGainValue(randomGain);
+        console.log(randomGain);
+        // Apply the new gain value
+        const amplification = Math.pow(10, randomGain / 20);
+        // gainNodeRef.current.gain.setValueAtTime(amplification, audioContextRef.current.currentTime);
+        gainNodeRef.current.gain.setValueAtTime(amplification, audioContextRef.current.currentTime);
+
+        return randomGain;
+    };
 
     const handleGainChange = (event) => {
         const newGainValue = event.target.value;
@@ -96,11 +111,22 @@ function AmplitudeExercise() {
     };
 
     const togglePlay = async () => {
+        if (!startPlaying) {
+            setStartPlaying(true);
+            sourceRef.current.start(0);
+        }
         if (isPlaying) {
-            audioRef.current.pause();
+            // audioRef.current.pause();
+            gainNodeRef.current.gain.setValueAtTime(0, audioContextRef.current.currentTime);
         } else {
-            await audioContextRef.current.resume();
-            audioRef.current.play();
+            // await audioContextRef.current.resume();
+            // audioRef.current.play();
+            if (!isOriginal) {
+                const amplification = Math.pow(10, gainValue / 20);
+                gainNodeRef.current.gain.setValueAtTime(amplification, audioContextRef.current.currentTime);
+            } else {
+                gainNodeRef.current.gain.setValueAtTime(1, audioContextRef.current.currentTime);
+            }
         }
         setIsPlaying(!isPlaying);
     };
@@ -140,7 +166,7 @@ function AmplitudeExercise() {
         <Frame>
             <Container size="lg" mt="xl">
                 <Paper shadow="md" p="xl" radius="md" align="center">
-                    <audio ref={audioRef} src={audioFile} loop />
+                    {/* <audio ref={audioRef} src={audioFile} loop /> */}
                     <Stack style={{ width: '50%' }}>
                         <Button onClick={togglePlay}>
                             {isPlaying ? 'Pause' : 'Play'}
@@ -200,6 +226,10 @@ function AmplitudeExercise() {
                             }
                         }}
                     />
+                    {/* Text for Debugging */}
+                    <Text size="sm" c="dimmed">
+                        (gainValue: {gainValue})
+                    </Text>
                 </Paper>
             </Container>
         </Frame>

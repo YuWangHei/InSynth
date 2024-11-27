@@ -46,6 +46,7 @@ export default function PanningExerciseSetup() {
                                 description="Choose how precise your panning guess needs to be"
                                 value={difficulty}
                                 onChange={setDifficulty}
+                                allowDeselect={false}
                                 data={[
                                     { value: 'Easy', label: 'Easy (Wider Range)' },
                                     { value: 'Hard', label: 'Hard (Narrow Range)' }
@@ -57,6 +58,7 @@ export default function PanningExerciseSetup() {
                                 description="Select how many panning challenges you want to complete"
                                 value={maxQuestions.toString()}
                                 onChange={(value) => setMaxQuestions(Number(value))}
+                                allowDeselect={false}
                                 data={[
                                     { value: '3', label: '3 Questions' },
                                     { value: '5', label: '5 Questions' },
@@ -86,7 +88,7 @@ export default function PanningExerciseSetup() {
                         <Title order={4} mb="md">Exercise Instructions</Title>
                         <Text>
                             • Listen to the original and panned audio<br />
-                            • Click on the panning container to guess the pan position<br />
+                            • Click on the panning panel to guess the pan position<br />
                             • Get points for guesses within the selected difficulty range
                         </Text>
                     </Card>
