@@ -29,6 +29,9 @@ function Playground() {
   const lowPassFilterRef = useRef(null);
   const highPassFilterRef = useRef(null);
   const bufferRef = useRef(null);
+
+  const waveformCanvasRef = useRef(null);
+  const analyzerRef = useRef(null);
   const animationFrameRef = useRef(null);
   const startTime = useRef(0);
 
@@ -53,6 +56,8 @@ function Playground() {
     // Create new audio context
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
     audioContextRef.current = audioContext;
+    analyzerRef.current = audioContextRef.current.createAnalyser();
+    analyzerRef.current.fftSize = 2048;
 
     // Create nodes
     const sourceNode = audioContext.createBufferSource();
@@ -134,6 +139,9 @@ function Playground() {
         // clearInterval(updateTimer);
         sourceNodeRef.current.stop();
       }
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
 
       // Create a new source node
       const sourceNode = audioContextRef.current.createBufferSource();
@@ -161,7 +169,8 @@ function Playground() {
       gainNodeRef.current.connect(pannerNodeRef.current);
       pannerNodeRef.current.connect(lowPassFilterRef.current);
       lowPassFilterRef.current.connect(highPassFilterRef.current);
-      highPassFilterRef.current.connect(audioContextRef.current.destination);
+      highPassFilterRef.current.connect(analyzerRef.current);
+      analyzerRef.current.connect(audioContextRef.current.destination);
 
       // Set loop if enabled
       sourceNode.loop = isLooping;
@@ -300,6 +309,41 @@ function Playground() {
     }
   };
 
+  const drawWaveform = () => {
+    const canvas = waveformCanvasRef.current;
+    if (!canvas || !analyzerRef.current) return;
+
+    const ctx = canvas.getContext('2d');
+    const bufferLength = analyzerRef.current.frequencyBinCount;
+    const dataArray = new Float32Array(bufferLength);
+    
+    analyzerRef.current.getFloatTimeDomainData(dataArray);
+    
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.beginPath();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#00ff00';
+    
+    const sliceWidth = canvas.width / bufferLength;
+    let x = 0;
+
+    for (let i = 0; i < bufferLength; i++) {
+        const v = dataArray[i];
+        const y = (v + 1) / 2 * canvas.height;
+
+        if (i === 0) {
+            ctx.moveTo(x, y);
+        } else {
+            ctx.lineTo(x, y);
+        }
+
+        x += sliceWidth;
+    }
+    
+    ctx.stroke();
+    animationFrameRef.current = requestAnimationFrame(drawWaveform);
+};
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
@@ -335,6 +379,22 @@ function Playground() {
                 </Button>
               )}
             </FileButton>
+
+            {file && (
+              <Paper p="xs" withBorder>
+                <canvas 
+                  ref={waveformCanvasRef}
+                  width={800}
+                  height={200}
+                  style={{
+                    width: '100%',
+                    height: '200px',
+                    backgroundColor: '#1A1B1E',
+                    borderRadius: '4px'
+                }}
+              />
+              </Paper>
+            )}
             
             {file && (
               <Paper shadow="sm" p="md" radius="md" withBorder>

@@ -262,7 +262,7 @@ const drawSpectrum = () => {
                 </Text> */}
                 </Group>
                     <RingProgress
-                  size={100}
+                  size={110}
                   label={
                     <Text size="lg" ta="center">
                       {score.total}/{TotalScore}

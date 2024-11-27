@@ -11,7 +11,9 @@ import {
     Alert,
     RingProgress,
     Space,
-    ActionIcon
+    ActionIcon,
+    Paper,
+    Switch
 } from '@mantine/core';
 import { IconVolume, IconPlayerPlayFilled, IconPlayerPauseFilled, IconPlayerPause, IconRefresh, IconArrowRight, IconSettings } from '@tabler/icons-react';
 import './PanningExercise.css';
@@ -44,6 +46,11 @@ export default function PanningExercise() {
     const [showAnswer, setShowAnswer] = useState(false);
     const [correct, setCorrect] = useState(null);
 
+    const [showWaveform, setShowWaveform] = useState(false);
+    const waveformCanvasRef = useRef(null);
+    const analyzerRef = useRef(null);
+    const animationFrameRef = useRef(null);
+
 
     const RANGE_WIDTH = DIFFICULTY_CONFIG[difficulty];
     const MAX_SCORE = maxQuestions;
@@ -59,6 +66,8 @@ export default function PanningExercise() {
         // Initialize audio context and load sample
         const initAudio = async () => {
             audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
+            analyzerRef.current = audioContextRef.current.createAnalyser();
+            analyzerRef.current.fftSize = 2048;
 
             const audioFile = getRandomAudio();
             const response = await fetch(audioFile);
@@ -73,6 +82,14 @@ export default function PanningExercise() {
             }
         };
     }, [location.state, navigate]);
+
+    useEffect(() => {
+        if (showWaveform && isPlaying) {
+            drawWaveform();
+        } else if (!showWaveform && animationFrameRef.current) {
+            cancelAnimationFrame(animationFrameRef.current);
+        }
+    }, [showWaveform]);
 
     const generateNewPanning = () => {
         // Stop any existing audio source
@@ -109,6 +126,9 @@ export default function PanningExercise() {
             currentSourceRef.current.disconnect();
             currentSourceRef.current = null;
         }
+        if (animationFrameRef.current) {
+            cancelAnimationFrame(animationFrameRef.current);
+        }
         setIsPlaying(false);
         setIsPlayingOriginal(false);
     };
@@ -118,7 +138,7 @@ export default function PanningExercise() {
 
         // If already playing original sound, stop it
         if (isPlayingOriginal) {
-            stopCurrentSound();
+            stopCurrentSound();    
             return;
         }
 
@@ -140,9 +160,13 @@ export default function PanningExercise() {
         gainNode.gain.value = 0.7;
 
         source.connect(gainNode);
-        gainNode.connect(audioContextRef.current.destination);
+        gainNode.connect(analyzerRef.current);
+        analyzerRef.current.connect(audioContextRef.current.destination);
 
         source.start(0);
+        if (showWaveform) {  // Start animation if waveform is visible
+            drawWaveform();
+        }
     };
 
     const handlePlay = async () => {
@@ -185,14 +209,17 @@ export default function PanningExercise() {
             // Connect the audio nodes
             source.connect(pannerNode);
             pannerNode.connect(gainNode);
-            gainNode.connect(audioContextRef.current.destination);
+            gainNode.connect(analyzerRef.current);
+            analyzerRef.current.connect(audioContextRef.current.destination);
 
             // Play the sound
             source.start(0);
 
             // Optional: Store the panner node reference if you need to modify it later
             currentPannerRef.current = pannerNode;
-
+            if (showWaveform) {  // Start animation if waveform is visible
+                drawWaveform();
+            }
         } catch (error) {
             console.error('Error setting up audio panning:', error);
             setIsPlaying(false);
@@ -251,9 +278,44 @@ export default function PanningExercise() {
         navigate('/PanningExercise/setup');
     };
 
+    const drawWaveform = () => {
+        const canvas = waveformCanvasRef.current;
+        if (!canvas || !analyzerRef.current) return;
+
+        const ctx = canvas.getContext('2d');
+        const bufferLength = analyzerRef.current.frequencyBinCount;
+        const dataArray = new Float32Array(bufferLength);
+        
+        analyzerRef.current.getFloatTimeDomainData(dataArray);
+        
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.beginPath();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#00ff00';
+        
+        const sliceWidth = canvas.width / bufferLength;
+        let x = 0;
+
+        for (let i = 0; i < bufferLength; i++) {
+            const v = dataArray[i];
+            const y = (v + 1) / 2 * canvas.height;
+
+            if (i === 0) {
+                ctx.moveTo(x, y);
+            } else {
+                ctx.lineTo(x, y);
+            }
+
+            x += sliceWidth;
+        }
+        
+        ctx.stroke();
+        animationFrameRef.current = requestAnimationFrame(drawWaveform);
+    };
+
     return (
         <Frame>
-            <Container size="md" px="md">
+            <Container size="md" px="md" align='center'>
                 <Stack spacing="lg" >
                     <Title order={1} align='center'>
                         Panning Exercise
@@ -263,48 +325,63 @@ export default function PanningExercise() {
                     </Title>
                     <Group position='apart' justify='space-between' align='center'>
                         <Group>
-                            <Button
-                                onClick={playOriginalSound}
-                                disabled={isPlayingOriginal}
-                                rightSection={isPlayingOriginal ? <IconVolume size={20} /> : <IconPlayerPlayFilled size={20} />}
-                                variant="filled"
-                                color="green"
-                                size='lg'
-                            >
+                            <Stack>
+                                <Group>
+                                    <Button
+                                    onClick={playOriginalSound}
+                                    disabled={isPlayingOriginal}
+                                    rightSection={isPlayingOriginal ? <IconVolume size={20} /> : <IconPlayerPlayFilled size={20} />}
+                                    variant="filled"
+                                    color="green"
+                                    size='lg'
+                                >
                                 {isPlayingOriginal ? 'Playing Original...' : 'Play Original'}
-                            </Button>
-                            <Button
-                                onClick={handlePlay}
-                                disabled={isPlaying}
-                                rightSection={isPlaying ? <IconVolume size={20} /> : <IconPlayerPlayFilled size={20} />}
-                                color="indigo"
-                                size='lg'
-                            >
-                                {isPlaying ? 'Playing Effect...' : 'Play with Effect'}
-                            </Button>
-                            <Button
-                                onClick={stopCurrentSound}
-                                variant="filled"
-                                color="rgba(255, 18, 18, 1)"
-                                size='lg'
-                                rightSection={!isPlaying && !isPlayingOriginal ? <IconPlayerPauseFilled size={20} /> : <IconPlayerPause size={20} />}
-                            >
-                                {"Pause"}
-                            </Button>
-                            <ActionIcon
-                                onClick={handleBackToSetup}
-                                color="Grey"
-                                variant="filled"
-                                size='xl'
-                            >
-                                <IconSettings size={30} />
-                            </ActionIcon>
-                            <Text size="xs" mt={4} c="dimmed">
-                                {currentPan}
-                            </Text>
+                                </Button>
+                                <Button
+                                    onClick={handlePlay}
+                                    disabled={isPlaying}
+                                    rightSection={isPlaying ? <IconVolume size={20} /> : <IconPlayerPlayFilled size={20} />}
+                                    color="indigo"
+                                    size='lg'
+                                >
+                                    {isPlaying ? 'Playing Effect...' : 'Play with Effect'}
+                                </Button>
+                                <Button
+                                    onClick={stopCurrentSound}
+                                    variant="filled"
+                                    color="rgba(255, 18, 18, 1)"
+                                    size='lg'
+                                    rightSection={!isPlaying && !isPlayingOriginal ? <IconPlayerPauseFilled size={20} /> : <IconPlayerPause size={20} />}
+                                >
+                                    {"Pause"}
+                                </Button>
+                                </Group>
+                                <Group position='apart' justify='flex-start' align='center'>
+                                <ActionIcon
+                                    onClick={handleBackToSetup}
+                                    color="Grey"
+                                    variant="filled"
+                                    size='xl'
+                                >
+                                    <IconSettings size={30} />
+                                </ActionIcon>
+                                <Switch 
+                                    label="Show Waveform"
+                                    checked={showWaveform}
+                                    onChange={() => setShowWaveform(!showWaveform)} 
+                                    color="green"
+                                    size="md"
+                                >
+                                </Switch>
+                                <Text size="xs" mt={4} c="dimmed">
+                                    {currentPan}
+                                </Text>
+                                </Group>
+                            </Stack>
                         </Group>
+                        
                         <RingProgress
-                            size={100}
+                            size={140}
                             label={
                                 <Text size="lg" ta="center">
                                     {score.total}/{MAX_SCORE}
@@ -403,6 +480,23 @@ export default function PanningExercise() {
                 </Stack>
                 <Space h="xl" />
                 <Stack align='stretch'>
+
+                {showWaveform && (
+                    <Paper p="xs" withBorder>
+                        <canvas 
+                            ref={waveformCanvasRef}
+                            width={800}
+                            height={200}
+                            style={{
+                                width: '100%',
+                                height: '200px',
+                                backgroundColor: '#1A1B1E',
+                                borderRadius: '4px'
+                        }}
+                        />
+                    </Paper>
+                )}
+                
                     {showAnswer && (
                         <Alert
                             color={correct ? "green" : "red"}

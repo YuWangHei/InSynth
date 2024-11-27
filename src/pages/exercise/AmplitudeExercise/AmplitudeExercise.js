@@ -249,11 +249,11 @@ function AmplitudeExercise() {
     return (
         <Frame>
             <Container size="md" mt="md">
-                <Stack spacing="lg" >
+                <Stack spacing="md" >
                     <Title order={1} align='center'>Amplitude Exercise</Title>
                     <Card shadow="md" p="lg" radius="md" withBorder>
                         
-                        <Stack spacing="md">
+                        <Stack spacing="sm">
                             <Group position="apart" justify="space-between" align="center">
                                 <Button 
                                     onClick={togglePlay}
@@ -264,7 +264,7 @@ function AmplitudeExercise() {
                                     {isPlaying ? 'Pause' : 'Play'}
                                 </Button>
                                 <RingProgress
-                                    size={100}
+                                    size={110}
                                     label={
                                         <Text size="lg" ta="center">
                                         {score.total}/{MAX_SCORE}

@@ -10,7 +10,9 @@ import {
   Alert,
   Container,
   RingProgress,
-  ActionIcon
+  ActionIcon,
+  Switch,
+  Paper
 } from '@mantine/core';
 import { IconVolume, IconRefresh, IconArrowRight, IconPlayerPlayFilled, IconPlayerPauseFilled, IconPlayerPause, IconSettings } from '@tabler/icons-react';
 import Frame from '../../Frame';
@@ -124,10 +126,14 @@ function EffectExercise() {
   const [selectedEffect, setSelectedEffect] = useState(null);
   const [isPlayingOriginal, setIsPlayingOriginal] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
+  const [showWaveform, setShowWaveform] = useState(false);
 
   const audioContextRef = useRef(null);
   const audioBufferRef = useRef(null);
   const currentSourceRef = useRef(null);
+  const analyzerRef = useRef(null);
+  const animationFrameRef = useRef(null);
+  const waveformCanvasRef = useRef(null);
 
   useEffect(() => {
     if (!location.state) {
@@ -136,14 +142,27 @@ function EffectExercise() {
     }
 
     audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
+    analyzerRef.current = audioContextRef.current.createAnalyser();
+    analyzerRef.current.fftSize = 2048;
     generateNewEffect();
 
     return () => {
       if (audioContextRef.current) {
         audioContextRef.current.close();
       }
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
     };
   }, [location.state, navigate]);
+
+  useEffect(() => {
+    if (showWaveform && isPlaying) {
+        drawWaveform();
+    } else if (!showWaveform && animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+    }
+  }, [showWaveform]);
 
   const generateNewEffect = () => {
     stopCurrentSound();
@@ -215,9 +234,15 @@ function EffectExercise() {
     gainNode.gain.value = 0.7;
 
     source.connect(gainNode);
-    gainNode.connect(audioContextRef.current.destination);
+    gainNode.connect(analyzerRef.current);
+    analyzerRef.current.connect(audioContextRef.current.destination);
 
+    
     source.start(0);
+    if (showWaveform) {
+      drawWaveform();
+    }
+
     // source.onended = () => {
     //   setIsPlayingOriginal(false);
     //   currentSourceRef.current = null;
@@ -260,7 +285,12 @@ function EffectExercise() {
       // Connect the audio nodes
       source.connect(effectNode);
       effectNode.connect(gainNode);
-      gainNode.connect(audioContextRef.current.destination);
+      gainNode.connect(analyzerRef.current);
+      analyzerRef.current.connect(audioContextRef.current.destination);
+
+      if (showWaveform) {
+        drawWaveform();
+      }
 
       // Play the sound
       source.start(0);
@@ -299,6 +329,41 @@ function EffectExercise() {
     navigate('/EffectExercise/setup');
   };
 
+  const drawWaveform = () => {
+    const canvas = waveformCanvasRef.current;
+    if (!canvas || !analyzerRef.current) return;
+
+    const ctx = canvas.getContext('2d');
+    const bufferLength = analyzerRef.current.frequencyBinCount;
+    const dataArray = new Float32Array(bufferLength);
+    
+    analyzerRef.current.getFloatTimeDomainData(dataArray);
+    
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.beginPath();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#00ff00';
+    
+    const sliceWidth = canvas.width / bufferLength;
+    let x = 0;
+
+    for (let i = 0; i < bufferLength; i++) {
+        const v = dataArray[i];
+        const y = (v + 1) / 2 * canvas.height;
+
+        if (i === 0) {
+            ctx.moveTo(x, y);
+        } else {
+            ctx.lineTo(x, y);
+        }
+
+        x += sliceWidth;
+    }
+    
+    ctx.stroke();
+    animationFrameRef.current = requestAnimationFrame(drawWaveform);
+};
+
   return (
     <Frame>
       <Container size="md" px="md">
@@ -311,10 +376,11 @@ function EffectExercise() {
             </Title>
 
           <Card shadow="sm" p="lg" radius="md" withBorder>
-            <Stack spacing="md">
+            <Stack spacing="md" justify="flex-start">
               <Group position="apart" justify="space-between" align="center">
-                <Group>
-                  <Button
+                <Stack>
+                  <Group>
+                    <Button
                     onClick={playOriginalSound}
                     disabled={isPlayingOriginal}
                     rightSection={isPlayingOriginal ? <IconVolume size={20} /> : <IconPlayerPlayFilled size={20} />}
@@ -342,6 +408,8 @@ function EffectExercise() {
                   >
                     {"Stop"}
                   </Button>
+                </Group>
+                <Group justify="flex-start">
                   <ActionIcon
                     onClick={handleBackToSetup}
                     color="Grey"
@@ -350,13 +418,19 @@ function EffectExercise() {
                   >
                     <IconSettings size={30} />
                   </ActionIcon>
+                    <Switch
+                      label="Show Waveform"
+                      checked={showWaveform}
+                      onChange={(event) => setShowWaveform(event.currentTarget.checked)}
+                    />
                   {/* Text for Debugging */}
                   {/* <Text size="sm" c="dimmed">
                       (isPlaying: {isPlaying.toString()}, isPlayingOriginal: {isPlayingOriginal.toString()})
                 </Text> */}
                 </Group>
+                </Stack>
                 <RingProgress
-                  size={100}
+                  size={140}
                   label={
                     <Text size="lg" ta="center">
                       {score.total}/{TotalScore}
@@ -431,6 +505,22 @@ function EffectExercise() {
               >
                 {score.total >= maxQuestions ? "Start Over" : "Next Sound"}
           </Button>
+
+              {showWaveform && (
+                <Paper p="xs" withBorder>
+                    <canvas 
+                        ref={waveformCanvasRef}
+                        width={800}
+                        height={200}
+                        style={{
+                            width: '100%',
+                            height: '200px',
+                            backgroundColor: '#1A1B1E',
+                            borderRadius: '4px'
+                        }}
+                    />
+                </Paper>
+              )}
             </Stack>
           </Card>
         </Stack>
