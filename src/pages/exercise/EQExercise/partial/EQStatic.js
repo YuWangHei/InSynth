@@ -5,7 +5,6 @@ import StaticPlayer from "./StaticPlayer";
 import { freq_centers, sliderGainRatio } from "./eq_helper";
 import CustomContainer from "../../../../components/CustomContainer";
 import EQPanel from "./EQPanel";
-import VSlider from "../../../../components/VSlider";
 
 function EQStatic({ audioFile }) {
   const [plotExpr, setPlotExpr] = useState('0');
@@ -22,8 +21,7 @@ function EQStatic({ audioFile }) {
     // Forward filter changes to StaticPlayer
     // No. of filters = no. of sliders
     const newFilters = filters.map((obj, idx) => {
-      obj.gain += newSliderValues[idx] / 100 * sliderGainRatio;
-      console.log(obj);
+      obj.gain = newSliderValues[idx] / 100 * sliderGainRatio;
       return obj;
     });
     setFilters(newFilters);

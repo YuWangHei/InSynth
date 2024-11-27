@@ -36,7 +36,7 @@ function StaticPlayer({ audioFile, filters = [] }) {
   useEffect(() => {
     if (filters.length !== 0 && filtersRef.current.length !== 0) {
       filters.map((obj, idx) => {
-        applyFilter(filtersRef.current[idx], obj.type);
+        applyFilter(filtersRef.current[idx], obj);
       });
     }
   }, [filters]);
@@ -80,6 +80,7 @@ function StaticPlayer({ audioFile, filters = [] }) {
 
   // Set the parameters of the given filterNode
   const applyFilter = (filterNode, obj = { type: 'peaking', freq: 20, q: 1, gain: 0 }) => {
+    console.log(obj);
     filterNode.type = obj.type;
     filterNode.frequency.setValueAtTime(obj.freq, audioContextRef.current.currentTime);
     filterNode.Q.setValueAtTime(obj.q, audioContextRef.current.currentTime);
