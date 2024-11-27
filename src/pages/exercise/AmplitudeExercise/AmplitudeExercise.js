@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Alert, Button, Card, Container, Group, Stack, Switch, Text, Title, RingProgress } from '@mantine/core';
 import { IconRefresh, IconArrowRight, IconPlayerPlayFilled, IconPlayerPauseFilled } from '@tabler/icons-react';
 import Frame from '../../Frame';
-import audioFile from '../../../Music/Mineral_cropped.wav'
+import { getRandomAudio } from '../../../Music/AudioPicker';
 
 function AmplitudeExercise() {
     const navigate = useNavigate();
@@ -14,6 +14,7 @@ function AmplitudeExercise() {
     const [gainValue, setGainValue] = useState(0);
     const [isOriginal, setIsOriginal] = useState(false);
 
+    const [audioFile, setAudioFile] = useState(null);
     const audioContextRef = useRef(null);
     const audioBufferRef = useRef(null);
     const gainNodeRef = useRef(null);
@@ -58,6 +59,7 @@ function AmplitudeExercise() {
 
         // Only create and connect the source when audio starts playing
         const setupAudio = async () => {
+            setAudioFile(getRandomAudio());
             
             const response = await  fetch(audioFile);
             const arrayBuffer = await response.arrayBuffer();

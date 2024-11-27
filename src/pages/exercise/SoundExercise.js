@@ -10,6 +10,7 @@ import {
   Alert,
   Container,
   RingProgress,
+  MantineProvider
 } from '@mantine/core';
 import { IconVolume, IconRefresh, IconArrowRight, IconPlayerPlayFilled, IconPlayerPauseFilled, IconPlayerPause } from '@tabler/icons-react';
 import Frame from '../Frame';
