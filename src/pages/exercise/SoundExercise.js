@@ -237,7 +237,7 @@ const drawSpectrum = () => {
                   <Group>
                   <Button 
                     onClick={handlePlayRandomWaveform} 
-                    disabled={score.total >= 10 || isPlayed} 
+                    disabled={score.total >= 10 || isPlayed || showFeedback} 
                     rightSection={ <IconPlayerPlayFilled size={20} />}
                     variant="gradient" 
                     gradient={{ from: 'indigo', to: 'cyan' }}
