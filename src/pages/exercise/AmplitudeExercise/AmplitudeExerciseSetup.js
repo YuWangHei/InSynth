@@ -76,9 +76,9 @@ function AmplitudeExerciseSetup() {
                     >
                         <Title order={4} mb="md">Exercise Instructions</Title>
                         <Text>
-                            • Listen to the original and panned audio<br />
-                            • Click on the panning container to guess the pan position<br />
-                            • Get points for guesses within the selected difficulty range
+                            • Listen to the original and amplified audio<br />
+                            • Guess how much decibels the audio is amplified by<br />
+                            • Get points for correct guesses
                         </Text>
                     </Card>
                 </Stack>
