@@ -44,47 +44,21 @@ function AmplitudeExercise() {
     };
 
     const nextQuestion = () => {
+        stopCurrentAudio();
+        setupAudio();
         generateAnswer(generateRandomGain());
         setHasAnswered(false);
-        if (isPlaying) {
-            togglePlay();
-        }
     };
 
     useEffect(() => {
-        let source = null;
         audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
         gainNodeRef.current = audioContextRef.current.createGain();
 
-        // Only create and connect the source when audio starts playing
-        const setupAudio = async () => {
-            const audioFile = getRandomAudio();
-            
-            const response = await  fetch(audioFile);
-            const arrayBuffer = await response.arrayBuffer();
-            audioBufferRef.current = await audioContextRef.current.decodeAudioData(arrayBuffer);
-            sourceRef.current = audioContextRef.current.createBufferSource();
-            sourceRef.current.buffer = audioBufferRef.current;
-
-            sourceRef.current.loop = true;
-            sourceRef.current.loopStart = 0;
-            sourceRef.current.loopEnd = audioBufferRef.current.duration;
-
-            sourceRef.current.connect(gainNodeRef.current);
-            gainNodeRef.current.connect(audioContextRef.current.destination);
-            // source = context.createMediaElementSource(audioRef.current);
-                // source.connect(gain);
-                // gain.connect(context.destination);
-                // gainNodeRef.current = gain;
-        };
         setupAudio();
-
-        // Add event listener for the first play
-        // audioRef.current.addEventListener('play', setupAudio, { once: true });
-
         nextQuestion();
 
         return () => {
+            stopCurrentAudio();
             if (audioContextRef.current) {
                 audioContextRef.current.close();
             }
@@ -114,14 +88,21 @@ function AmplitudeExercise() {
     const togglePlay = async () => {
         if (!startPlaying) {
             setStartPlaying(true);
-            sourceRef.current.start(0);
+            if (sourceRef.current) {
+                try {
+                    sourceRef.current.start(0);
+                } catch (e) {
+                    console.log('Error starting source:', e);
+                    // If there's an error, try to set up audio again
+                    await setupAudio();
+                    sourceRef.current?.start(0);
+                }
+            }
         }
+        
         if (isPlaying) {
-            // audioRef.current.pause();
             gainNodeRef.current.gain.setValueAtTime(0, audioContextRef.current.currentTime);
         } else {
-            // await audioContextRef.current.resume();
-            // audioRef.current.play();
             if (!isOriginal) {
                 const amplification = Math.pow(10, gainValue / 20);
                 gainNodeRef.current.gain.setValueAtTime(amplification, audioContextRef.current.currentTime);
@@ -152,16 +133,53 @@ function AmplitudeExercise() {
     const toggleOriginal = (gain) => {
         setIsOriginal(!isOriginal);
         if (!isOriginal) {
-            gainNodeRef.current.gain.setValueAtTime(1, audioContextRef.current.currentTime);
+            if (isPlaying) {
+                gainNodeRef.current.gain.setValueAtTime(1, audioContextRef.current.currentTime);
+            }
         } else {
+            if (isPlaying) {
             const amplification = Math.pow(10, gain / 20);
             gainNodeRef.current.gain.setValueAtTime(amplification, audioContextRef.current.currentTime);
+            }
         }
     };
 
     const startOver = () => {
         navigate('/AmplitudeExercise/setup');
     }
+
+    const stopCurrentAudio = () => {
+        if (sourceRef.current) {
+            try {
+                sourceRef.current.stop();
+                sourceRef.current.disconnect();
+            } catch (e) {
+                console.log('Error stopping source:', e);
+            }
+            sourceRef.current = null;
+        }
+        setIsPlaying(false);
+        setStartPlaying(false);  // Reset the start playing state
+    };
+
+    const setupAudio = async () => {
+        // Stop any currently playing audio
+        stopCurrentAudio();
+        
+        const audioFile = getRandomAudio();
+        const response = await fetch(audioFile);
+        const arrayBuffer = await response.arrayBuffer();
+        audioBufferRef.current = await audioContextRef.current.decodeAudioData(arrayBuffer);
+        sourceRef.current = audioContextRef.current.createBufferSource();
+        sourceRef.current.buffer = audioBufferRef.current;
+
+        sourceRef.current.loop = true;
+        sourceRef.current.loopStart = 0;
+        sourceRef.current.loopEnd = audioBufferRef.current.duration;
+
+        sourceRef.current.connect(gainNodeRef.current);
+        gainNodeRef.current.connect(audioContextRef.current.destination);
+    };
 
     return (
         <Frame>
