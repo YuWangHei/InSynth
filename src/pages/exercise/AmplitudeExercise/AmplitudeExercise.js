@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Alert, Button, Container, Group, Paper, Stack, Switch, Text } from '@mantine/core';
 import { IconRefresh, IconArrowRight } from '@tabler/icons-react';
 import Frame from '../../Frame';
-import audioFile from '../../Music/Mineral_cropped.wav'
+import audioFile from '../../../Music/Mineral_cropped.wav'
 
 function AmplitudeExercise() {
     const navigate = useNavigate();

@@ -6,7 +6,7 @@ import Dashboard from './pages/dashboard/Dashboard';
 import SoundExercise from './pages/exercise/SoundExercise.js';
 import EffectExercise from './pages/exercise/EffectExercise.js';
 import SynthExercise from './pages/exercise/SynthExercise.js';
-import AmplitudeExercise from './pages/exercise/AmplitudeExercise/AmplitudeExerciseSetup.js';
+import AmplitudeExercise from './pages/exercise/AmplitudeExercise/AmplitudeExercise.js';
 import AmplitudeExerciseSetup from './pages/exercise/AmplitudeExercise/AmplitudeExerciseSetup.js';
 import EQExercise from './pages/exercise/EQExercise/EQExercise.js';
 import PanningExercise from './pages/exercise/PanningExercise/PanningExercise.js';
