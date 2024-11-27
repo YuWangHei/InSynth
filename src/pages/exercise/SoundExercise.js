@@ -9,10 +9,8 @@ import {
   Grid,
   Alert,
   Container,
-  RingProgress,
-  MantineProvider
-} from '@mantine/core';
-import { IconVolume, IconRefresh, IconArrowRight, IconPlayerPlayFilled, IconPlayerPauseFilled, IconPlayerPause } from '@tabler/icons-react';
+  RingProgress} from '@mantine/core';
+import { IconRefresh, IconArrowRight, IconPlayerPlayFilled } from '@tabler/icons-react';
 import Frame from '../Frame';
 import * as Tone from 'tone';
 

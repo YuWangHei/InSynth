@@ -40,7 +40,7 @@ function Home() {
     {
       title: 'Panning Exercise',
       description: 'Learn about panning and how it works',
-      path: '/AmplitudeExercise/setup',
+      path: '/PanningExercise/setup',
       icon: '🎧'
     }
   ];

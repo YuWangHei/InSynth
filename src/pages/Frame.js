@@ -8,8 +8,8 @@ function Frame({ children }) {
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
 
   return (
-    <AppShell
-      header={{ height: 60 }}
+      <AppShell
+        header={{ height: 60 }}
       navbar={{
         width: 300,
         breakpoint: 'sm',
@@ -42,8 +42,9 @@ function Frame({ children }) {
       </AppShell.Navbar>
       <AppShell.Main>
         {children}
-      </AppShell.Main>
-    </AppShell>
+        </AppShell.Main>
+      </AppShell>
+    
   );
 }
 

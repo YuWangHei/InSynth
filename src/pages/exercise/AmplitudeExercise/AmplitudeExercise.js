@@ -14,7 +14,6 @@ function AmplitudeExercise() {
     const [gainValue, setGainValue] = useState(0);
     const [isOriginal, setIsOriginal] = useState(false);
 
-    const [audioFile, setAudioFile] = useState(null);
     const audioContextRef = useRef(null);
     const audioBufferRef = useRef(null);
     const gainNodeRef = useRef(null);
@@ -59,7 +58,7 @@ function AmplitudeExercise() {
 
         // Only create and connect the source when audio starts playing
         const setupAudio = async () => {
-            setAudioFile(getRandomAudio());
+            const audioFile = getRandomAudio();
             
             const response = await  fetch(audioFile);
             const arrayBuffer = await response.arrayBuffer();
