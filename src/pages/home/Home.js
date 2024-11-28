@@ -61,7 +61,8 @@ function Home() {
           src={homebg2}
           h={200}
         >
-          <Container size="lg" h="100%" style={{ position: 'relative', zIndex: 1 }} px={2} justify="flex-end">
+        </BackgroundImage>
+        <Container size="lg" h="100%" style={{ position: 'relative', zIndex: 1 }} px={2} justify="flex-end">
             <Text size="xl" fw={700} c="#FFFFFF" pt={60}>
               Audio Learning & Training Platform
             </Text>
@@ -69,7 +70,6 @@ function Home() {
               Master the fundamentals of audio processing and mixing
             </Text>
           </Container>
-        </BackgroundImage>
         <div className={styles.cardContainer}>
           <h1>Playground Portal</h1>
           <div className={styles.cardGrid}>
