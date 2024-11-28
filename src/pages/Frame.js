@@ -38,17 +38,17 @@ function Frame({ children }) {
               <Text size='xl' fw={700}>InSynth</Text>
             </Group>
             <Group>
-            <Button onClick={() => navigate('/')} variant='outline'>
-              <IconHome />
-            </Button>
-            <ActionIcon
-              variant="outline"
-              color={dark ? 'yellow' : 'blue'}
-              onClick={() => toggleColorScheme()}
-              title="Toggle color scheme"
-            >
-              {dark ? <IconSun size={18} /> : <IconMoon size={18} />}
-            </ActionIcon>
+              <Button onClick={() => navigate('/')} variant='outline'>
+                <IconHome />
+              </Button>
+              <ActionIcon
+                variant="outline"
+                color={dark ? 'yellow' : 'blue'}
+                onClick={() => toggleColorScheme()}
+                title="Toggle color scheme"
+              >
+                {dark ? <IconSun size={18} /> : <IconMoon size={18} />}
+              </ActionIcon>
             </Group>
           </Group>
         </AppShell.Header>
@@ -65,9 +65,9 @@ function Frame({ children }) {
             <NavLink href='#/AmplitudeExercise/setup' label='Amplitude' />
             <NavLink href='#/PanningExercise/setup' label='Panning' />
             {/* <NavLink href='#/SoundQ3' label='Question Type 3' /> */}
-            <NavLink href='#/MixingEq' label='Eq1' />
+            {/* <NavLink href='#/MixingEq' label='Eq1' /> */}
             {/* <NavLink href='#/SynthQ2' label='Eq2' /> */}
-            
+
           </NavLink>
         </AppShell.Navbar>
         <AppShell.Main>
