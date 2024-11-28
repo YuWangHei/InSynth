@@ -1,19 +1,32 @@
 import { Button, Flex } from "@mantine/core";
 import { useEffect, useState, useRef } from "react";
+import { generateLogSamples } from "./eq_helper";
 
 // filters: expect fixed number of filters, i.e. no adding or removing filters after initialization
-function StaticPlayer({ audioFile, filters = [] }) {
+function StaticPlayer({ audioFile, filters = [], onChange }) {
   const audioContextRef = useRef(null);
   const sourceRef = useRef(null);
   const audioBufferRef = useRef(null);
   const filtersRef = useRef([]);
+  const sampleSpace = new Float32Array(generateLogSamples());
+  const magResponseRef = useRef([]);
+  const phaseResponseRef = useRef([]);
 
 
   // One-time actions
   useEffect(() => {
     // Action on mount
+
     // Create AudioContext
     audioContextRef.current = new window.AudioContext();
+
+    // Create nested arrays for frequency response
+    for (let i = 0; i < filters.length; i++) {
+      magResponseRef.current[i] = new Float32Array(sampleSpace.length);
+      phaseResponseRef.current[i] = new Float32Array(sampleSpace.length);
+      console.log(magResponseRef.current);
+    }
+
     // Load audio file
     const loadAudio = async () => {
       const response = await fetch(audioFile);
@@ -36,7 +49,13 @@ function StaticPlayer({ audioFile, filters = [] }) {
   useEffect(() => {
     if (filters.length !== 0 && filtersRef.current.length !== 0) {
       filters.map((obj, idx) => {
-        applyFilter(filtersRef.current[idx], obj.type);
+        // Apply filter to the audio
+        applyFilter(filtersRef.current[idx], obj);
+        // Obtain the frequency response ratio change from this filter
+        filtersRef.current[idx].getFrequencyResponse(sampleSpace, magResponseRef.current[idx], phaseResponseRef.current[idx]);
+        // Pass data to parent
+        console.log(magResponseRef.current);
+        onChange(magResponseRef.current, phaseResponseRef.current);
       });
     }
   }, [filters]);
