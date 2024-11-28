@@ -63,14 +63,27 @@ function Home() {
         >
           <Container size="lg" h="100%" style={{ position: 'relative', zIndex: 1 }} px={2} justify="flex-end">
             <Text size="xl" fw={700} c="#FFFFFF" pt={60}>
-              Audio Learning Platform
+              Audio Learning & Training Platform
             </Text>
             <Text size="xl"  c="#FFFFFF" mt="sm">
               Master the fundamentals of audio processing and mixing
             </Text>
           </Container>
         </BackgroundImage>
-
+        <div className={styles.cardContainer}>
+          <h1>Playground Portal</h1>
+          <div className={styles.cardGrid}>
+            <div 
+              key="playground"
+              className={styles.card}
+              onClick={() => navigate('/Playground')}
+            >
+              <div className={styles.cardIcon}>🎮</div>
+              <h2>Playground</h2>
+              <p>Explore and experiment with audio processing tools</p>
+            </div>
+          </div>
+        </div>
         <div className={styles.cardContainer}>
           <h1>Synth Exercises</h1>
           <div className={styles.cardGrid}>

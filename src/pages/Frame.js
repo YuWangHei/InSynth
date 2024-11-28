@@ -1,7 +1,8 @@
-import { AppShell, NavLink, Burger, Group, Text, MantineProvider, createTheme, ActionIcon, useMantineColorScheme } from '@mantine/core';
+import { AppShell, NavLink, Burger, Group, Text, MantineProvider, createTheme, ActionIcon, useMantineColorScheme, Button } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IconDashboard, IconHome, IconBrandDeezer, IconAdjustmentsAlt, IconSun, IconMoon } from '@tabler/icons-react';
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const theme = createTheme({
   fontFamily: 'Open Sans, sans-serif',
@@ -13,6 +14,7 @@ function Frame({ children }) {
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
   const dark = colorScheme === 'dark';
+  const navigate = useNavigate();
 
   return (
     <MantineProvider
@@ -35,7 +37,10 @@ function Frame({ children }) {
               <Burger opened={desktopOpened} onClick={toggleDesktop} visibleFrom="sm" size="sm" />
               <Text size='xl' fw={700}>InSynth</Text>
             </Group>
-
+            <Group>
+            <Button onClick={() => navigate('/')} variant='outline'>
+              <IconHome />
+            </Button>
             <ActionIcon
               variant="outline"
               color={dark ? 'yellow' : 'blue'}
@@ -44,6 +49,7 @@ function Frame({ children }) {
             >
               {dark ? <IconSun size={18} /> : <IconMoon size={18} />}
             </ActionIcon>
+            </Group>
           </Group>
         </AppShell.Header>
         <AppShell.Navbar p="md">
