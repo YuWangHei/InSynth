@@ -330,16 +330,14 @@ function Playground() {
     for (let i = 0; i < bufferLength; i++) {
         const v = dataArray[i];
         const y = (v + 1) / 2 * canvas.height;
-
         if (i === 0) {
             ctx.moveTo(x, y);
         } else {
             ctx.lineTo(x, y);
         }
-
         x += sliceWidth;
     }
-    
+
     ctx.stroke();
     animationFrameRef.current = requestAnimationFrame(drawWaveform);
 };
