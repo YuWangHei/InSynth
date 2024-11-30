@@ -4,12 +4,20 @@ import './index.css';
 import App from './App';
 // import reportWebVitals from './reportWebVitals';
 import { HashRouter } from 'react-router-dom';
-import { MantineProvider } from '@mantine/core';
+import { MantineProvider, createTheme } from '@mantine/core';
+
+const theme = createTheme({
+  fontFamily: 'Open Sans, sans-serif',
+  primaryColor: 'cyan',
+});
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <MantineProvider>
+    <MantineProvider
+      theme={theme}
+      defaultColorScheme='dark'
+    >
       <HashRouter>
         <App />
       </HashRouter>

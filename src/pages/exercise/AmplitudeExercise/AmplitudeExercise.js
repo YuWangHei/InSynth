@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Alert, Button, Card, Container, Group, Stack, Switch, Text, Title, RingProgress, Paper } from '@mantine/core';
 import { IconRefresh, IconArrowRight, IconPlayerPlayFilled, IconPlayerPauseFilled } from '@tabler/icons-react';
-import Frame from '../../Frame';
 import { getRandomAudio } from '../../../Music/AudioPicker';
 
 function AmplitudeExercise() {
@@ -82,14 +81,14 @@ function AmplitudeExercise() {
         const ctx = canvas.getContext('2d');
         const bufferLength = analyzerRef.current.frequencyBinCount;
         const dataArray = new Float32Array(bufferLength);
-        
+
         analyzerRef.current.getFloatTimeDomainData(dataArray);
-        
+
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.beginPath();
         ctx.lineWidth = 2;
         ctx.strokeStyle = '#00ff00';
-        
+
         const sliceWidth = canvas.width / bufferLength;
         let x = 0;
 
@@ -105,7 +104,7 @@ function AmplitudeExercise() {
 
             x += sliceWidth;
         }
-        
+
         ctx.stroke();
         animationFrameRef.current = requestAnimationFrame(drawWaveform);
     };
@@ -149,7 +148,7 @@ function AmplitudeExercise() {
                 }
             }
         }
-        
+
         if (isPlaying) {
             gainNodeRef.current.gain.setValueAtTime(0, audioContextRef.current.currentTime);
             if (animationFrameRef.current) {
@@ -203,8 +202,8 @@ function AmplitudeExercise() {
             }
         } else {
             if (isPlaying) {
-            const amplification = Math.pow(10, gain / 20);
-            gainNodeRef.current.gain.setValueAtTime(amplification, audioContextRef.current.currentTime);
+                const amplification = Math.pow(10, gain / 20);
+                gainNodeRef.current.gain.setValueAtTime(amplification, audioContextRef.current.currentTime);
             }
         }
     };
@@ -229,7 +228,7 @@ function AmplitudeExercise() {
 
     const setupAudio = async () => {
         stopCurrentAudio();
-        
+
         const audioFile = getRandomAudio();
         const response = await fetch(audioFile);
         const arrayBuffer = await response.arrayBuffer();
@@ -247,56 +246,55 @@ function AmplitudeExercise() {
     };
 
     return (
-        <Frame>
-            <Container size="md" mt="md">
-                <Stack spacing="md" >
-                    <Title order={1} align='center'>Amplitude Exercise</Title>
-                    <Card shadow="md" p="lg" radius="md" withBorder>
-                        
-                        <Stack spacing="sm">
-                            <Group position="apart" justify="space-between" align="center">
-                                <Button 
-                                    onClick={togglePlay}
-                                    rightSection={isPlaying ? <IconPlayerPauseFilled size={20} /> : <IconPlayerPlayFilled size={20} />}
-                                    size='lg'
-                                    color={isPlaying ? 'red' : 'green'}
-                                >
-                                    {isPlaying ? 'Pause' : 'Play'}
-                                </Button>
-                                <RingProgress
-                                    size={110}
-                                    label={
-                                        <Text size="lg" ta="center">
+        <Container size="md" mt="md">
+            <Stack spacing="md" >
+                <Title order={1} align='center'>Amplitude Exercise</Title>
+                <Card shadow="md" p="lg" radius="md" withBorder>
+
+                    <Stack spacing="sm">
+                        <Group position="apart" justify="space-between" align="center">
+                            <Button
+                                onClick={togglePlay}
+                                rightSection={isPlaying ? <IconPlayerPauseFilled size={20} /> : <IconPlayerPlayFilled size={20} />}
+                                size='lg'
+                                color={isPlaying ? 'red' : 'green'}
+                            >
+                                {isPlaying ? 'Pause' : 'Play'}
+                            </Button>
+                            <RingProgress
+                                size={110}
+                                label={
+                                    <Text size="lg" ta="center">
                                         {score.total}/{MAX_SCORE}
-                                        </Text>
-                                    }
-                                    sections={[
-                                        { value: ((score.total - score.correct) / MAX_SCORE) * 100, color: 'red' },
+                                    </Text>
+                                }
+                                sections={[
+                                    { value: ((score.total - score.correct) / MAX_SCORE) * 100, color: 'red' },
                                     { value: (score.correct / MAX_SCORE) * 100, color: 'green' }
                                 ]}
                             />
-                            </Group>
-                            
-                            <Group justify="center" grow wrap="nowrap">
-                                <Button 
-                                    onClick={() => handleAnswer(answer1)} 
-                                    variant="outline" 
-                                    color="blue" 
-                                    radius="lg"
-                                    h={100}
-                                >
-                                    <Text size="xl" weight={500} fw={700}>{answer1 + " dB"}</Text>
-                                </Button>
-                                <Button 
-                                    onClick={() => handleAnswer(answer2)} 
-                                    variant="outline" 
-                                    color="blue" 
-                                    radius="lg" 
-                                    h={100}
-                                >
-                                    <Text size="xl" weight={500} fw={700}>{answer2 + " dB"}</Text>
-                                </Button>
-                            </Group>
+                        </Group>
+
+                        <Group justify="center" grow wrap="nowrap">
+                            <Button
+                                onClick={() => handleAnswer(answer1)}
+                                variant="outline"
+                                color="blue"
+                                radius="lg"
+                                h={100}
+                            >
+                                <Text size="xl" weight={500} fw={700}>{answer1 + " dB"}</Text>
+                            </Button>
+                            <Button
+                                onClick={() => handleAnswer(answer2)}
+                                variant="outline"
+                                color="blue"
+                                radius="lg"
+                                h={100}
+                            >
+                                <Text size="xl" weight={500} fw={700}>{answer2 + " dB"}</Text>
+                            </Button>
+                        </Group>
 
                         {hasAnswered && (
                             <Alert
@@ -327,55 +325,54 @@ function AmplitudeExercise() {
                         >
                             {score.total >= MAX_SCORE ? "Start Over" : "Next Stage"}
                         </Button>
-                    {/* {hasAnswered && <Button onClick={nextQuestion}>Next Question</Button>} */}
-                    <Group position="apart" align="center">
-                        <Switch
-                            checked={isOriginal}
-                            onChange={() => toggleOriginal(gainValue)}
-                            label={isOriginal ? "Original" : "Edited"}
-                            color="blue"
-                            size="md"
-                            styles={{
-                                label: {
-                                    color: 'var(--mantine-color-text)',
-                                    fontWeight: 500
-                                }
-                            }}
-                        />
-                        <Button 
-                            onClick={() => setShowWaveform(!showWaveform)} 
-                            color="teal"
-                            size="md"
-                            variant="light"
-                        >
-                            {showWaveform ? 'Hide Waveform' : 'Show Waveform'}
-                        </Button>
-                    </Group>
-                    {/* Text for Debugging */}
-                    <Text size="sm" c="dimmed">
-                        (gainValue: {gainValue})
-                        (IsPlaying: {isPlaying.toString()}.)
-                        </Text>
-                    {showWaveform && (
-                        <Paper p="xs" withBorder>
-                            <canvas 
-                                ref={waveformCanvasRef}
-                                width={800}
-                                height={200}
-                                style={{
-                                    width: '100%',
-                                    height: '200px',
-                                    backgroundColor: '#1A1B1E',
-                                    borderRadius: '4px'
+                        {/* {hasAnswered && <Button onClick={nextQuestion}>Next Question</Button>} */}
+                        <Group position="apart" align="center">
+                            <Switch
+                                checked={isOriginal}
+                                onChange={() => toggleOriginal(gainValue)}
+                                label={isOriginal ? "Original" : "Edited"}
+                                color="blue"
+                                size="md"
+                                styles={{
+                                    label: {
+                                        color: 'var(--mantine-color-text)',
+                                        fontWeight: 500
+                                    }
                                 }}
                             />
-                        </Paper>
-                    )}
+                            <Button
+                                onClick={() => setShowWaveform(!showWaveform)}
+                                color="teal"
+                                size="md"
+                                variant="light"
+                            >
+                                {showWaveform ? 'Hide Waveform' : 'Show Waveform'}
+                            </Button>
+                        </Group>
+                        {/* Text for Debugging */}
+                        <Text size="sm" c="dimmed">
+                            (gainValue: {gainValue})
+                            (IsPlaying: {isPlaying.toString()}.)
+                        </Text>
+                        {showWaveform && (
+                            <Paper p="xs" withBorder>
+                                <canvas
+                                    ref={waveformCanvasRef}
+                                    width={800}
+                                    height={200}
+                                    style={{
+                                        width: '100%',
+                                        height: '200px',
+                                        backgroundColor: '#1A1B1E',
+                                        borderRadius: '4px'
+                                    }}
+                                />
+                            </Paper>
+                        )}
                     </Stack>
-                    </Card>
-                </Stack>
-            </Container>
-        </Frame>
+                </Card>
+            </Stack>
+        </Container>
     );
 }
 

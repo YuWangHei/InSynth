@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import Frame from '../Frame';
 import styled from 'styled-components';
-import { getRandomAudio } from '../../Music/AudioPicker';
+import { getRandomAudio } from '../../../Music/AudioPicker';
 import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -381,38 +380,36 @@ function SynthExercise() {
   // ... (keep the rest of the code the same, including chartData and chartOptions)
 
   return (
-    <Frame>
-      <EQContainer>
-        <h1>EQ Training Exercise</h1>
+    <EQContainer>
+      <h1>EQ Training Exercise</h1>
 
-        <GraphContainer>
-          <Line ref={chartRef} data={chartData} options={chartOptions} />
-        </GraphContainer>
+      <GraphContainer>
+        <Line ref={chartRef} data={chartData} options={chartOptions} />
+      </GraphContainer>
 
-        <PlaybackControls>
-          <PlaybackButton onClick={playOriginal}>
-            {isPlayingOriginal ? 'Stop Original' : 'Play Original'}
-          </PlaybackButton>
-          <PlaybackButton $mode="target" onClick={playTarget}>
-            {isPlayingTarget ? 'Stop Target' : 'Play Target'}
-          </PlaybackButton>
-          <Button onClick={togglePlay}>
-            {isPlaying ? 'Stop Your EQ' : 'Play Your EQ'}
-          </Button>
-        </PlaybackControls>
+      <PlaybackControls>
+        <PlaybackButton onClick={playOriginal}>
+          {isPlayingOriginal ? 'Stop Original' : 'Play Original'}
+        </PlaybackButton>
+        <PlaybackButton $mode="target" onClick={playTarget}>
+          {isPlayingTarget ? 'Stop Target' : 'Play Target'}
+        </PlaybackButton>
+        <Button onClick={togglePlay}>
+          {isPlaying ? 'Stop Your EQ' : 'Play Your EQ'}
+        </Button>
+      </PlaybackControls>
 
-        <Controls>
-          <Button onClick={generateTargetEQ}>
-            New Target EQ
-          </Button>
-          <Button onClick={checkScore}>
-            Check Score
-          </Button>
-        </Controls>
+      <Controls>
+        <Button onClick={generateTargetEQ}>
+          New Target EQ
+        </Button>
+        <Button onClick={checkScore}>
+          Check Score
+        </Button>
+      </Controls>
 
-        <Score>Score: {score}</Score>
-      </EQContainer>
-    </Frame>
+      <Score>Score: {score}</Score>
+    </EQContainer>
   );
 }
 

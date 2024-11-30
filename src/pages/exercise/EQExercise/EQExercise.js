@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import Frame from "../../Frame";
 import EQStatic from "./partial/EQStatic";
 import EQMenu from "./partial/EQMenu";
 import EQParametric from "./partial/EQParametric";
 import { getRandomAudio } from "../../../Music/AudioPicker";
+import { Container } from "@mantine/core";
 
 function EQExercise() {
   const [inMenu, setInMenu] = useState(true);
@@ -26,14 +26,14 @@ function EQExercise() {
   }
 
   return (
-    <Frame>
+    <Container>
       {inMenu ?
         <EQMenu onSelect={onSelect} /> :
         inQMode ?
           <EQStatic audioFile={audio} /> :
           <EQParametric audioFile={audio} />
       }
-    </Frame>
+    </Container>
   )
 }
 

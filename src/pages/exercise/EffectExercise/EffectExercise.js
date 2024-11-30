@@ -15,7 +15,6 @@ import {
   Paper
 } from '@mantine/core';
 import { IconVolume, IconRefresh, IconArrowRight, IconPlayerPlayFilled, IconPlayerPauseFilled, IconPlayerPause, IconSettings } from '@tabler/icons-react';
-import Frame from '../../Frame';
 import { getRandomAudio } from '../../../Music/AudioPicker';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -51,7 +50,7 @@ const effects = [
       const convolver = audioContext.createConvolver();
       const length = audioContext.sampleRate * (2 * config.parameterMultipliers['Reverb'].length);
       const impulse = audioContext.createBuffer(2, length, audioContext.sampleRate);
-      
+
       for (let channel = 0; channel < 2; channel++) {
         const channelData = impulse.getChannelData(channel);
         for (let i = 0; i < length; i++) {
@@ -85,7 +84,7 @@ const effects = [
       compressor.threshold.value = -24 * config.parameterMultipliers['Compression'].threshold;
       compressor.knee.value = 30;
       compressor.ratio.value = 12 * config.parameterMultipliers['Compression'].ratio;
-      compressor.attack.value = 0.003 ;
+      compressor.attack.value = 0.003;
       compressor.release.value = 0.25;
       return compressor;
     }
@@ -93,7 +92,7 @@ const effects = [
   {
     name: 'Distortion',
     description: 'Adds harmonic saturation and grit',
-    setup: (audioContext, difficulty ) => {
+    setup: (audioContext, difficulty) => {
       const config = DIFFICULTY_CONFIG[difficulty];
       const distortion = audioContext.createWaveShaper();
       const amount = 50 * config.parameterMultipliers['Distortion'].amount;
@@ -115,9 +114,9 @@ const effects = [
 function EffectExercise() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { 
-    difficulty = 'Easy', 
-    maxQuestions = 10 
+  const {
+    difficulty = 'Easy',
+    maxQuestions = 10
   } = location.state || {};
 
   const [currentEffect, setCurrentEffect] = useState(null);
@@ -158,9 +157,9 @@ function EffectExercise() {
 
   useEffect(() => {
     if (showWaveform && isPlaying) {
-        drawWaveform();
+      drawWaveform();
     } else if (!showWaveform && animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
+      cancelAnimationFrame(animationFrameRef.current);
     }
   }, [showWaveform]);
 
@@ -172,7 +171,7 @@ function EffectExercise() {
       setCurrentEffect(randomEffect);
       setSelectedEffect(null);
       setShowFeedback(false);
-      
+
       setupNewAudio();
     } else {
       setCurrentEffect(null);
@@ -237,7 +236,7 @@ function EffectExercise() {
     gainNode.connect(analyzerRef.current);
     analyzerRef.current.connect(audioContextRef.current.destination);
 
-    
+
     source.start(0);
     if (showWaveform) {
       drawWaveform();
@@ -336,51 +335,50 @@ function EffectExercise() {
     const ctx = canvas.getContext('2d');
     const bufferLength = analyzerRef.current.frequencyBinCount;
     const dataArray = new Float32Array(bufferLength);
-    
+
     analyzerRef.current.getFloatTimeDomainData(dataArray);
-    
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.beginPath();
     ctx.lineWidth = 2;
     ctx.strokeStyle = '#00ff00';
-    
+
     const sliceWidth = canvas.width / bufferLength;
     let x = 0;
 
     for (let i = 0; i < bufferLength; i++) {
-        const v = dataArray[i];
-        const y = (v + 1) / 2 * canvas.height;
+      const v = dataArray[i];
+      const y = (v + 1) / 2 * canvas.height;
 
-        if (i === 0) {
-            ctx.moveTo(x, y);
-        } else {
-            ctx.lineTo(x, y);
-        }
+      if (i === 0) {
+        ctx.moveTo(x, y);
+      } else {
+        ctx.lineTo(x, y);
+      }
 
-        x += sliceWidth;
+      x += sliceWidth;
     }
-    
+
     ctx.stroke();
     animationFrameRef.current = requestAnimationFrame(drawWaveform);
-};
+  };
 
   return (
-    <Frame>
-      <Container size="md" px="md">
-        <Stack spacing="lg">
-          <Title order={1} align='center'>
-              Effect Exercise
-              <Text size="md" fs={700} c="dimmed">
-                {difficulty} Mode | {maxQuestions} Questions
-              </Text>
-            </Title>
+    <Container size="md" px="md">
+      <Stack spacing="lg">
+        <Title order={1} align='center'>
+          Effect Exercise
+          <Text size="md" fs={700} c="dimmed">
+            {difficulty} Mode | {maxQuestions} Questions
+          </Text>
+        </Title>
 
-          <Card shadow="sm" p="lg" radius="md" withBorder>
-            <Stack spacing="md" justify="flex-start">
-              <Group position="apart" justify="space-between" align="center">
-                <Stack>
-                  <Group>
-                    <Button
+        <Card shadow="sm" p="lg" radius="md" withBorder>
+          <Stack spacing="md" justify="flex-start">
+            <Group position="apart" justify="space-between" align="center">
+              <Stack>
+                <Group>
+                  <Button
                     onClick={playOriginalSound}
                     disabled={isPlayingOriginal}
                     rightSection={isPlayingOriginal ? <IconVolume size={20} /> : <IconPlayerPlayFilled size={20} />}
@@ -418,114 +416,113 @@ function EffectExercise() {
                   >
                     <IconSettings size={30} />
                   </ActionIcon>
-                    <Switch
-                      label="Show Waveform"
-                      checked={showWaveform}
-                      onChange={(event) => setShowWaveform(event.currentTarget.checked)}
-                    />
+                  <Switch
+                    label="Show Waveform"
+                    checked={showWaveform}
+                    onChange={(event) => setShowWaveform(event.currentTarget.checked)}
+                  />
                   {/* Text for Debugging */}
                   {/* <Text size="sm" c="dimmed">
                       (isPlaying: {isPlaying.toString()}, isPlayingOriginal: {isPlayingOriginal.toString()})
                 </Text> */}
                 </Group>
-                </Stack>
-                <RingProgress
-                  size={140}
-                  label={
-                    <Text size="lg" ta="center">
-                      {score.total}/{TotalScore}
-                    </Text>
-                  }
-                  sections={[
-                    { value: ((score.total - score.correct) / TotalScore) * 100, color: 'red' },
-                    { value: (score.correct / TotalScore) * 100, color: 'green' }
-                  ]}
-                />
-                </Group>
+              </Stack>
+              <RingProgress
+                size={140}
+                label={
+                  <Text size="lg" ta="center">
+                    {score.total}/{TotalScore}
+                  </Text>
+                }
+                sections={[
+                  { value: ((score.total - score.correct) / TotalScore) * 100, color: 'red' },
+                  { value: (score.correct / TotalScore) * 100, color: 'green' }
+                ]}
+              />
+            </Group>
 
-              <Grid>
-                {effects.map((effect) => (
-                  <Grid.Col key={effect.name} span={6}>
-                    <Button
-                      onClick={() => handleEffectGuess(effect)}
-                      disabled={showFeedback}
-                      variant="outline"
-                      radius="lg"
-                      color="blue"
-                      fullWidth
-                      h={100}
-                      styles={{
-                        inner: {
-                          flexDirection: 'column',
-                          height: '100%',
-                          justifyContent: 'center',
-                        },
-                      }}
-                    >
-                      <Text size="lg" weight={500} fw={700}>{effect.name}</Text>
-                      {/* <Text size="xs" mt={4} c="dimmed">
+            <Grid>
+              {effects.map((effect) => (
+                <Grid.Col key={effect.name} span={6}>
+                  <Button
+                    onClick={() => handleEffectGuess(effect)}
+                    disabled={showFeedback}
+                    variant="outline"
+                    radius="lg"
+                    color="blue"
+                    fullWidth
+                    h={100}
+                    styles={{
+                      inner: {
+                        flexDirection: 'column',
+                        height: '100%',
+                        justifyContent: 'center',
+                      },
+                    }}
+                  >
+                    <Text size="lg" weight={500} fw={700}>{effect.name}</Text>
+                    {/* <Text size="xs" mt={4} c="dimmed">
                         {effect.description}
                       </Text> */}
-                    </Button>
-                  </Grid.Col>
-                ))}
-              </Grid>
+                  </Button>
+                </Grid.Col>
+              ))}
+            </Grid>
 
-              {showFeedback && (
-                <Alert
-                  color={selectedEffect?.name === currentEffect?.name ? "green" : "red"}
-                  title={<Text fw={700} size="lg">{selectedEffect?.name === currentEffect?.name ? "Correct!" : "Not quite!"}</Text>}
-                >
-                  <Text fw={500} size="md" mt={4}>
-                    The effect was {currentEffect?.name}.
-                    {selectedEffect?.name !== currentEffect?.name &&
-                      ` Listen for ${currentEffect?.description.toLowerCase()}`}
-                  </Text>
-                </Alert>
-              )}
-
-              {score.total >= TotalScore && (
-                <Alert
-                  color="green"
-                  title={<Text fw={700} size="lg">Finished!</Text>}
-                >
-                  <Text fw={500} size="md" mt={4}>
-                    All {TotalScore} Questions are finished.
-                    Your score is {score.correct}/{score.total}!!!
-                  </Text>
-                </Alert>
-              )}
-
-              <Button
-                onClick={score.total < maxQuestions ? generateNewEffect : startOver}
-                disabled={!showFeedback}
-                rightSection={score.total >= maxQuestions ? <IconRefresh size={20} /> : <IconArrowRight size={20} />}
-                variant={score.total < maxQuestions ? "light" : "filled"}
-                fullWidth
+            {showFeedback && (
+              <Alert
+                color={selectedEffect?.name === currentEffect?.name ? "green" : "red"}
+                title={<Text fw={700} size="lg">{selectedEffect?.name === currentEffect?.name ? "Correct!" : "Not quite!"}</Text>}
               >
-                {score.total >= maxQuestions ? "Start Over" : "Next Sound"}
-          </Button>
+                <Text fw={500} size="md" mt={4}>
+                  The effect was {currentEffect?.name}.
+                  {selectedEffect?.name !== currentEffect?.name &&
+                    ` Listen for ${currentEffect?.description.toLowerCase()}`}
+                </Text>
+              </Alert>
+            )}
 
-              {showWaveform && (
-                <Paper p="xs" withBorder>
-                    <canvas 
-                        ref={waveformCanvasRef}
-                        width={800}
-                        height={200}
-                        style={{
-                            width: '100%',
-                            height: '200px',
-                            backgroundColor: '#1A1B1E',
-                            borderRadius: '4px'
-                        }}
-                    />
-                </Paper>
-              )}
-            </Stack>
-          </Card>
-        </Stack>
-      </Container>
-    </Frame>
+            {score.total >= TotalScore && (
+              <Alert
+                color="green"
+                title={<Text fw={700} size="lg">Finished!</Text>}
+              >
+                <Text fw={500} size="md" mt={4}>
+                  All {TotalScore} Questions are finished.
+                  Your score is {score.correct}/{score.total}!!!
+                </Text>
+              </Alert>
+            )}
+
+            <Button
+              onClick={score.total < maxQuestions ? generateNewEffect : startOver}
+              disabled={!showFeedback}
+              rightSection={score.total >= maxQuestions ? <IconRefresh size={20} /> : <IconArrowRight size={20} />}
+              variant={score.total < maxQuestions ? "light" : "filled"}
+              fullWidth
+            >
+              {score.total >= maxQuestions ? "Start Over" : "Next Sound"}
+            </Button>
+
+            {showWaveform && (
+              <Paper p="xs" withBorder>
+                <canvas
+                  ref={waveformCanvasRef}
+                  width={800}
+                  height={200}
+                  style={{
+                    width: '100%',
+                    height: '200px',
+                    backgroundColor: '#1A1B1E',
+                    borderRadius: '4px'
+                  }}
+                />
+              </Paper>
+            )}
+          </Stack>
+        </Card>
+      </Stack>
+    </Container>
   );
 }
 

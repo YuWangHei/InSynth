@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import Frame from '../../Frame';
 import {
     Title,
     Button,
@@ -138,7 +137,7 @@ export default function PanningExercise() {
 
         // If already playing original sound, stop it
         if (isPlayingOriginal) {
-            stopCurrentSound();    
+            stopCurrentSound();
             return;
         }
 
@@ -285,14 +284,14 @@ export default function PanningExercise() {
         const ctx = canvas.getContext('2d');
         const bufferLength = analyzerRef.current.frequencyBinCount;
         const dataArray = new Float32Array(bufferLength);
-        
+
         analyzerRef.current.getFloatTimeDomainData(dataArray);
-        
+
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.beginPath();
         ctx.lineWidth = 2;
         ctx.strokeStyle = '#00ff00';
-        
+
         const sliceWidth = canvas.width / bufferLength;
         let x = 0;
 
@@ -308,26 +307,25 @@ export default function PanningExercise() {
 
             x += sliceWidth;
         }
-        
+
         ctx.stroke();
         animationFrameRef.current = requestAnimationFrame(drawWaveform);
     };
 
     return (
-        <Frame>
-            <Container size="md" px="md" align='center'>
-                <Stack spacing="lg" >
-                    <Title order={1} align='center'>
-                        Panning Exercise
-                        <Text size="md" fs={700} c="dimmed">
-                            {difficulty} Mode | {MAX_SCORE} Questions
-                        </Text>
-                    </Title>
-                    <Group position='apart' justify='space-between' align='center'>
-                        <Group>
-                            <Stack>
-                                <Group>
-                                    <Button
+        <Container size="md" px="md" align='center'>
+            <Stack spacing="lg" >
+                <Title order={1} align='center'>
+                    Panning Exercise
+                    <Text size="md" fs={700} c="dimmed">
+                        {difficulty} Mode | {MAX_SCORE} Questions
+                    </Text>
+                </Title>
+                <Group position='apart' justify='space-between' align='center'>
+                    <Group>
+                        <Stack>
+                            <Group>
+                                <Button
                                     onClick={playOriginalSound}
                                     disabled={isPlayingOriginal}
                                     rightSection={isPlayingOriginal ? <IconVolume size={20} /> : <IconPlayerPlayFilled size={20} />}
@@ -335,7 +333,7 @@ export default function PanningExercise() {
                                     color="green"
                                     size='lg'
                                 >
-                                {isPlayingOriginal ? 'Playing Original...' : 'Play Original'}
+                                    {isPlayingOriginal ? 'Playing Original...' : 'Play Original'}
                                 </Button>
                                 <Button
                                     onClick={handlePlay}
@@ -355,8 +353,8 @@ export default function PanningExercise() {
                                 >
                                     {"Pause"}
                                 </Button>
-                                </Group>
-                                <Group position='apart' justify='flex-start' align='center'>
+                            </Group>
+                            <Group position='apart' justify='flex-start' align='center'>
                                 <ActionIcon
                                     onClick={handleBackToSetup}
                                     color="Grey"
@@ -365,10 +363,10 @@ export default function PanningExercise() {
                                 >
                                     <IconSettings size={30} />
                                 </ActionIcon>
-                                <Switch 
+                                <Switch
                                     label="Show Waveform"
                                     checked={showWaveform}
-                                    onChange={() => setShowWaveform(!showWaveform)} 
+                                    onChange={() => setShowWaveform(!showWaveform)}
                                     color="green"
                                     size="md"
                                 >
@@ -376,114 +374,114 @@ export default function PanningExercise() {
                                 <Text size="xs" mt={4} c="dimmed">
                                     {currentPan}
                                 </Text>
-                                </Group>
-                            </Stack>
-                        </Group>
-                        
-                        <RingProgress
-                            size={140}
-                            label={
-                                <Text size="lg" ta="center">
-                                    {score.total}/{MAX_SCORE}
-                                </Text>
-                            }
-                            sections={[
-                                { value: ((score.total - score.correct) / MAX_SCORE) * 100, color: 'red' },
-                                { value: (score.correct / MAX_SCORE) * 100, color: 'green' }
-                            ]}
-                        />
+                            </Group>
+                        </Stack>
                     </Group>
-                    <div className="panning-exercise">
-                        <div className="header">
-                            <div ></div>
-                            <div className="score"><Text fw={700} size="lg" mt={4}>SCORE: {score.total} / {MAX_SCORE}</Text>  </div>
-                        </div>
 
-                        <div
-                            className="panning-container"
-                            onClick={userGuess === null ? handlePanningGuess : undefined}
-                            onMouseMove={userGuess === null ? handleMouseMove : undefined}
-                            onMouseLeave={handleMouseLeave}
-                        >
-                            {[...Array(19)].map((_, index) => (
-                                <div key={index} className="grid-line">
-                                    <div className="grid-value">{((index / 18) * 2 - 1).toFixed(1)}</div>
-                                </div>
-                            ))}
-
-                            {userGuess !== null && (
-                                <>
-                                    <div
-                                        className="guess-range"
-                                        style={{
-                                            position: 'absolute',
-                                            left: `${((userGuess - RANGE_WIDTH + 1) / 2) * 100}%`,
-                                            width: `${RANGE_WIDTH * 100}%`,
-                                            height: '100%',
-                                            backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                                            pointerEvents: 'none'
-                                        }}
-                                    />
-                                    <div
-                                        className="guess-marker"
-                                        style={{ left: `${((userGuess + 1) / 2) * 100}%` }}
-                                    >
-                                        {userGuess.toFixed(3)}
-                                    </div>
-                                </>
-                            )}
-
-                            {showAnswer && (
-                                <>
-                                    <div
-                                        className="answer-marker"
-                                        style={{
-                                            left: `${((currentPan + 1) / 2) * 100}%`,
-                                            backgroundColor: correct ? 'rgba(48, 254, 32, 1)' : "red"
-                                        }}
-                                    >
-                                        {currentPan.toFixed(3)}
-                                    </div>
-                                </>
-                            )}
-
-                            {hoverPosition !== null && userGuess === null && score.total < MAX_SCORE && (
-                                <>
-                                    <div
-                                        className="guess-range"
-                                        style={{
-                                            position: 'absolute',
-                                            left: `${((hoverPosition - RANGE_WIDTH + 1) / 2) * 100}%`,
-                                            width: `${RANGE_WIDTH * 100}%`,
-                                            height: '100%',
-                                            backgroundColor: 'rgba(180, 180, 180, 0.2)',
-                                            pointerEvents: 'none'
-                                        }}
-                                    />
-                                    <div
-                                        className="hover-marker"
-                                        style={{
-                                            left: `${((hoverPosition + 1) / 2) * 100}%`
-                                        }}
-                                        title={hoverPosition.toFixed(3)}
-                                    >
-                                    </div>
-                                </>
-                            )}
-                        </div>
-
-                        <div className="panning-labels">
-                            <span>LEFT</span>
-                            <span>RIGHT</span>
-                        </div>
+                    <RingProgress
+                        size={140}
+                        label={
+                            <Text size="lg" ta="center">
+                                {score.total}/{MAX_SCORE}
+                            </Text>
+                        }
+                        sections={[
+                            { value: ((score.total - score.correct) / MAX_SCORE) * 100, color: 'red' },
+                            { value: (score.correct / MAX_SCORE) * 100, color: 'green' }
+                        ]}
+                    />
+                </Group>
+                <div className="panning-exercise">
+                    <div className="header">
+                        <div ></div>
+                        <div className="score"><Text fw={700} size="lg" mt={4}>SCORE: {score.total} / {MAX_SCORE}</Text>  </div>
                     </div>
-                </Stack>
-                <Space h="xl" />
-                <Stack align='stretch'>
+
+                    <div
+                        className="panning-container"
+                        onClick={userGuess === null ? handlePanningGuess : undefined}
+                        onMouseMove={userGuess === null ? handleMouseMove : undefined}
+                        onMouseLeave={handleMouseLeave}
+                    >
+                        {[...Array(19)].map((_, index) => (
+                            <div key={index} className="grid-line">
+                                <div className="grid-value">{((index / 18) * 2 - 1).toFixed(1)}</div>
+                            </div>
+                        ))}
+
+                        {userGuess !== null && (
+                            <>
+                                <div
+                                    className="guess-range"
+                                    style={{
+                                        position: 'absolute',
+                                        left: `${((userGuess - RANGE_WIDTH + 1) / 2) * 100}%`,
+                                        width: `${RANGE_WIDTH * 100}%`,
+                                        height: '100%',
+                                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                                        pointerEvents: 'none'
+                                    }}
+                                />
+                                <div
+                                    className="guess-marker"
+                                    style={{ left: `${((userGuess + 1) / 2) * 100}%` }}
+                                >
+                                    {userGuess.toFixed(3)}
+                                </div>
+                            </>
+                        )}
+
+                        {showAnswer && (
+                            <>
+                                <div
+                                    className="answer-marker"
+                                    style={{
+                                        left: `${((currentPan + 1) / 2) * 100}%`,
+                                        backgroundColor: correct ? 'rgba(48, 254, 32, 1)' : "red"
+                                    }}
+                                >
+                                    {currentPan.toFixed(3)}
+                                </div>
+                            </>
+                        )}
+
+                        {hoverPosition !== null && userGuess === null && score.total < MAX_SCORE && (
+                            <>
+                                <div
+                                    className="guess-range"
+                                    style={{
+                                        position: 'absolute',
+                                        left: `${((hoverPosition - RANGE_WIDTH + 1) / 2) * 100}%`,
+                                        width: `${RANGE_WIDTH * 100}%`,
+                                        height: '100%',
+                                        backgroundColor: 'rgba(180, 180, 180, 0.2)',
+                                        pointerEvents: 'none'
+                                    }}
+                                />
+                                <div
+                                    className="hover-marker"
+                                    style={{
+                                        left: `${((hoverPosition + 1) / 2) * 100}%`
+                                    }}
+                                    title={hoverPosition.toFixed(3)}
+                                >
+                                </div>
+                            </>
+                        )}
+                    </div>
+
+                    <div className="panning-labels">
+                        <span>LEFT</span>
+                        <span>RIGHT</span>
+                    </div>
+                </div>
+            </Stack>
+            <Space h="xl" />
+            <Stack align='stretch'>
 
                 {showWaveform && (
                     <Paper p="xs" withBorder>
-                        <canvas 
+                        <canvas
                             ref={waveformCanvasRef}
                             width={800}
                             height={200}
@@ -492,46 +490,45 @@ export default function PanningExercise() {
                                 height: '200px',
                                 backgroundColor: '#1A1B1E',
                                 borderRadius: '4px'
-                        }}
+                            }}
                         />
                     </Paper>
                 )}
-                
-                    {showAnswer && (
-                        <Alert
-                            color={correct ? "green" : "red"}
-                            title={<Text fw={700} size="lg">{correct ? "Correct!" : "Not quite!"}</Text>}
-                        >
-                            <Text fw={500} size="md" mt={4}>
-                                {!correct &&
-                                    ` The sound was panned to ${currentPan}.`}
-                            </Text>
-                        </Alert>
-                    )}
 
-                    {score.total >= MAX_SCORE && (
-                        <Alert
-                            color="green"
-                            title={<Text fw={700} size="lg">Finished!</Text>}
-                        >
-                            <Text fw={500} size="md" mt={4}>
-                                All {MAX_SCORE} Questions are finished.
-                                Your score is {score.correct}/{score.total}!!!
-                            </Text>
-                        </Alert>
-                    )}
-                    <Button
-                        onClick={score.total < MAX_SCORE ? generateNewPanning : startOver}
-                        disabled={!showAnswer}
-                        rightSection={score.total >= MAX_SCORE ? <IconRefresh size={20} /> : <IconArrowRight size={20} />}
-                        variant={score.total < MAX_SCORE ? "light" : "filled"}
-                        fullWidth
+                {showAnswer && (
+                    <Alert
+                        color={correct ? "green" : "red"}
+                        title={<Text fw={700} size="lg">{correct ? "Correct!" : "Not quite!"}</Text>}
                     >
-                        {score.total >= MAX_SCORE ? "Start Over" : "Next Stage"}
-                    </Button>
-                    
-                </Stack>
-            </Container>
-        </Frame>
+                        <Text fw={500} size="md" mt={4}>
+                            {!correct &&
+                                ` The sound was panned to ${currentPan}.`}
+                        </Text>
+                    </Alert>
+                )}
+
+                {score.total >= MAX_SCORE && (
+                    <Alert
+                        color="green"
+                        title={<Text fw={700} size="lg">Finished!</Text>}
+                    >
+                        <Text fw={500} size="md" mt={4}>
+                            All {MAX_SCORE} Questions are finished.
+                            Your score is {score.correct}/{score.total}!!!
+                        </Text>
+                    </Alert>
+                )}
+                <Button
+                    onClick={score.total < MAX_SCORE ? generateNewPanning : startOver}
+                    disabled={!showAnswer}
+                    rightSection={score.total >= MAX_SCORE ? <IconRefresh size={20} /> : <IconArrowRight size={20} />}
+                    variant={score.total < MAX_SCORE ? "light" : "filled"}
+                    fullWidth
+                >
+                    {score.total >= MAX_SCORE ? "Start Over" : "Next Stage"}
+                </Button>
+
+            </Stack>
+        </Container>
     );
 }
