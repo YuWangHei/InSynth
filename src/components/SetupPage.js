@@ -43,9 +43,9 @@ function SetupPage({ name, options = [], instr = [], handleStartExercise }) {
       {/* Lower Box: Instructions */}
       <Card shadow="sm" padding="lg" radius="md" withBorder style={{ width: '100%' }}>
         <Title order={4} mb="md">Exercise Instructions</Title>
-        {instr.map((str) => {
+        {instr.map((str, idx) => {
           return (
-            <Text>• {str}</Text>
+            <Text key={`${name}-instr-${idx}`}>• {str}</Text>
           )
         })}
       </Card>

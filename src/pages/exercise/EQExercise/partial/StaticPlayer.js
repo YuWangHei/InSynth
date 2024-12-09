@@ -1,5 +1,4 @@
-import { Button, Flex } from "@mantine/core";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { generateLogSamples } from "./eq_helper";
 
 // filters: expect fixed number of filters, i.e. no adding or removing filters after initialization
@@ -24,7 +23,6 @@ function StaticPlayer({ audioFile, filters = [], onChange }) {
     for (let i = 0; i < filters.length; i++) {
       magResponseRef.current[i] = new Float32Array(sampleSpace.length);
       phaseResponseRef.current[i] = new Float32Array(sampleSpace.length);
-      // console.log(magResponseRef.current);
     }
 
     // Load audio file
@@ -54,8 +52,8 @@ function StaticPlayer({ audioFile, filters = [], onChange }) {
         // Obtain the frequency response ratio change from this filter
         filtersRef.current[idx].getFrequencyResponse(sampleSpace, magResponseRef.current[idx], phaseResponseRef.current[idx]);
         // Pass data to parent
-        // console.log(magResponseRef.current);
         onChange(magResponseRef.current, phaseResponseRef.current);
+        return null;
       });
     }
   }, [filters]);
@@ -90,6 +88,7 @@ function StaticPlayer({ audioFile, filters = [], onChange }) {
     // Apply filters for the first time
     filters.map((obj, idx) => {
       applyFilter(filtersRef.current[idx], obj);
+      return null;
     });
 
     // Start playing the audio
@@ -98,11 +97,25 @@ function StaticPlayer({ audioFile, filters = [], onChange }) {
   };
 
   // Set the parameters of the given filterNode
-  const applyFilter = (filterNode, obj = { type: 'peaking', freq: 20, q: 1, gain: 0 }) => {
+  // Note: gain is percentage change in amplitude, which can be +ve or -ve
+  const applyFilter = (filterNode, obj = { type: 'peaking', freq: 31, q: 1, gain: 0 }) => {
     filterNode.type = obj.type;
     filterNode.frequency.setValueAtTime(obj.freq, audioContextRef.current.currentTime);
     filterNode.Q.setValueAtTime(obj.q, audioContextRef.current.currentTime);
-    filterNode.gain.setValueAtTime(obj.gain, audioContextRef.current.currentTime);
+    // gain received is the percentage change, translate percentage to dB
+    // If percentage change is -100%, mute directly (log10(0) is -inf)
+    if (obj.gain === -1) {
+      // dB = 20 * log(A), where A is the percentage change
+      const dBGain = -40; // Set to almost 0 because log cannot receive 0
+      filterNode.gain.setValueAtTime(dBGain, audioContextRef.current.currentTime);
+    }
+    // Else, calculate respective dB
+    else {
+      // dB = 20 * log(A), where A is the percentage change
+      const dBGain = 20 * Math.log10(1 + obj.gain);
+      console.log(dBGain)
+      filterNode.gain.setValueAtTime(dBGain, audioContextRef.current.currentTime);
+    }
   };
 
   // Return no UI

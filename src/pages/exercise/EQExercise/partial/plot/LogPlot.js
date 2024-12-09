@@ -33,7 +33,7 @@ const customLogScalePlugin = {
 
 ChartJS.register(customLogScalePlugin);
 
-const LogPlot = ({ data, params: { y_bounds: { min: y_min, max: y_max }, y_tick } }) => {
+const LogPlot = ({ data, params: { y_bounds: { min: y_min, max: y_max }, y_tick, x_tick_cb, y_tick_cb } }) => {
   // Create reference to the chart for ease of cleanup
   const chartRef = useRef(null);
   // Whenever there is any changes, cleanup chart
@@ -57,7 +57,7 @@ const LogPlot = ({ data, params: { y_bounds: { min: y_min, max: y_max }, y_tick 
           text: "Frequency (Hz)",
         },
         ticks: {
-          callback: (val) => (log_tick_pos.includes(val) ? val : ""),
+          callback: x_tick_cb,
         },
       },
       y: {
@@ -70,42 +70,12 @@ const LogPlot = ({ data, params: { y_bounds: { min: y_min, max: y_max }, y_tick 
         max: y_max,
         ticks: {
           stepSize: y_tick,
-          callback: (value) => value.toFixed(2), // Format y-axis ticks
+          callback: y_tick_cb,
         },
       },
     },
   }), [y_min, y_max, y_tick]);
 
-  /*
-  const options = {
-    responsive: true,
-    scales: {
-      x: {
-        type: "logarithmic",
-        title: {
-          display: true,
-          text: "Frequency (Hz)",
-        },
-        ticks: {
-          callback: (val) => (log_tick_pos.includes(val) ? val : ''),
-        }
-      },
-      y: {
-        type: 'linear',
-        title: {
-          display: true,
-          text: "Amplitude",
-        },
-        min: y_min,
-        max: y_max,
-        ticks: {
-          stepSize: y_tick,
-          callback: (value) => value.toFixed(2), // Format y-axis ticks
-        },
-      },
-    },
-  };
-  */
   return (
     <Line ref={chartRef} data={data} options={options} />
   );

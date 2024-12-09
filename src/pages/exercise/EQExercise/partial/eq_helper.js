@@ -2,7 +2,6 @@ const sampling_freq = 60;
 const freq_centers = [31, 62, 125, 250, 500, 1000, 2000, 4000, 8000, 16000];
 const log_bounds = { min: 20, max: 22000 };
 const log_tick_pos = [log_bounds.min, ...freq_centers, log_bounds.max];
-const sliderGainRatio = 10; // max in slider corresponds to 100%
 
 // Generate x_values for log scale graph
 function generateLogSamples() {
@@ -22,4 +21,4 @@ function generateLogSamples() {
   return arr;
 }
 
-export { sampling_freq, freq_centers, log_bounds, log_tick_pos, sliderGainRatio, generateLogSamples };
+export { sampling_freq, freq_centers, log_bounds, log_tick_pos, generateLogSamples };

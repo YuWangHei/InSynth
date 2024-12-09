@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { Button, Card, Select, Stack, Text, Title } from "@mantine/core";
 import { IconArrowRight } from "@tabler/icons-react";
 import CustomContainer from "../../../components/CustomContainer";
-import { getRandomAudio } from "../../../Music/AudioPicker";
 
 function EQExerciseSetup() {
   const [mode, setMode] = useState('Graphic'); // Graphic or Parametric
@@ -34,7 +33,9 @@ function EQExerciseSetup() {
   const instr = [
     'Listen to the original and equalized audio',
     'Reconstruct the filters applied by the equalized audio',
-    'Try to identify the changes in different frequency ranges'
+    'Try to identify the changes in different frequency ranges',
+    'Graphic EQ: Edit the amplitude of each frequency range with a percentage change between -100% and +100%',
+    'Parametric EQ: Add various filters and adjust their parameters to apply effects on the frequency response'
   ]
 
   return (
@@ -93,9 +94,9 @@ function EQExerciseSetup() {
       {/* Lower Box: Instructions */}
       <Card shadow="sm" padding="lg" radius="md" withBorder style={{ width: '100%' }}>
         <Title order={4} mb="md">Exercise Instructions</Title>
-        {instr.map((str) => {
+        {instr.map((str, idx) => {
           return (
-            <Text>• {str}</Text>
+            <Text key={`eq-instr-${idx}`}>• {str}</Text>
           )
         })}
       </Card>
