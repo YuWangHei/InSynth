@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import SetUpPage from '../../../components/SetUpPage';
+import SetupPage from '../../../components/SetupPage';
 
 export default function EffectExerciseSetup() {
     const [difficulty, setDifficulty] = useState('Easy');
@@ -47,7 +47,7 @@ export default function EffectExerciseSetup() {
     ];
 
     return (
-        <SetUpPage
+        <SetupPage
             name="Effect Exercise"
             options={options}
             instr={instr}

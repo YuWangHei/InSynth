@@ -7,10 +7,12 @@ import Dashboard from './pages/dashboard/Dashboard';
 import SoundExercise from './pages/exercise/SoundExercise/SoundExercise.js';
 import EffectExercise from './pages/exercise/EffectExercise/EffectExercise.js';
 import EffectExerciseSetup from './pages/exercise/EffectExercise/EffectExerciseSetup.js';
+import EQExerciseSetup from './pages/exercise/EQExercise/EQExerciseSetup.js';
+import EQGraphic from './pages/exercise/EQExercise/EQGraphic.js';
+import EQParametric from './pages/exercise/EQExercise/EQParametric.js';
 import SynthExercise from './pages/exercise/EQExercise/SynthExercise.js';
 import AmplitudeExercise from './pages/exercise/AmplitudeExercise/AmplitudeExercise.js';
 import AmplitudeExerciseSetup from './pages/exercise/AmplitudeExercise/AmplitudeExerciseSetup.js';
-import EQExercise from './pages/exercise/EQExercise/EQExercise.js';
 import PanningExercise from './pages/exercise/PanningExercise/PanningExercise.js';
 import PanningExerciseSetup from './pages/exercise/PanningExercise/PanningExerciseSetup.js';
 import Playground from './pages/playground/Playground.js';
@@ -46,8 +48,16 @@ function App() {
       element: <EffectExercise />
     },
     {
-      path: '/MixingEq',
-      element: <EQExercise />
+      path: '/EQExercise/setup',
+      element: <EQExerciseSetup />
+    },
+    {
+      path: '/EQExercise/graphic',
+      element: <EQGraphic />
+    },
+    {
+      path: '/EQExercise/parametric',
+      element: <EQParametric />
     },
     {
       path: '/SynthQ2',

@@ -45,7 +45,7 @@ function Frame({ children }) {
         <NavLink label='Exercise' leftSection={<IconAdjustmentsAlt />}>
           <NavLink href='#/SoundSynth' label='Sound Synthesis' />
           <NavLink href='#/EffectExercise/setup' label='Effect Exercise' />
-          <NavLink href='#/MixingEq' label='EQ Exercise' />
+          <NavLink href='#/EQExercise/setup' label='EQ Exercise' />
           <NavLink href='#/AmplitudeExercise/setup' label='Amplitude' />
           <NavLink href='#/PanningExercise/setup' label='Panning' />
 

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Group, Text, Switch } from "@mantine/core";
-import MathPlot from "./plot/MathPlot";
-import CustomContainer from "../../../../components/CustomContainer";
+import MathPlot from "./partial/plot/MathPlot";
+import CustomContainer from "../../../components/CustomContainer";
 
 function EQParametric({ audioFile }) {
   const [plotExpr, setPlotExpr] = useState('0');

@@ -1,10 +1,8 @@
-import * as math from 'mathjs'
-
 const sampling_freq = 60;
-const freq_centers = [60, 150, 400, 1000, 2400, 5800, 14000];
+const freq_centers = [31, 62, 125, 250, 500, 1000, 2000, 4000, 8000, 16000];
 const log_bounds = { min: 20, max: 22000 };
 const log_tick_pos = [log_bounds.min, ...freq_centers, log_bounds.max];
-const sliderGainRatio = 12; // max in slider corresponds to 100%
+const sliderGainRatio = 10; // max in slider corresponds to 100%
 
 // Generate x_values for log scale graph
 function generateLogSamples() {

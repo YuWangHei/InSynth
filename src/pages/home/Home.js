@@ -27,7 +27,7 @@ function Home() {
     {
       title: 'Equalizer Exercise',
       description: 'Learn about equalizer and how it works',
-      path: '/MixingEq',
+      path: '/EQExercise/setup',
       icon: '💿' // Optional: you can use an icon or image
     },
     {

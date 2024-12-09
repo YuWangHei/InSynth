@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import SetUpPage from '../../../components/SetUpPage';
+import SetupPage from '../../../components/SetupPage';
 
 function AmplitudeExerciseSetup() {
     const [difficulty, setDifficulty] = useState('Easy');
@@ -19,7 +19,7 @@ function AmplitudeExerciseSetup() {
     const options = [
         {
             label: 'Difficulty',
-            description: 'Choose how large the difference of the options',
+            description: 'Choose how subtle the difference of options will be',
             state: difficulty,
             setState: setDifficulty,
             data: [
@@ -47,7 +47,7 @@ function AmplitudeExerciseSetup() {
     ]
 
     return (
-        <SetUpPage
+        <SetupPage
             name="Amplitude Exercise"
             options={options}
             instr={instr}

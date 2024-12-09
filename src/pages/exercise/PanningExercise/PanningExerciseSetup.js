@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import SetUpPage from '../../../components/SetUpPage';
+import SetupPage from '../../../components/SetupPage';
 
 // Setup Page Component
 export default function PanningExerciseSetup() {
@@ -48,7 +48,7 @@ export default function PanningExerciseSetup() {
     ]
 
     return (
-        <SetUpPage
+        <SetupPage
             name="Panning Exercise"
             options={options}
             instr={instr}

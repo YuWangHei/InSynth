@@ -24,7 +24,7 @@ function StaticPlayer({ audioFile, filters = [], onChange }) {
     for (let i = 0; i < filters.length; i++) {
       magResponseRef.current[i] = new Float32Array(sampleSpace.length);
       phaseResponseRef.current[i] = new Float32Array(sampleSpace.length);
-      console.log(magResponseRef.current);
+      // console.log(magResponseRef.current);
     }
 
     // Load audio file
@@ -54,7 +54,7 @@ function StaticPlayer({ audioFile, filters = [], onChange }) {
         // Obtain the frequency response ratio change from this filter
         filtersRef.current[idx].getFrequencyResponse(sampleSpace, magResponseRef.current[idx], phaseResponseRef.current[idx]);
         // Pass data to parent
-        console.log(magResponseRef.current);
+        // console.log(magResponseRef.current);
         onChange(magResponseRef.current, phaseResponseRef.current);
       });
     }
