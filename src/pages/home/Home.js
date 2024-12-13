@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BackgroundImage, Text, Container } from '@mantine/core';
 import styles from './Home.module.css';
@@ -7,6 +7,32 @@ import homebg2 from './homebg5.jpeg';
 
 function Home() {
   const navigate = useNavigate();
+
+  // const exercises = ["SoundSynth", "EffectEx", "EQEX", "AmplitudeEx", "PanningEx"];
+  // const createCookie = () => {
+  //   const data = {totalEx: 0, totalQ: 0, correct: 0, wrong: 0};
+  //   for (let i = 0; i < exercises.length; i++) {
+  //     document.cookie = `${exercises[i]}=${JSON.stringify(data)};`; 
+  //   } 
+  // }
+
+  // const checkCookie = () => {
+  //   for (let i = 0; i < exercises.length; i++) {
+  //     const cookie = document.cookie
+  //     .split("; ")
+  //     .find((row) => row.startsWith(`${exercises[i]}=`));
+  //     if (!cookie) {
+  //       return false;
+  //     }
+  //   }
+  //   return true
+  // }
+
+  // useEffect(() => {
+  //   if (!checkCookie()) {
+  //     createCookie();
+  //   }
+  // }, [])
 
   const synthExercises = [
     {
