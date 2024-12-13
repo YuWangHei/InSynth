@@ -260,6 +260,21 @@ export default function PanningExercise() {
 
     };
 
+    useEffect(() => {
+        if (score.total == MAX_SCORE) {
+            const cookieValue = document.cookie
+            .split("; ")
+            .find((row) => row.startsWith("PanningEx="))
+            ?.split("=")[1];
+            let data = (cookieValue) ? JSON.parse(cookieValue) : {totalEx: 0, totalQ: 0, correct: 0, wrong: 0};
+            data.totalEx++;
+            data.totalQ += score.total;
+            data.correct += score.correct;
+            data.wrong += score.total - score.correct;
+            document.cookie = `PanningEx=${JSON.stringify(data)};`;
+        }
+    }, [score])
+
     const handleMouseMove = (event) => {
         const container = event.currentTarget;
         const rect = container.getBoundingClientRect();
