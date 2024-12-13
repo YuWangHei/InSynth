@@ -3,23 +3,11 @@ import { useMantineTheme } from '@mantine/core';
 import { useMove } from '@mantine/hooks';
 
 function VSlider({ initPos = 0.5, onChange, index = 0, min = 0, max = 100, height = 120, resetFlag }) {
-  // Ensure initPos is between 0 and 1
-  if (initPos > 1 || initPos < 0) {
-    alert('Invalid initPos in <VSlider/>.');
-  }
-
   // Initialize theme and state
   const theme = useMantineTheme();
   const [value, setValue] = useState(initPos);
   const [outValue, setOutValue] = useState(min + (1 - initPos) * (max - min));
   const [isHovered, setIsHovered] = useState(false);
-
-  useEffect(() => {
-    if (resetFlag) {
-      setValue(0.5);
-      setOutValue(0);
-    }
-  }, [resetFlag]);
 
   const { ref } = useMove(({ y }) => {
     // Update value based on vertical position
@@ -34,6 +22,11 @@ function VSlider({ initPos = 0.5, onChange, index = 0, min = 0, max = 100, heigh
       onChange(newOutValue, index);
     }
   });
+
+  useEffect(() => {
+    setValue(initPos);
+    setOutValue(Math.round(min + (1 - initPos) * (max - min)));
+  }, [resetFlag, initPos, min, max]);
 
   return (
     <div

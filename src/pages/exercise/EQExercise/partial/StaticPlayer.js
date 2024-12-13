@@ -1,9 +1,9 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CustomEQFilter, generateLogSamples, getInitGraphicFilters } from "./utilsGraphic";
 
 // audioIdentity: what audio is currently playing, in StaticPlayer, it is just a direct pass to notify the subsequent program)
 // filters: expect fixed number of filters, i.e. no adding or removing filters after initialization
-function StaticPlayer({ audioFile, audioIdentity, filters = getInitGraphicFilters(), onChange }) {
+function StaticPlayer({ audioFile, filters, onChange, trigger }) {
   const audioContextRef = useRef(null);
   const sourceRef = useRef(null);
   const audioBufferRef = useRef(null);
@@ -11,12 +11,32 @@ function StaticPlayer({ audioFile, audioIdentity, filters = getInitGraphicFilter
   const sampleSpace = new Float32Array(generateLogSamples());
   const magResponseRef = useRef([]);
   const phaseResponseRef = useRef([]);
+  const [filterChange, setFilterChange] = useState(0);
 
 
-  // One-time actions
+  // Actions when filters are changes
+  const onFilters = () => {
+    if (filters.length !== 0 && filtersRef.current.length !== 0) {
+      filters.map((obj, idx) => {
+        // Apply filter to the audio
+        applyFilter(filtersRef.current[idx], obj);
+        // Obtain the frequency response ratio change from this filter
+        filtersRef.current[idx].getFrequencyResponse(sampleSpace, magResponseRef.current[idx], phaseResponseRef.current[idx]);
+        // Pass data to parent
+        onChange(magResponseRef.current, phaseResponseRef.current);
+        return null;
+      });
+    }
+  }
+
+  // Actions when filters are changes
   useEffect(() => {
-    // Action on mount
+    onFilters();
+  }, [filterChange, filters, trigger]);
 
+
+  // Actions on mount
+  useEffect(() => {
     // Create AudioContext
     audioContextRef.current = new window.AudioContext();
 
@@ -32,6 +52,8 @@ function StaticPlayer({ audioFile, audioIdentity, filters = getInitGraphicFilter
       const audioData = await response.arrayBuffer();
       audioBufferRef.current = await audioContextRef.current.decodeAudioData(audioData);
       playAudio();
+      // Update filterChange to force re-rendering after loading audio
+      setFilterChange(filterChange + 1);
     }
 
     loadAudio();
@@ -42,23 +64,6 @@ function StaticPlayer({ audioFile, audioIdentity, filters = getInitGraphicFilter
       audioContextRef.current.close();
     }
   }, []);
-
-
-  // Action when filters are changed
-  useEffect(() => {
-    console.log("Listening to", audioIdentity);
-    if (filters.length !== 0 && filtersRef.current.length !== 0) {
-      filters.map((obj, idx) => {
-        // Apply filter to the audio
-        applyFilter(filtersRef.current[idx], obj);
-        // Obtain the frequency response ratio change from this filter
-        filtersRef.current[idx].getFrequencyResponse(sampleSpace, magResponseRef.current[idx], phaseResponseRef.current[idx]);
-        // Pass data to parent
-        onChange(audioIdentity, magResponseRef.current, phaseResponseRef.current);
-        return null;
-      });
-    }
-  }, [filters]);
 
 
   const playAudio = () => {

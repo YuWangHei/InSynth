@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, Card, Container, Group, RingProgress, Stack, Text, Title } from "@mantine/core";
+import { Alert, Button, Card, Container, Group, RingProgress, Stack, Text, Title } from "@mantine/core";
 import MathPlot from "./partial/plot/MathPlot";
 import StaticPlayer from "./partial/StaticPlayer";
 import { log_tick_pos, getInitGraphicFilters, filter_count, sample_count, getNewGraphicSol, checkSolution } from "./partial/utilsGraphic";
@@ -27,7 +27,6 @@ import { IconArrowRight, IconRefresh } from "@tabler/icons-react";
  * 
  */
 function EQGraphic() {
-  const navigate = useNavigate();
   const location = useLocation();
   const {
     qCount = 3
@@ -36,17 +35,21 @@ function EQGraphic() {
   // The audio file to be played
   const [audioFile, setAudioFile] = useState(getRandomAudio());
   // Whether the user is listening to the target
-  const [viewTarget, setViewTarget] = useState(false);
-  // Indicates that whether the audio playing is by the user or solution
-  const [audioIdentity, setAudioIdentity] = useState(0); // -1: user, 0: init pass to solution, 1: solution
+  const [viewTarget, setViewTarget] = useState(true);
   // The filter to be fed to StaticPlayer
   const [filters, setFilters] = useState(getInitGraphicFilters());
+  // Trigger rendering
+  const [trigger, setTrigger] = useState(0);
+  // Indicate that whether the need of change in graph comes from trigger
+  const [fromTrigger, setFromTrigger] = useState(false);
+  // Indicate that whether the need of change in graph comes from onSwitch or onSlider
+  const [fromSlider, setFromSlider] = useState(false);
   // The filters edited by user
   const [userFilters, setUserFilters] = useState(getInitGraphicFilters());
   // y_values on the plot to display user frequency response
   const [yValues, setYValues] = useState(new Array(sample_count).fill(0));
   // The filters used in the solution of current question
-  const [solFilters, setSolFilters] = useState(getInitGraphicFilters());
+  const [solFilters, setSolFilters] = useState(getNewGraphicSol());
   // sol_values on the plot to display solution frequency response (only when easy mode is ON)
   const [solValues, setSolValues] = useState(new Array(sample_count).fill(0));
   // Number of questions the user have answered, and how many of them are correct
@@ -55,91 +58,109 @@ function EQGraphic() {
   const [easyMode, setEasyMode] = useState(false);
   // State of the question: the user is answering or watching result?
   const [submitted, setSubmitted] = useState(false);
+  // Whether the solution is correct after submission
+  const [feedback, setFeedback] = useState(false);
   // The flag to be passed to EQPanel to reset sliders
-  const [resetSliders, setResetSliders] = useState(false);
+  const [resetSliders, setResetSliders] = useState(0);
+  // Player key: the StaticPlayer will be remounted when the key changes
+  const [playerKey, setPlayerKey] = useState(0);
+  // To record whether the player has started trying out his question
+  const [firstSwitch, setFirstSwitch] = useState(false);
 
   // Action on start
   useEffect(() => {
-    // Get random audio file in state definition or else error occurs
-    // Generate the first question
-    const sol_filters = getNewGraphicSol();
-    setSolFilters(sol_filters);
-    // Initialize solValues
-    setFilters(sol_filters);
+    // Get random audio file and solution in state definition or else error occurs
+    setTrigger(trigger + 1);
   }, []);
 
-  // Turn back to false after resetting sliders
-  // useEffect(() => {
-  //   if (resetSliders) {
-  //     setResetSliders(false);
-  //   }
-  // }, [resetSliders]);
+  useEffect(() => {
+    if (trigger) {
+      setFilters(solFilters);
+      setFromTrigger(true);
+    }
+  }, [trigger]);
 
+  // Extra rendering taken to help reset of graph after resetting sliders
+  useEffect(() => {
+    const newYValues = new Array(sample_count);
+    newYValues.fill(0);
+    setYValues(newYValues);
+    const newSolValues = new Array(sample_count);
+    newSolValues.fill(0);
+    setSolValues(newSolValues);
+  }, [resetSliders]);
+
+  // Reset all answers, display and state of a question
   const initSetup = () => {
-    setFilters(getInitGraphicFilters());
+    setTrigger(trigger + 1);
+    setFromTrigger(false);
     setSolFilters(getInitGraphicFilters());
     setUserFilters(getInitGraphicFilters());
-    setYValues(new Array(sample_count).fill(0));
-    setSolValues(new Array(sample_count).fill(0));
-    // console.log("#######################Reset slider", resetSliders);
-    setResetSliders(true);
+
+    setResetSliders(resetSliders + 1); // Keep changing value to force re-rendering
+    const newYValues = new Array(sample_count);
+    newYValues.fill(0);
+    setYValues(newYValues);
+    const newSolValues = new Array(sample_count);
+    newSolValues.fill(0);
+    setSolValues(newSolValues);
+
+    setViewTarget(true);
+    setSubmitted(false);
+    setEasyMode(false);
+    setFirstSwitch(false);
+
+    // Obtain new audio file
+    const newAudioFile = getRandomAudio();
+    setAudioFile(newAudioFile);
+    console.log(newAudioFile);
+    // Generate new eq solution
+    const newSolFilters = getNewGraphicSol();
+    setSolFilters(newSolFilters);
+    setPlayerKey(playerKey + 1);
   }
 
   // On submit when question completed has not reached total question available
   const nextQuestion = () => {
     // Clear filters, values and sliders
     initSetup();
-    // Obtain new audio file
-    const newAudioFile = getRandomAudio();
-    setAudioFile(newAudioFile);
-    // Generate new eq solution
-    const newSolFilters = getNewGraphicSol();
-    setSolFilters(newSolFilters);
-    // Set back to not submitted and disable easy mode
-    setSubmitted(false);
-    setEasyMode(false);
   }
 
   // On submit when question completed has reached total question available
   const startOver = () => {
-    // Reset question record
-    setScore({ completed: 0, correct: 0, easyCorrect: 0 });
     // Clear filters, values and sliders
     initSetup();
-    // Obtain new audio file
-    const newAudioFile = getRandomAudio();
-    setAudioFile(newAudioFile);
-    // Generate new eq solution
-    const newSolFilters = getNewGraphicSol();
-    setSolFilters(newSolFilters);
-    // Set back to not submitted and disable easy mode
-    setSubmitted(false);
-    setEasyMode(false);
+    // Reset question record
+    setScore({ completed: 0, correct: 0, easyCorrect: 0 });
   }
 
   // Switch to listen to user eq or solution eq
   const onSwitch = () => {
+    // Complete first switch
+    if (!firstSwitch) {
+      setFirstSwitch(true);
+    }
+    // Disable fromTrigger here to prevent error caused by multiple rendering at once
+    setFromTrigger(false);
     // Update viewTarget
     const newViewTarget = !viewTarget;
     setViewTarget(newViewTarget);
-    // If now we are listening to solution eq
+    // Reverse the identity
     if (newViewTarget) {
-      // Tell StaticPlayer to play solution audio
       setFilters(solFilters);
-      setAudioIdentity(-1); // reversed to hardcode desired outcome
     }
-    // If now we are listening to user eq
+    // If the page was solution, display user next
     else {
-      // Tell StaticPlayer to play user audio
       setFilters(userFilters);
-      setAudioIdentity(1); // reversed to hardcode desired outcome
     }
+    setFromSlider(false);
   }
 
   // Receive changes from EQPanel sliders (viewTarget must be false)
   const onSlide = (newSliderValues) => {
-    // Forward filter changes to StaticPlayer
-    // No. of filters = no. of sliders
+    // Disable fromTrigger here to prevent error caused by multiple rendering at once
+    setFromTrigger(false);
+    // Handle slider changes
     const newUserFilters = userFilters.map((obj, idx) => {
       const percentGain = newSliderValues[idx] / 100;
       obj.gain = percentGain;
@@ -152,15 +173,25 @@ function EQGraphic() {
       }
       return obj;
     });
+    // Update newest user filters, and stay on user view
     setUserFilters(newUserFilters);
-    // viewTarget must be false onSlide, the filters fed to StaticPlayer must be the user eq
     setFilters(newUserFilters);
-    setAudioIdentity(-1);
+    setFromSlider(true);
+  }
+
+  // When easy mode is enabled
+  const onEasyMode = () => {
+    setEasyMode(true);
+    // Force to trigger StaticPlayer to generate frequency response
+    if (viewTarget) {
+      setTrigger(trigger + 1);
+    }
   }
 
   // Receive changes from StaticPlayer
-  const onResponse = (identity, magResponseList, phaseResponseList) => {
-    // console.log("Received response", identity);
+  // Note: the order of React computation is: update of state -> re-rendering components -> useEffect -> receive callback from child
+  const onResponse = (magResponseList, phaseResponseList) => {
+    console.log("Responding");
     // Sample the received magResponseList into log samples
     const received_values = new Array(sample_count).fill(0);
     for (let i = 0; i < filter_count; i++) {
@@ -168,45 +199,51 @@ function EQGraphic() {
         received_values[j] += (magResponseList[i][j] - 1);
       }
     }
-    // If now is viewing the solution, received magResponseList is about the solValues
-    if (identity >= 0) {
-      if (identity === 0) {
-        // console.log("First pass");
-      }
-      setSolValues(received_values);
-      // console.log("put response to sol")
-    }
-    // If now is viewing the user, received magResponseList is about the yValues
-    else if (identity < 0) {
-      setYValues(received_values);
-      // console.log('put response to user')
-    }
-  }
 
-  const OnEasyModeClicked = () => {
-    setEasyMode(true);
-    // Force re-render to update graph
-    setSolValues(solValues);
-    setViewTarget(viewTarget);
+    // Identify whether this is induced from onSlide, and can assume current view is user
+    if (fromSlider) {
+      console.log("From slider")
+      setYValues(received_values);
+    }
+    // Identify if this is induced from trigger: if is trigger, update solValues only (currently only onEasyMode causes trigger)
+    else if (fromTrigger) {
+      console.log("From trigger")
+      setSolValues(received_values);
+      console.log(received_values);
+    }
+    // Else, it must be switch
+    // Due to the order of React computation, on switching pages, the frequency response should be updating the view that is gone
+    else {
+      if (viewTarget) {
+        console.log("From switch to solution")
+        setYValues(received_values);
+      }
+      else {
+        console.log("From switch to user")
+        setSolValues(received_values);
+      }
+    }
   }
 
   // When submit button is clicked
   const onSubmit = () => {
     // Check answer
     const result = checkSolution(yValues, solValues);
-    // Display solution
-
     // Update answer record
     let completed = score.completed + 1;
     let correct = score.correct;
     let easyCorrect = score.easyCorrect;
     if (result) { // If correct
+      setFeedback(true);
       if (easyMode) { // Easy mode was used
         easyCorrect++;
       }
       else { // Real correct
         correct++;
       }
+    }
+    else {
+      setFeedback(false);
     }
     setScore({ completed: completed, correct: correct, easyCorrect: easyCorrect });
     setSubmitted(true);
@@ -246,12 +283,12 @@ function EQGraphic() {
                 </Group>
                 <Group>
                   <Button
-                    onClick={OnEasyModeClicked}
-                    disabled={easyMode}
+                    onClick={onEasyMode}
+                    disabled={easyMode || submitted}
                     color="indigo"
                     size="lg"
                   >
-                    {easyMode ? "Easy Mode: ON" : "Easy Mode: OFF"}
+                    {easyMode ? "Easy Mode: ON" : (submitted ? "Easy Mode: Disabled" : "Easy Mode: OFF")}
                   </Button>
                 </Group>
               </Stack>
@@ -287,15 +324,51 @@ function EQGraphic() {
                 log_scale={true}
               />
               {/* Panel for graphic equalization */}
-              <EQPanel onChange={onSlide} />
+              <EQPanel onChange={onSlide} resetFlag={resetSliders} />
             </div>
+
+            {/* Feedback for the question */}
+            {submitted && (
+              <Alert
+                color={feedback ?
+                  (easyMode ?
+                    "blue" :
+                    "green"
+                  ) :
+                  "red"
+                }
+                title={
+                  <Text fw={700} size="lg">
+                    {feedback ?
+                      (easyMode ?
+                        "Correct! Try it yourself next time!" :
+                        "Correct!"
+                      ) :
+                      "Not quite!"
+                    }
+                  </Text>}
+              />
+            )}
+            {/* Feedback for the set of questions */}
+            {score.completed >= qCount && (
+              <Alert
+                color="green"
+                title={<Text fw={700} size="lg">Finished!</Text>}
+              >
+                <Text fw={500} size="md" mt={4}>
+                  All {qCount} Questions are finished. <br />
+                  Your score is {score.correct}/{score.completed}!!! <br />
+                  {score.easyCorrect} correct questions with the aid of Easy Mode will not be counted to your record
+                </Text>
+              </Alert>
+            )}
 
             {/* Submit button */}
             <Button
               onClick={onSubmit}
-              disabled={submitted}
+              disabled={submitted || !firstSwitch}
             >
-              Submit
+              {firstSwitch ? "Submit" : "Try it out first!"}
             </Button>
 
             {/* Next Question button */}
@@ -309,7 +382,7 @@ function EQGraphic() {
             </Button>
 
             {/* Audio player */}
-            <StaticPlayer audioFile={audioFile} audioIdentity={audioIdentity} filters={filters} onChange={onResponse} />
+            <StaticPlayer key={playerKey} audioFile={audioFile} filters={filters} onChange={onResponse} trigger={trigger} />
 
           </Stack>
         </Card>
