@@ -1,10 +1,16 @@
 import { Flex, Group, Stack, Text } from "@mantine/core";
-import { freq_centers } from "./eq_helper";
+import { freq_centers } from "./utilsGraphic";
 import VSlider from "../../../../components/VSlider";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-function EQPanel({ onChange }) {
+function EQPanel({ onChange, resetFlag }) {
   const [sliderValues, setSliderValues] = useState(freq_centers.map(() => 0));
+
+  useEffect(() => {
+    if (resetFlag) {
+      setSliderValues(freq_centers.map(() => 0));
+    }
+  }, [resetFlag]);
 
   // Edit sliderValues onSlide
   const onSlide = (newVal, index) => {
@@ -22,7 +28,7 @@ function EQPanel({ onChange }) {
         {freq_centers.map((val, idx) => {
           return (
             <Stack key={`panel-stack-${idx}`} align="center">
-              <VSlider min={-100} max={100} onChange={onSlide} index={idx} key={`panel-vslider-${idx}`} />
+              <VSlider min={-100} max={100} onChange={onSlide} index={idx} key={`panel-vslider-${idx}`} resetFlag={resetFlag} />
               <Text key={`panel-text-${idx}`}>{`${val} Hz`}</Text>
             </Stack>
           )

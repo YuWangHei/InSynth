@@ -1,12 +1,13 @@
 import { Flex } from "@mantine/core";
 import LinearPlot from "./LinearPlot";
 import LogPlot from "./LogPlot";
-import { sampling_freq, generateLogSamples } from "../eq_helper";
+import { sampling_freq, generateLogSamples } from "../utilsGraphic";
 import { useEffect, useState } from "react";
 
 // x_bounds must be divisible by x_tick
 function MathPlot({
-  y_values,
+  y_values = [],
+  sol_values = null,
   x_bounds = { min: 0, max: 5 },
   y_bounds = { min: 0, max: 1 },
   x_tick = 1,
@@ -22,26 +23,34 @@ function MathPlot({
   const sample_size = sampling_freq * x_intervals;
   const x_values = log_scale ? generateLogSamples() : Array.from({ length: sample_size }, (val, idx) => (x_bounds.min + idx * x_intervals * x_tick / sample_size)); // generate linear scale and log scale samples separately
 
-  // Create data separately
-  const createData = () => {
-    // For log scale
-    if (log_scale) {
-      const newData = {
-        labels: x_values, // x labels
-        datasets: [
-          {
-            label: curve_name,
-            data: y_values,
-            fill: false,
-            backgroundColor: 'rgba(75,192,192,0.4)',
-            borderColor: 'rgba(75,192,192,1)',
-            pointRadius: 0,
-          }
-        ]
-      }
-      return newData;
+  const createLogData = () => {
+    const newData = {
+      labels: x_values, // x labels
+      datasets: [
+        {
+          label: curve_name,
+          data: y_values,
+          fill: false,
+          backgroundColor: 'rgba(75,192,192,0.4)',
+          borderColor: 'rgba(75,192,192,1)',
+          pointRadius: 0,
+        }
+      ]
     }
-    // For linear scale
+    if (sol_values) { // If solution line is not null
+      newData.datasets.push({
+        label: 'Solution',
+        data: sol_values,
+        fill: false,
+        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+        borderColor: 'rgba(255, 99, 132, 1)',
+        pointRadius: 0,
+      })
+    }
+    return newData;
+  }
+
+  const createLinearData = () => {
     const newData = {
       datasets: [
         {
@@ -56,16 +65,25 @@ function MathPlot({
         }
       ]
     }
+    if (sol_values) { // If solution line is not null
+      newData.datasets.push({
+        label: 'Solution',
+        data: sol_values,
+        fill: false,
+        borderColor: 'rgba(255, 99, 132, 1)',
+        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+      })
+    }
     return newData;
   }
 
-  const [data, setData] = useState(createData());
+  const [data, setData] = useState(log_scale ? createLogData() : createLinearData());
 
-  // On new pass of filter to here
+  // On new pass of user filter to here
   useEffect(() => {
-    const newData = createData();
+    const newData = log_scale ? createLogData() : createLinearData();
     setData(newData);
-  }, [y_values]);
+  }, [y_values, sol_values]);
 
   // Options for chart
   const linear_params = { x_bounds, y_bounds, x_tick, y_tick };
