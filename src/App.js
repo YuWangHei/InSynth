@@ -4,6 +4,7 @@ import { Route, Routes } from 'react-router-dom';
 import Frame from './pages/Frame.js';
 import Home from './pages/home/Home';
 import Dashboard from './pages/dashboard/Dashboard';
+import SoundSynthSetup from './pages/exercise/SoundExercise/SoundExerciseSetup.js';
 import SoundExercise from './pages/exercise/SoundExercise/SoundExercise.js';
 import EffectExercise from './pages/exercise/EffectExercise/EffectExercise.js';
 import EffectExerciseSetup from './pages/exercise/EffectExercise/EffectExerciseSetup.js';
@@ -32,8 +33,12 @@ function App() {
       element: <Playground />
     },
     {
-      path: '/SoundSynth',
+      path: '/SoundSynth/play',
       element: <SoundExercise />
+    },
+    {
+      path: '/SoundSynth/setup',
+      element: <SoundSynthSetup />
     },
     {
       path: '/SoundQ3',

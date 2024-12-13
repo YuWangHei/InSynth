@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+
 import {
   Title,
   Button,
@@ -39,6 +41,9 @@ function SoundExercise() {
   const [isGuessed, setIsGuessed] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
 
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const canvasRef = useRef(null);
   const waveformCanvasRef = useRef(null);
   const analyzerRef = useRef(null);
@@ -49,6 +54,11 @@ function SoundExercise() {
   let currentSynth = null; // Store current synth instance
 
   useEffect(() => {
+
+      // Return to setup if no parameters passed
+    if (!location.state) {
+      navigate('/SoundSynth/setup');
+    }
     return () => {
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);

@@ -2,15 +2,15 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SetupPage from '../../../components/SetupPage';
 
-export default function EffectExerciseSetup() {
-    const [difficulty, setDifficulty] = useState('Easy');
+// Setup Page Component
+export default function PanningExerciseSetup() {
     const [maxQuestions, setMaxQuestions] = useState('3');
+
     const navigate = useNavigate();
 
     const handleStartExercise = () => {
-        navigate('/EffectExercise/play', {
+        navigate('/SoundSynth/play', {
             state: {
-                difficulty,
                 maxQuestions
             }
         });
@@ -18,18 +18,8 @@ export default function EffectExerciseSetup() {
 
     const options = [
         {
-            label: 'Difficulty',
-            description: 'Choose how subtle the effect will be',
-            state: difficulty,
-            setState: setDifficulty,
-            data: [
-                { value: 'Easy', label: 'Easy (More Obvious Effects)' },
-                { value: 'Hard', label: 'Hard (Subtle Effects)' },
-            ]
-        },
-        {
             label: 'Number of Questions',
-            description: 'Select how many effect challenges you want to complete',
+            description: 'Select how many sound challenges you want to complete',
             state: maxQuestions,
             setState: setMaxQuestions,
             data: [
@@ -41,14 +31,14 @@ export default function EffectExerciseSetup() {
     ];
 
     const instr = [
-        'Listen to the original and effected audio',
-        'Guess which audio effect was applied',
-        'Try to identify the effect by ear',
-    ];
+        'Listen to the waveform',
+        'Click on the corresponding button',
+        'Get points for correct guess',
+    ]
 
     return (
         <SetupPage
-            name="Effect Exercise"
+            name="Sound Synthesis"
             options={options}
             instr={instr}
             handleStartExercise={handleStartExercise}
@@ -59,7 +49,7 @@ export default function EffectExerciseSetup() {
     return (
         <Container size="sm" px="md">
             <Stack spacing="lg" align='center'>
-                <Title order={1} align='center'>Effect Exercise Setup</Title>
+                <Title order={1} align='center'>Panning Exercise Setup</Title>
 
                 <Card
                     shadow="sm"
@@ -71,19 +61,19 @@ export default function EffectExerciseSetup() {
                     <Stack>
                         <Select
                             label="Difficulty"
-                            description="Choose how subtle the effect will be"
+                            description="Choose how precise your panning guess needs to be"
                             value={difficulty}
                             onChange={setDifficulty}
                             allowDeselect={false}
                             data={[
-                                { value: 'Easy', label: 'Easy (More Obvious Effects)' },
-                                { value: 'Hard', label: 'Hard (Subtle Effects)' }
+                                { value: 'Easy', label: 'Easy (Wider Range)' },
+                                { value: 'Hard', label: 'Hard (Narrow Range)' }
                             ]}
                         />
 
                         <Select
                             label="Number of Questions"
-                            description="Select how many effect challenges you want to complete"
+                            description="Select how many panning challenges you want to complete"
                             value={maxQuestions.toString()}
                             onChange={(value) => setMaxQuestions(Number(value))}
                             allowDeselect={false}
@@ -101,7 +91,7 @@ export default function EffectExerciseSetup() {
                             rightSection={<IconArrowRight size={20} />}
                             color="green"
                         >
-                            Start Effect Exercise
+                            Start Panning Exercise
                         </Button>
                     </Stack>
                 </Card>
@@ -115,9 +105,9 @@ export default function EffectExerciseSetup() {
                 >
                     <Title order={4} mb="md">Exercise Instructions</Title>
                     <Text>
-                        • Listen to the original and effected audio<br />
-                        • Guess which audio effect was applied<br />
-                        • Try to identify the effect by ear
+                        • Listen to the original and panned audio<br />
+                        • Click on the panning panel to guess the pan position<br />
+                        • Get points for guesses within the selected difficulty range
                     </Text>
                 </Card>
             </Stack>
