@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useMemo } from "react";
 import { Chart as ChartJS, LogarithmicScale } from "chart.js";
 import { Line } from "react-chartjs-2";
-import { log_tick_pos } from "../eq_helper";
+import { log_tick_pos } from "../utilsGraphic";
 
 // Register necessary Chart.js components
 ChartJS.register(

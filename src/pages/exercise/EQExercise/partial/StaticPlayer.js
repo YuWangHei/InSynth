@@ -1,8 +1,9 @@
 import { useEffect, useRef } from "react";
-import { generateLogSamples } from "./eq_helper";
+import { CustomEQFilter, generateLogSamples, getInitGraphicFilters } from "./utilsGraphic";
 
+// audioIdentity: what audio is currently playing, in StaticPlayer, it is just a direct pass to notify the subsequent program)
 // filters: expect fixed number of filters, i.e. no adding or removing filters after initialization
-function StaticPlayer({ audioFile, filters = [], onChange }) {
+function StaticPlayer({ audioFile, audioIdentity, filters = getInitGraphicFilters(), onChange }) {
   const audioContextRef = useRef(null);
   const sourceRef = useRef(null);
   const audioBufferRef = useRef(null);
@@ -45,6 +46,7 @@ function StaticPlayer({ audioFile, filters = [], onChange }) {
 
   // Action when filters are changed
   useEffect(() => {
+    console.log("Listening to", audioIdentity);
     if (filters.length !== 0 && filtersRef.current.length !== 0) {
       filters.map((obj, idx) => {
         // Apply filter to the audio
@@ -52,7 +54,7 @@ function StaticPlayer({ audioFile, filters = [], onChange }) {
         // Obtain the frequency response ratio change from this filter
         filtersRef.current[idx].getFrequencyResponse(sampleSpace, magResponseRef.current[idx], phaseResponseRef.current[idx]);
         // Pass data to parent
-        onChange(magResponseRef.current, phaseResponseRef.current);
+        onChange(audioIdentity, magResponseRef.current, phaseResponseRef.current);
         return null;
       });
     }
@@ -97,25 +99,29 @@ function StaticPlayer({ audioFile, filters = [], onChange }) {
   };
 
   // Set the parameters of the given filterNode
-  // Note: gain is percentage change in amplitude, which can be +ve or -ve
-  const applyFilter = (filterNode, obj = { type: 'peaking', freq: 31, q: 1, gain: 0 }) => {
+  // Note: gain is percentage change in amplitude (from -1 to 1), which can be +ve or -ve
+  const applyFilter = (filterNode, obj = new CustomEQFilter('peaking', 62, 1, 0)) => {
+    // console.log(`Gain: ${obj.gain}`) // DEBUG
     filterNode.type = obj.type;
     filterNode.frequency.setValueAtTime(obj.freq, audioContextRef.current.currentTime);
     filterNode.Q.setValueAtTime(obj.q, audioContextRef.current.currentTime);
     // gain received is the percentage change, translate percentage to dB
-    // If percentage change is -100%, mute directly (log10(0) is -inf)
+    // If percentage change is -100%, set to valid value to prevent infinity
+    let newQ = obj.q;
+    let newGain = obj.gain;
     if (obj.gain === -1) {
-      // dB = 20 * log(A), where A is the percentage change
-      const dBGain = -40; // Set to almost 0 because log cannot receive 0
-      filterNode.gain.setValueAtTime(dBGain, audioContextRef.current.currentTime);
+      // console.log('cleared 100'); // DEBUG
+      newGain = -0.99;
     }
-    // Else, calculate respective dB
-    else {
-      // dB = 20 * log(A), where A is the percentage change
-      const dBGain = 20 * Math.log10(1 + obj.gain);
-      console.log(dBGain)
-      filterNode.gain.setValueAtTime(dBGain, audioContextRef.current.currentTime);
+    // If percentage change is negative, set q to compensate bandwidth
+    if (obj.gain < 0) {
+      newQ = Math.pow(-newGain * 2, -newGain);
     }
+    // dB = 20 * log(A), where A is the percentage change
+    const dBGain = 20 * Math.log10(1 + newGain);
+    // console.log(obj.freq, dBGain, newQ); // DEBUG
+    filterNode.gain.setValueAtTime(dBGain, audioContextRef.current.currentTime);
+    filterNode.Q.setValueAtTime(newQ, audioContextRef.current.currentTime);
   };
 
   // Return no UI
