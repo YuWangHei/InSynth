@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { Alert, Button, Card, Container, Group, RingProgress, Stack, Text, Title } from "@mantine/core";
-import MathPlot from "./partial/plot/MathPlot";
-import StaticPlayer from "./partial/StaticPlayer";
-import { log_tick_pos, getInitGraphicFilters, filter_count, sample_count, getNewGraphicSol, checkSolution } from "./partial/utilsGraphic";
-import EQPanel from "./partial/EQPanel";
+import MathPlot from "./partial/shared/MathPlot";
+import StaticPlayer from "./partial/graphic/StaticPlayer";
+import { log_tick_pos, getInitGraphicFilters, filter_count, sample_count, getNewGraphicSol, checkSolution } from "./partial/graphic/utilsGraphic";
+import EQPanel from "./partial/graphic/EQPanel";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getRandomAudio } from "../../../Music/AudioPicker";
 import { IconArrowRight, IconRefresh } from "@tabler/icons-react";

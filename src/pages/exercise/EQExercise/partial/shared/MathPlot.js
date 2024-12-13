@@ -1,7 +1,7 @@
 import { Flex } from "@mantine/core";
 import LinearPlot from "./LinearPlot";
 import LogPlot from "./LogPlot";
-import { sampling_freq, generateLogSamples } from "../utilsGraphic";
+import { sampling_freq, generateLogSamples } from "../graphic/utilsGraphic";
 import { useEffect, useState } from "react";
 
 // x_bounds must be divisible by x_tick

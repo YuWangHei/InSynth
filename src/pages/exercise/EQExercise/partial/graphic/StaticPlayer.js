@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { CustomEQFilter, generateLogSamples, getInitGraphicFilters } from "./utilsGraphic";
+import { CustomEQFilter, generateLogSamples } from "./utilsGraphic";
 
 // audioIdentity: what audio is currently playing, in StaticPlayer, it is just a direct pass to notify the subsequent program)
 // filters: expect fixed number of filters, i.e. no adding or removing filters after initialization
@@ -14,7 +14,7 @@ function StaticPlayer({ audioFile, filters, onChange, trigger }) {
   const [filterChange, setFilterChange] = useState(0);
 
 
-  // Actions when filters are changes
+  // Actions when filters are changed
   const onFilters = () => {
     if (filters.length !== 0 && filtersRef.current.length !== 0) {
       filters.map((obj, idx) => {

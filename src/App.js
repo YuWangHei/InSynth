@@ -11,7 +11,6 @@ import EffectExerciseSetup from './pages/exercise/EffectExercise/EffectExerciseS
 import EQExerciseSetup from './pages/exercise/EQExercise/EQExerciseSetup.js';
 import EQGraphic from './pages/exercise/EQExercise/EQGraphic.js';
 import EQParametric from './pages/exercise/EQExercise/EQParametric.js';
-import SynthExercise from './pages/exercise/EQExercise/SynthExercise.js';
 import AmplitudeExercise from './pages/exercise/AmplitudeExercise/AmplitudeExercise.js';
 import AmplitudeExerciseSetup from './pages/exercise/AmplitudeExercise/AmplitudeExerciseSetup.js';
 import PanningExercise from './pages/exercise/PanningExercise/PanningExercise.js';
@@ -63,10 +62,6 @@ function App() {
     {
       path: '/EQExercise/parametric',
       element: <EQParametric />
-    },
-    {
-      path: '/SynthQ2',
-      element: <SynthExercise />
     },
     {
       path: '/AmplitudeExercise/setup',

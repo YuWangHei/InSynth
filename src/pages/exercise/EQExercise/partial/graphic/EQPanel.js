@@ -1,6 +1,6 @@
 import { Flex, Group, Stack, Text } from "@mantine/core";
 import { freq_centers } from "./utilsGraphic";
-import VSlider from "../../../../components/VSlider";
+import VSlider from "../../../../../components/VSlider";
 import { useEffect, useState } from "react";
 
 function EQPanel({ onChange, resetFlag }) {
