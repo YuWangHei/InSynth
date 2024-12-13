@@ -113,7 +113,6 @@ function EQGraphic() {
     // Obtain new audio file
     const newAudioFile = getRandomAudio();
     setAudioFile(newAudioFile);
-    console.log(newAudioFile);
     // Generate new eq solution
     const newSolFilters = getNewGraphicSol();
     setSolFilters(newSolFilters);
@@ -191,7 +190,6 @@ function EQGraphic() {
   // Receive changes from StaticPlayer
   // Note: the order of React computation is: update of state -> re-rendering components -> useEffect -> receive callback from child
   const onResponse = (magResponseList, phaseResponseList) => {
-    console.log("Responding");
     // Sample the received magResponseList into log samples
     const received_values = new Array(sample_count).fill(0);
     for (let i = 0; i < filter_count; i++) {
@@ -202,24 +200,19 @@ function EQGraphic() {
 
     // Identify whether this is induced from onSlide, and can assume current view is user
     if (fromSlider) {
-      console.log("From slider")
       setYValues(received_values);
     }
     // Identify if this is induced from trigger: if is trigger, update solValues only (currently only onEasyMode causes trigger)
     else if (fromTrigger) {
-      console.log("From trigger")
       setSolValues(received_values);
-      console.log(received_values);
     }
     // Else, it must be switch
     // Due to the order of React computation, on switching pages, the frequency response should be updating the view that is gone
     else {
       if (viewTarget) {
-        console.log("From switch to solution")
         setYValues(received_values);
       }
       else {
-        console.log("From switch to user")
         setSolValues(received_values);
       }
     }

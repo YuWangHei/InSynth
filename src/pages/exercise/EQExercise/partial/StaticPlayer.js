@@ -106,7 +106,6 @@ function StaticPlayer({ audioFile, filters, onChange, trigger }) {
   // Set the parameters of the given filterNode
   // Note: gain is percentage change in amplitude (from -1 to 1), which can be +ve or -ve
   const applyFilter = (filterNode, obj = new CustomEQFilter('peaking', 62, 1, 0)) => {
-    // console.log(`Gain: ${obj.gain}`) // DEBUG
     filterNode.type = obj.type;
     filterNode.frequency.setValueAtTime(obj.freq, audioContextRef.current.currentTime);
     filterNode.Q.setValueAtTime(obj.q, audioContextRef.current.currentTime);
@@ -115,7 +114,6 @@ function StaticPlayer({ audioFile, filters, onChange, trigger }) {
     let newQ = obj.q;
     let newGain = obj.gain;
     if (obj.gain === -1) {
-      // console.log('cleared 100'); // DEBUG
       newGain = -0.99;
     }
     // If percentage change is negative, set q to compensate bandwidth
@@ -124,7 +122,6 @@ function StaticPlayer({ audioFile, filters, onChange, trigger }) {
     }
     // dB = 20 * log(A), where A is the percentage change
     const dBGain = 20 * Math.log10(1 + newGain);
-    // console.log(obj.freq, dBGain, newQ); // DEBUG
     filterNode.gain.setValueAtTime(dBGain, audioContextRef.current.currentTime);
     filterNode.Q.setValueAtTime(newQ, audioContextRef.current.currentTime);
   };
