@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Button, Group, Text, FileButton, Container, Switch, Title, Slider, Stack, Flex, Paper, Card, Space } from '@mantine/core';
 import { IconPlayerPlayFilled, IconPlayerPauseFilled } from '@tabler/icons-react';
+import { use } from 'react';
 
 function Playground() {
   const [file, setFile] = useState(null);
@@ -99,6 +100,9 @@ function Playground() {
   };
 
   const handleFileSelect = (selectedFile) => {
+    if (isPlaying) {
+      pauseAudio();
+    }
     if (selectedFile) {
       // Check file type
       const fileType = selectedFile.name.toLowerCase().split('.').pop();
@@ -141,6 +145,10 @@ function Playground() {
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }
+      // else
+      // {
+      //   drawWaveform();
+      // }
 
       // Create a new source node
       const sourceNode = audioContextRef.current.createBufferSource();
@@ -187,7 +195,7 @@ function Playground() {
         // Adjust startTime to maintain current position
         startTime.current = audioContextRef.current.currentTime - currentTime;
       }
-
+      // drawWaveform(); 
       // const updateTimer = setInterval(() => {
       //   if (isPlaying && audioContextRef.current) {
       //     const elapsedTime = audioContextRef.current.currentTime-startTime.current;
@@ -212,6 +220,7 @@ function Playground() {
       sourceNode.start(0, currentTime);
       sourceNodeRef.current = sourceNode;
       setIsPlaying(true);
+      // drawWaveform();
     }
   };
 
@@ -340,6 +349,10 @@ function Playground() {
     ctx.stroke();
     animationFrameRef.current = requestAnimationFrame(drawWaveform);
   };
+
+  useEffect(() => {
+    drawWaveform();
+  }, [file, isPlaying])
 
   // Cleanup on unmount
   useEffect(() => {
