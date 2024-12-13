@@ -23,8 +23,8 @@ export default function PanningExerciseSetup() {
             state: maxQuestions,
             setState: setMaxQuestions,
             data: [
-                //{ value: '3', label: '3 Questions' },
-                //{ value: '5', label: '5 Questions' },
+                { value: '3', label: '3 Questions' },
+                { value: '5', label: '5 Questions' },
                 { value: '10', label: '10 Questions' }
             ]
         }
