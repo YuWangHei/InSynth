@@ -74,9 +74,6 @@ const sample_count = generateLogSamples().length;
 
 // Create new set of EQ solution (array of filters) for graphic eq
 const getNewGraphicSol = () => {
-  return getInitGraphicFilters().map((obj) => {
-    return new CustomEQFilter(obj.type, obj.freq, obj.q, -0.8);
-  })
   const pattern = randomRange(0, 9);
   const sol_filters = getInitGraphicFilters();
   // return sol_filters.map((obj) => obj.gain = -10);
