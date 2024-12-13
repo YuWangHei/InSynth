@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
-import { Container, Group, Progress, Stack, Text, Tooltip } from '@mantine/core';
+import { BackgroundImage, Container, Group, Progress, Stack, Text, Tooltip } from '@mantine/core';
+import homebg from '../home/homebg3Blurred.png';
 // import { Tooltip } from 'recharts';
 
 function Dashboard() {
@@ -36,15 +37,15 @@ function Dashboard() {
     const correctPercent = Math.round(data[i].correct/data[i].totalQ*100);
     console.log(correctPercent);
     progresses.push(
-      <Text size="lg">{exName[i]}</Text>
+      <Text size="lg" c="#FFFFFF">{exName[i]}</Text>
     );
     if (data[i].totalEx)
     {
       progresses.push(data[i].totalEx &&
         <Container w={900}>
           <Group position="apart" style={{ marginBottom: '10px' }}>
-            <Text>Total exercises done: {data[i].totalEx}</Text>
-            <Text>Total questions done: {data[i].totalQ}</Text>
+            <Text c="#FFFFFF">Total exercises done: {data[i].totalEx}</Text>
+            <Text c="#FFFFFF">Total questions done: {data[i].totalQ}</Text>
           </Group>
           <Progress.Root size="xl">
             <Tooltip label={`Correct - ${data[i].correct} (${correctPercent}%)`} position='left' offset={10}>
@@ -64,7 +65,7 @@ function Dashboard() {
     else
     {
       progresses.push(
-        <Text> You haven't done any exercise.</Text>
+        <Text c="#FFFFFF"> You haven't done any exercise.</Text>
       );
     }
     progresses.push(
@@ -80,20 +81,24 @@ function Dashboard() {
   // }, []);
 
   return (
-    <Container>
-        <h1>Your Journey into InSynth</h1>
-        <tbody>
-          {progresses}
-        </tbody>
-        {/* <Progress.Root size="xl">
-          <Progress.Section value={30} color="green">
-            <Progress.Label>Correct</Progress.Label>
-          </Progress.Section>
-          <Progress.Section value={70} color="red">
-            <Progress.Label>Wrong</Progress.Label>
-          </Progress.Section>
-        </Progress.Root> */}
-    </Container>
+    <BackgroundImage src={homebg} style={{ minHeight: '100vh' }}>
+      <Container c="#FFFFFF">
+          <br></br>
+          <h1>Your Journey into InSynth</h1>
+          <br></br>
+          <tbody>
+            {progresses}
+          </tbody>
+          {/* <Progress.Root size="xl">
+            <Progress.Section value={30} color="green">
+              <Progress.Label>Correct</Progress.Label>
+            </Progress.Section>
+            <Progress.Section value={70} color="red">
+              <Progress.Label>Wrong</Progress.Label>
+            </Progress.Section>
+          </Progress.Root> */}
+      </Container>
+    </BackgroundImage>
   );
 }
 
