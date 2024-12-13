@@ -38,7 +38,7 @@ function Home() {
     {
       title: 'Sound Synthesis',
       description: 'Get familiar with waveforms and their tones',
-      path: '/SoundSynth',
+      path: '/SoundSynth/setup',
       icon: '🔊' // Optional: you can use an icon or image
     },
     {
