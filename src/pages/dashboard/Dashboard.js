@@ -81,7 +81,7 @@ function Dashboard() {
 
   return (
     <Container>
-        <h1>Dashboard</h1>
+        <h1>Your Journey into InSynth</h1>
         <tbody>
           {progresses}
         </tbody>

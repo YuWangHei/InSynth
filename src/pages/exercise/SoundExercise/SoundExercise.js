@@ -235,6 +235,21 @@ function SoundExercise() {
     setIsPlayed(false);
   };
 
+  useEffect(() => {
+    if (score.total == TotalScore) {
+        const cookieValue = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("SoundSynth="))
+        ?.split("=")[1];
+        let data = (cookieValue) ? JSON.parse(cookieValue) : {totalEx: 0, totalQ: 0, correct: 0, wrong: 0};
+        data.totalEx++;
+        data.totalQ += score.total;
+        data.correct += score.correct;
+        data.wrong += score.total - score.correct;
+        document.cookie = `SoundSynth=${JSON.stringify(data)};`;
+    }
+}, [score])
+
   return (
     <Container size="md" px="md">
       <Stack spacing="lg">
