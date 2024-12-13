@@ -194,6 +194,21 @@ function AmplitudeExercise() {
         }
     };
 
+    useEffect(() => {
+        if (score.total == MAX_SCORE) {
+            const cookieValue = document.cookie
+            .split("; ")
+            .find((row) => row.startsWith("AmplitudeEx="))
+            ?.split("=")[1];
+            let data = (cookieValue) ? JSON.parse(cookieValue) : {totalEx: 0, totalQ: 0, correct: 0, wrong: 0};
+            data.totalEx++;
+            data.totalQ += score.total;
+            data.correct += score.correct;
+            data.wrong += score.total - score.correct;
+            document.cookie = `AmplitudeEx=${JSON.stringify(data)};`;
+        }
+    }, [score])
+
     const toggleOriginal = (gain) => {
         setIsOriginal(!isOriginal);
         if (!isOriginal) {
