@@ -4,7 +4,7 @@ import SetupPage from '../../../components/SetupPage';
 
 export default function EffectExerciseSetup() {
     const [difficulty, setDifficulty] = useState('Easy');
-    const [maxQuestions, setMaxQuestions] = useState('10');
+    const [maxQuestions, setMaxQuestions] = useState('3');
     const navigate = useNavigate();
 
     const handleStartExercise = () => {
@@ -88,9 +88,9 @@ export default function EffectExerciseSetup() {
                             onChange={(value) => setMaxQuestions(Number(value))}
                             allowDeselect={false}
                             data={[
-                                { value: '10', label: '10 Questions' },
-                                { value: '15', label: '15 Questions' },
-                                { value: '20', label: '20 Questions' }
+                                { value: '3', label: '3 Questions' },
+                                { value: '5', label: '5 Questions' },
+                                { value: '10', label: '10 Questions' }
                             ]}
                         />
 
