@@ -27,7 +27,7 @@ function Dashboard() {
   }
   // const exercises = ["SoundSynth"];
   // const exercises = ["SoundSynth", "EffectEx"];
-  const exercises = ["SoundSynth", "EffectEx", "EQEX", "AmplitudeEx", "PanningEx"];
+  const exercises = ["SoundSynth", "EffectEx", "EQEx", "AmplitudeEx", "PanningEx"];
   const data = exercises.map(retrieveCookie);
   const exName = ["Sound Synthesis", "Effect Exercise", "EQ Exercise", "Amplitude Exercise", "Panning Exercise"]
   const progresses = [];
