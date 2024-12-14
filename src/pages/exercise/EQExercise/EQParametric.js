@@ -1,33 +1,61 @@
 import { useState, useEffect } from "react";
-import { Group, Text, Switch } from "@mantine/core";
+import { useLocation } from "react-router-dom";
+import { Group, Text, Switch, Container, Stack, Title, Card, Button } from "@mantine/core";
 import MathPlot from "./partial/shared/MathPlot";
 import CustomContainer from "../../../components/CustomContainer";
 
 function EQParametric({ audioFile }) {
-  const [plotExpr, setPlotExpr] = useState('0');
+  const location = useLocation();
+  const {
+    qCount = 3
+  } = location.state || {};
+
   // Whether the user is listening to the target
   const [viewTarget, setViewTarget] = useState(false);
 
-  // To play safe, when an audioFile is passed, reset states
-  useEffect(() => {
-    setPlotExpr('0');
-    setViewTarget(false);
-  }, [audioFile]);
+  const onSwitch = () => {
+
+  }
 
   return (
-    <CustomContainer size="md" title="Parametric EQ">
-      {/* MathPlot, blur when listening to target */}
-      <div style={{ filter: viewTarget ? 'blur(5px)' : 'none' }}>
-        <MathPlot expr={plotExpr} x_bounds={{ min: 0, max: 22000 }} y_bounds={{ min: -1, max: 1 }} x_tick={2000} y_tick={0.5} curve_name="Frequency Response" log_scale={true} />
-      </div>
-      {/* Switch, select to listen to synth audio or target audio */}
-      <Group>
-        <Text>Synth</Text>
-        <Switch onChange={(event) => setViewTarget(event.currentTarget.checked)} />
-        <Text>Target</Text>
-      </Group>
-      {/* Audio player */}
-    </CustomContainer>
+    <Container size="md" px="md">
+      <Stack spacing="lg">
+        {/* Title and Subtitle */}
+        <Title order={1} align="center">
+          Parametric EQ Exercise
+          <Text size="md" fs={700} c="dimmed">
+            {qCount} Questions
+          </Text>
+        </Title>
+        {/* Main Section */}
+        <Card shadow="sm" p="lg" radius="md" withBorder>
+          <Stack spacing="md" justify="flex-start">
+
+            {/* Setting Header */}
+            <Group position="apart" justify="space-between" align="center">
+              <Stack>
+                {/* Select to listen to synth audio or target audio */}
+                <Group>
+                  <Button
+                    onClick={onSwitch}
+                    color={viewTarget ? "green" : "rgba(255, 18, 18, 1)"}
+                    size="lg"
+                  >
+                    {`Switch to ${viewTarget ? "Your Audio" : "Target Audio"}`}
+                  </Button>
+                  <Text size="lg">{`Now listening to ${viewTarget ? "Target Audio" : "Your Audio"}`}</Text>
+                </Group>
+                <Group>
+                  <Button>
+
+                  </Button>
+                </Group>
+              </Stack>
+            </Group>
+          </Stack>
+        </Card>
+      </Stack>
+    </Container>
   )
 }
 

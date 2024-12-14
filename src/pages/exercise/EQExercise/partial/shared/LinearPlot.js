@@ -1,10 +1,9 @@
-import { Chart, registerables } from "chart.js";
+import { Chart as ChartJS, LinearScale } from "chart.js";
 import { useEffect, useRef } from "react";
 import { Line } from "react-chartjs-2";
 
 // Register necessary Chart.js components
-Chart.register(...registerables);
-
+ChartJS.register(LinearScale);
 
 function LinearPlot({ data, params: { x_bounds: { min: x_min, max: x_max }, y_bounds: { min: y_min, max: y_max }, x_tick, y_tick } }) {
   // Create reference to the chart for ease of cleanup

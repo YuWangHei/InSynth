@@ -1,4 +1,4 @@
-import { randomRange, CustomEQFilter, sampling_freq, freq_centers, log_bounds, log_tick_pos, generateLogSamples } from "../shared/utilsGeneral";
+import { randomRange, CustomEQFilter, sampling_freq, freq_centers, log_bounds, log_tick_pos, generateLogSamples, checkSolution } from "../shared/utilsGeneral";
 
 // https://stackoverflow.com/questions/48844865/in-the-web-audio-api-how-to-set-correctly-the-q-value-of-a-biquadfilter-for-1-3
 // https://stackoverflow.com/questions/30065093/web-audio-api-equalizer
@@ -99,20 +99,6 @@ const getNewGraphicSol = () => {
   }
   // After finish creating the solution, return
   return sol_filters;
-}
-
-// Check the answer by calculating the difference of each point in the user answer from the solution, and check if the difference is acceptable
-const allowance = 10 / 100; // How much error can be accepted to call an answer correct
-function checkSolution(yValues, solValues) {
-  if (yValues.length !== solValues.length) {
-    throw Error('Program error in checkSolution(): yValues and solValues have different length.');
-  }
-  for (let i = 0; i < solValues.length; i++) {
-    if (Math.abs(yValues[i] - solValues[i]) > allowance) {
-      return false;
-    }
-  }
-  return true;
 }
 
 export { sampling_freq, freq_centers, log_bounds, log_tick_pos, generateLogSamples, CustomEQFilter, getInitGraphicFilters, filter_count, sample_count, getNewGraphicSol, checkSolution };

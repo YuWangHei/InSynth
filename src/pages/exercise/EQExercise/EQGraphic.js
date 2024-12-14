@@ -4,7 +4,7 @@ import MathPlot from "./partial/shared/MathPlot";
 import StaticPlayer from "./partial/graphic/StaticPlayer";
 import { log_tick_pos, getInitGraphicFilters, filter_count, sample_count, getNewGraphicSol, checkSolution } from "./partial/graphic/utilsGraphic";
 import EQPanel from "./partial/graphic/EQPanel";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { getRandomAudio } from "../../../Music/AudioPicker";
 import { IconArrowRight, IconRefresh } from "@tabler/icons-react";
 
@@ -260,7 +260,7 @@ function EQGraphic() {
         <Card shadow="sm" p="lg" radius="md" withBorder>
           <Stack spacing="md" justify="flex-start">
 
-            {/* Setting header */}
+            {/* Setting Header */}
             <Group position="apart" justify="space-between" align="center">
               <Stack>
                 {/* Select to listen to synth audio or target audio */}
