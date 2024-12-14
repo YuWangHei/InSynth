@@ -36,19 +36,6 @@ const sampling_freq = 60;
 const freq_centers = [31, 62, 125, 250, 500, 1000, 2000, 4000, 8000, 16000];
 const log_bounds = { min: 20, max: 22000 };
 const log_tick_pos = [log_bounds.min, ...freq_centers, log_bounds.max];
+const sample_count = generateLogSamples().length;
 
-// Check the answer by calculating the difference of each point in the user answer from the solution, and check if the difference is acceptable
-const allowance = 10 / 100; // How much error can be accepted to call an answer correct
-function checkSolution(yValues, solValues) {
-  if (yValues.length !== solValues.length) {
-    throw Error('Program error in checkSolution(): yValues and solValues have different length.');
-  }
-  for (let i = 0; i < solValues.length; i++) {
-    if (Math.abs(yValues[i] - solValues[i]) > allowance) {
-      return false;
-    }
-  }
-  return true;
-}
-
-export { randomRange, CustomEQFilter, sampling_freq, freq_centers, log_bounds, log_tick_pos, generateLogSamples, checkSolution }
+export { randomRange, CustomEQFilter, sampling_freq, freq_centers, log_bounds, log_tick_pos, generateLogSamples, sample_count }

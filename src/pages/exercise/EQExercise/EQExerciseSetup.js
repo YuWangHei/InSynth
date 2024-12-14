@@ -65,7 +65,6 @@ function EQExerciseSetup() {
               { value: "2", label: "2 Filters" },
               { value: "3", label: "3 Filters" },
               { value: "4", label: "4 Filters" },
-              { value: "5", label: "5 Filters" },
             ]}
           />}
           <Select

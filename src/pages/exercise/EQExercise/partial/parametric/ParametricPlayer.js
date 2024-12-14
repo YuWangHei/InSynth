@@ -15,7 +15,7 @@ function ParametricPlayer({ audioFile, filters, onChange, trigger }) {
   const props = { audioFile: audioFile, filters: filters, onChange: onChange, trigger: trigger };
 
   return (
-    <GeneralPlayer props={props} />
+    <GeneralPlayer applyFilter={applyFilter} props={props} />
   )
 }
 

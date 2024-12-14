@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Alert, Button, Card, Container, Group, RingProgress, Stack, Text, Title } from "@mantine/core";
 import MathPlot from "./partial/shared/MathPlot";
 import StaticPlayer from "./partial/graphic/StaticPlayer";
-import { log_tick_pos, getInitGraphicFilters, filter_count, sample_count, getNewGraphicSol, checkSolution } from "./partial/graphic/utilsGraphic";
+import { log_tick_pos, getInitGraphicFilters, filter_count, sample_count, getNewGraphicSol, checkGraphicSolution } from "./partial/graphic/utilsGraphic";
 import EQPanel from "./partial/graphic/EQPanel";
 import { useLocation } from "react-router-dom";
 import { getRandomAudio } from "../../../Music/AudioPicker";
@@ -44,14 +44,20 @@ function EQGraphic() {
   const [fromTrigger, setFromTrigger] = useState(false);
   // Indicate that whether the need of change in graph comes from onSwitch or onSlider
   const [fromSlider, setFromSlider] = useState(false);
+
   // The filters edited by user
   const [userFilters, setUserFilters] = useState(getInitGraphicFilters());
   // y_values on the plot to display user frequency response
-  const [yValues, setYValues] = useState(new Array(sample_count).fill(0));
+  const initYValues = new Array(sample_count);
+  initYValues.fill(0);
+  const [yValues, setYValues] = useState(initYValues);
   // The filters used in the solution of current question
   const [solFilters, setSolFilters] = useState(getNewGraphicSol());
   // sol_values on the plot to display solution frequency response (only when easy mode is ON)
-  const [solValues, setSolValues] = useState(new Array(sample_count).fill(0));
+  const initSolValues = new Array(sample_count);
+  initSolValues.fill(0);
+  const [solValues, setSolValues] = useState(initSolValues);
+
   // Number of questions the user have answered, and how many of them are correct
   const [score, setScore] = useState({ completed: 0, correct: 0 });
   // Whether the user has used easy mode
@@ -69,7 +75,7 @@ function EQGraphic() {
 
   // Action on start
   useEffect(() => {
-    // Get random audio file and solution in state definition or else error occurs
+    // Get random audio file and solution in state definition to avoid errors
     setTrigger(trigger + 1);
   }, []);
 
@@ -94,7 +100,6 @@ function EQGraphic() {
   const initSetup = () => {
     setTrigger(trigger + 1);
     setFromTrigger(false);
-    setSolFilters(getInitGraphicFilters());
     setUserFilters(getInitGraphicFilters());
 
     setResetSliders(resetSliders + 1); // Keep changing value to force re-rendering
@@ -221,7 +226,7 @@ function EQGraphic() {
   // When submit button is clicked
   const onSubmit = () => {
     // Check answer
-    const result = checkSolution(yValues, solValues);
+    const result = checkGraphicSolution(yValues, solValues);
     // Update answer record
     let completed = score.completed + 1;
     let correct = score.correct;
@@ -250,7 +255,7 @@ function EQGraphic() {
       data.wrong += score.completed - score.correct;
       document.cookie = `EQEx=${JSON.stringify(data)};`;
     }
-  }, [score])
+  }, [score]);
 
   const x_tick_cb = (val) => (log_tick_pos.includes(val) ? val : '');
   const y_tick_cb = (val) => (val >= 0 ? `+${val * 100}%` : `-${val * 100}%`);
@@ -313,7 +318,6 @@ function EQGraphic() {
               {/* Graph for frequency response */}
               <MathPlot
                 y_values={yValues}
-                // sol_values={solValues}
                 sol_values={((easyMode && viewTarget) || submitted) ? solValues : null}
                 x_bounds={{ min: 20, max: 22000 }} // not related, log plot does not take x_bounds
                 y_bounds={{ min: -1, max: 1 }}
