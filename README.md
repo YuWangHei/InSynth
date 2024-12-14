@@ -42,11 +42,6 @@ If you wish to remove all records, please simply delete the cookies by following
 
 `/src/dashboard` stores scripts `Dashboard.js` for dashboard 
 
-### Home Page
-Home page contains portals for different pages (exercises and playground)
-
-`/src/home` stores scripts for the home page
-
 ### Amplitude Exercise
 Amplitude exercise allow users to train their ears with questions on gain value
 
@@ -95,6 +90,16 @@ Sound synthesis exercise allow users to train their ears with questions on guess
 `AmplitudeExerciseSetup.js` is responsible for selecting difficulties and no. of questions;
 
 `AmplitudeExercise.js` is responsible for the main part of exercise
+
+### Home Page
+Home page contains portals for different pages (exercises and playground)
+
+`/src/home` stores scripts for the home page
+
+### Playground
+Playground allows user to import their own music file and try add effects on the music file in real-time in order to gain practical experience on filter and effects
+
+`src/playground/Playground.js` is responsible for the playground code
 
 ### Frame
 
