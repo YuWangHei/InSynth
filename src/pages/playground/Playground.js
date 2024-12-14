@@ -1,7 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Button, Group, Text, FileButton, Container, Switch, Title, Slider, Stack, Flex, Paper, Card, Space, Progress} from '@mantine/core';
+import { Button, Group, Text, FileButton, Container, Switch, Title, Slider, Stack, Flex, Paper, Card, Space} from '@mantine/core';
 import { IconPlayerPlayFilled, IconPlayerPauseFilled } from '@tabler/icons-react';
-import { use } from 'react';
 
 function Playground() {
   const [file, setFile] = useState(null);
@@ -190,34 +189,6 @@ function Playground() {
       lowPassFilterRef.current.frequency.setValueAtTime(20000, audioContextRef.current.currentTime);
       highPassFilterRef.current.frequency.setValueAtTime(0, audioContextRef.current.currentTime);
 
-      // Only reset startTime if we're starting from the beginning
-      // if (!isPlaying || currentTime >= duration) {
-      //   setStartTime(audioContextRef.current.currentTime);
-      // } else {
-      //   // Adjust startTime to maintain current position
-      //   setStartTime(audioContextRef.current.currentTime - currentTime);
-      // }
-      // drawWaveform(); 
-      // const updateTimer = setInterval(() => {
-      //   if (isPlaying && audioContextRef.current) {
-      //     const elapsedTime = audioContextRef.current.currentTime-startTime.current;
-
-      //     if (elapsedTime >= duration) {
-      //       // If we've reached the end and not looping, stop playback
-      //       if (!isLooping) {
-      //         pauseAudio();
-      //         setCurrentTime(0);
-      //         clearInterval(updateTimer);
-      //         return;
-      //       }
-      //       // If looping, adjust startTime to loop back to beginning
-      //       startTime.current = audioContextRef.current.currentTime;
-      //     } else {
-      //       setCurrentTime(elapsedTime);
-      //     }
-      //   }
-      // }, 100);
-
       // Start playback from current position
       
       sourceNode.start(0, pauseTime);
@@ -225,6 +196,13 @@ function Playground() {
       setPauseTime(0)
       sourceNodeRef.current = sourceNode;
       setIsPlaying(true);
+
+      sourceNode.onended = function() {
+        sourceNode.loop = isLooping;
+        if (!isLooping) {
+          setIsPlaying(false)
+        }
+      }
       // drawWaveform();
     }
   };
@@ -235,7 +213,7 @@ function Playground() {
     if (sourceNodeRef.current) {
       sourceNodeRef.current.stop();
       setIsPlaying(false);
-      setPauseTime(currentTime - startTime)
+      setPauseTime((currentTime - startTime) % duration)
       setStartTime(0)
       
       // Cancel animation frame
@@ -282,6 +260,11 @@ function Playground() {
       }
     }
   };
+
+  const handleLoop = () => {
+    setIsLooping(!isLooping);
+    sourceNodeRef.current.loop = isLooping;
+  }
 
   const handleReverbToggle = () => {
     if (isReverbOn) {
@@ -465,7 +448,7 @@ function Playground() {
                   <Switch
                     label="Loop"
                     checked={isLooping}
-                    onChange={() => setIsLooping(!isLooping)}
+                    onChange={handleLoop}
                   />
                   {/* Text for debugging */}
                   {/* <Text c="dimmed" size='sm'>current:{currentTime} | pauseTime: {pauseTime}| startAt: {startTime}</Text> */}
