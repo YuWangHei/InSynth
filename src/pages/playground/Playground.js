@@ -342,7 +342,7 @@ function Playground() {
     // }
 
     setCurrentTime(audioContextRef.current.currentTime)
-    setPlayTime(audioContextRef.current.currentTime - startTime)
+    setPlayTime((audioContextRef.current.currentTime - startTime) % duration)
     
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -470,15 +470,6 @@ function Playground() {
                   {/* Text for debugging */}
                   {/* <Text c="dimmed" size='sm'>current:{currentTime} | pauseTime: {pauseTime}| startAt: {startTime}</Text> */}
                 </Group>
-
-                {/* Time display */}
-                <Flex justify="space-between">
-                    <Text>Time</Text>
-                    <Progress value={currentTime / duration} />
-                    <Text>{Math.round(currentTime)}s</Text>
-                    <Text>{Math.round(duration)}s</Text>
-                  </Flex>
-
                 <Card shadow="sm" p="md" radius="md" withBorder>
                   <Title order={3}>Gain</Title>
                   <Slider
