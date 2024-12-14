@@ -53,7 +53,7 @@ function EQGraphic() {
   // sol_values on the plot to display solution frequency response (only when easy mode is ON)
   const [solValues, setSolValues] = useState(new Array(sample_count).fill(0));
   // Number of questions the user have answered, and how many of them are correct
-  const [score, setScore] = useState({ completed: 0, correct: 0, easyCorrect: 0 });
+  const [score, setScore] = useState({ completed: 0, correct: 0 });
   // Whether the user has used easy mode
   const [easyMode, setEasyMode] = useState(false);
   // State of the question: the user is answering or watching result?
@@ -130,7 +130,7 @@ function EQGraphic() {
     // Clear filters, values and sliders
     initSetup();
     // Reset question record
-    setScore({ completed: 0, correct: 0, easyCorrect: 0 });
+    setScore({ completed: 0, correct: 0 });
   }
 
   // Switch to listen to user eq or solution eq
@@ -225,20 +225,14 @@ function EQGraphic() {
     // Update answer record
     let completed = score.completed + 1;
     let correct = score.correct;
-    let easyCorrect = score.easyCorrect;
     if (result) { // If correct
       setFeedback(true);
-      if (easyMode) { // Easy mode was used
-        easyCorrect++;
-      }
-      else { // Real correct
-        correct++;
-      }
+      correct++;
     }
     else {
       setFeedback(false);
     }
-    setScore({ completed: completed, correct: correct, easyCorrect: easyCorrect });
+    setScore({ completed: completed, correct: correct });
     setSubmitted(true);
   }
 
@@ -280,7 +274,7 @@ function EQGraphic() {
                     color="indigo"
                     size="lg"
                   >
-                    {easyMode ? "Easy Mode: ON" : (submitted ? "Easy Mode: Disabled" : "Easy Mode: OFF")}
+                    {easyMode ? "Easy Mode: ON" : "Easy Mode: OFF"}
                   </Button>
                 </Group>
               </Stack>
@@ -292,9 +286,8 @@ function EQGraphic() {
                   </Text>
                 }
                 sections={[
-                  { value: ((score.completed - score.correct - score.easyCorrect) / qCount) * 100, color: "red" },
+                  { value: ((score.completed - score.correct) / qCount) * 100, color: "red" },
                   { value: (score.correct / qCount) * 100, color: "green" },
-                  { value: (score.easyCorrect / qCount) * 100, color: "blue" }
                 ]}
               />
             </Group>
@@ -322,13 +315,7 @@ function EQGraphic() {
             {/* Feedback for the question */}
             {submitted && (
               <Alert
-                color={feedback ?
-                  (easyMode ?
-                    "blue" :
-                    "green"
-                  ) :
-                  "red"
-                }
+                color={feedback ? "green" : "red"}
                 title={
                   <Text fw={700} size="lg">
                     {feedback ?
@@ -349,8 +336,7 @@ function EQGraphic() {
               >
                 <Text fw={500} size="md" mt={4}>
                   All {qCount} Questions are finished. <br />
-                  Your score is {score.correct}/{score.completed}!!! <br />
-                  {score.easyCorrect} correct questions with the aid of Easy Mode will not be counted to your record
+                  Your score is {score.correct}/{score.completed}!!!
                 </Text>
               </Alert>
             )}
