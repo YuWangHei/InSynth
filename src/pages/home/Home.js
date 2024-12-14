@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BackgroundImage, Text, Container } from '@mantine/core';
 import styles from './Home.module.css';
@@ -8,38 +8,12 @@ import homebg2 from './homebg5.jpeg';
 function Home() {
   const navigate = useNavigate();
 
-  // const exercises = ["SoundSynth", "EffectEx", "EQEX", "AmplitudeEx", "PanningEx"];
-  // const createCookie = () => {
-  //   const data = {totalEx: 0, totalQ: 0, correct: 0, wrong: 0};
-  //   for (let i = 0; i < exercises.length; i++) {
-  //     document.cookie = `${exercises[i]}=${JSON.stringify(data)};`; 
-  //   } 
-  // }
-
-  // const checkCookie = () => {
-  //   for (let i = 0; i < exercises.length; i++) {
-  //     const cookie = document.cookie
-  //     .split("; ")
-  //     .find((row) => row.startsWith(`${exercises[i]}=`));
-  //     if (!cookie) {
-  //       return false;
-  //     }
-  //   }
-  //   return true
-  // }
-
-  // useEffect(() => {
-  //   if (!checkCookie()) {
-  //     createCookie();
-  //   }
-  // }, [])
-
   const synthExercises = [
     {
       title: 'Sound Synthesis',
       description: 'Get familiar with waveforms and their tones',
       path: '/SoundSynth/setup',
-      icon: '🔊' // Optional: you can use an icon or image
+      icon: '🔊'
     },
     {
       title: 'Effect Exercise',
@@ -54,7 +28,7 @@ function Home() {
       title: 'Equalizer Exercise',
       description: 'Learn about equalizer and how it works',
       path: '/EQExercise/setup',
-      icon: '💿' // Optional: you can use an icon or image
+      icon: '💿'
     },
     {
       title: 'Amplitude Exercise',
@@ -73,14 +47,8 @@ function Home() {
   return (
     <BackgroundImage
       src={homebg}
-      // radius="lg"
       style={{ minHeight: '100vh' }}
     >
-      {/* <Overlay
-      gradient="linear-gradient(180deg, rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, .65) 40%)"
-      opacity={1}
-      zIndex={0}
-    /> */}
       <BackgroundImage
         src={homebg2}
         h={200}
