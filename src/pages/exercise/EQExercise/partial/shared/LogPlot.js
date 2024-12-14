@@ -1,10 +1,10 @@
 import { useRef, useEffect, useMemo } from "react";
-import { Chart as ChartJS, LogarithmicScale } from "chart.js";
+import { Chart as ChartJS, LineElement, PointElement, LogarithmicScale, Title, Tooltip, Legend, Filler } from "chart.js";
 import { Line } from "react-chartjs-2";
 import { log_tick_pos } from "../graphic/utilsGraphic";
 
 // Register necessary Chart.js components
-ChartJS.register(LogarithmicScale);
+ChartJS.register(LineElement, PointElement, LogarithmicScale, Title, Tooltip, Legend, Filler);
 
 // Chart.js plugin to customize ticks
 const customLogScalePlugin = {
@@ -38,8 +38,9 @@ const LogPlot = ({ data, params: { y_bounds: { min: y_min, max: y_max }, y_tick,
   useEffect(() => {
     return () => {
       // Destroy chart instance if it exists
-      if (chartRef.current) {
-        chartRef.current.destroy();
+      const ref = chartRef;
+      if (ref.current) {
+        ref.current.destroy();
       }
     };
   }, []);
@@ -72,7 +73,7 @@ const LogPlot = ({ data, params: { y_bounds: { min: y_min, max: y_max }, y_tick,
         },
       },
     },
-  }), [y_min, y_max, y_tick]);
+  }), [y_min, y_max, y_tick, x_tick_cb, y_tick_cb]);
 
   return (
     <Line ref={chartRef} data={data} options={options} />

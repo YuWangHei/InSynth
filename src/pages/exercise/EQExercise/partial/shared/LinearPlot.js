@@ -1,9 +1,9 @@
-import { Chart as ChartJS, LinearScale } from "chart.js";
+import { Chart as ChartJS, LineElement, PointElement, LinearScale, Title, Tooltip, Legend, Filler } from "chart.js";
 import { useEffect, useRef } from "react";
 import { Line } from "react-chartjs-2";
 
 // Register necessary Chart.js components
-ChartJS.register(LinearScale);
+ChartJS.register(LineElement, PointElement, LinearScale, Title, Tooltip, Legend, Filler);
 
 function LinearPlot({ data, params: { x_bounds: { min: x_min, max: x_max }, y_bounds: { min: y_min, max: y_max }, x_tick, y_tick } }) {
   // Create reference to the chart for ease of cleanup
@@ -12,8 +12,9 @@ function LinearPlot({ data, params: { x_bounds: { min: x_min, max: x_max }, y_bo
   useEffect(() => {
     return () => {
       // Destroy chart instance if it exists
-      if (chartRef.current) {
-        chartRef.current.destroy();
+      const ref = chartRef;
+      if (ref.current) {
+        ref.current.destroy();
       }
     };
     // The chart will be generated once again because something has changed

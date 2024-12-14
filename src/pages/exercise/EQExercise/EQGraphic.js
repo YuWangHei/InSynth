@@ -242,7 +242,6 @@ function EQGraphic() {
     setSubmitted(true);
   }
 
-
   const x_tick_cb = (val) => (log_tick_pos.includes(val) ? val : '');
   const y_tick_cb = (val) => (val >= 0 ? `+${val * 100}%` : `-${val * 100}%`);
 
