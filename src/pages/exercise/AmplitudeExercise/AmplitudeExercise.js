@@ -112,10 +112,8 @@ function AmplitudeExercise() {
     const generateRandomGain = () => {
         const randomGain = Math.floor(Math.random() * 41) - 20; // Random number between -20 and 20
         setGainValue(randomGain);
-        console.log(randomGain);
         // Apply the new gain value
         const amplification = Math.pow(10, randomGain / 20);
-        // gainNodeRef.current.gain.setValueAtTime(amplification, audioContextRef.current.currentTime);
         gainNodeRef.current.gain.setValueAtTime(amplification, audioContextRef.current.currentTime);
 
         return randomGain;
@@ -135,7 +133,7 @@ function AmplitudeExercise() {
             if (sourceRef.current) {
                 try {
                     sourceRef.current.start(0);
-                    if (showWaveform) {  // Start animation if waveform is visible
+                    if (showWaveform) {
                         drawWaveform();
                     }
                 } catch (e) {
@@ -161,14 +159,13 @@ function AmplitudeExercise() {
             } else {
                 gainNodeRef.current.gain.setValueAtTime(1, audioContextRef.current.currentTime);
             }
-            if (showWaveform) {  // Start animation if waveform is visible
+            if (showWaveform) {
                 drawWaveform();
             }
         }
         setIsPlaying(!isPlaying);
     };
 
-    // Add useEffect to handle waveform visibility changes
     useEffect(() => {
         if (showWaveform && isPlaying) {
             drawWaveform();
@@ -340,7 +337,7 @@ function AmplitudeExercise() {
                         >
                             {score.total >= MAX_SCORE ? "Start Over" : "Next Stage"}
                         </Button>
-                        {/* {hasAnswered && <Button onClick={nextQuestion}>Next Question</Button>} */}
+
                         <Group position="apart" align="center">
                             <Switch
                                 checked={isOriginal}
@@ -365,10 +362,10 @@ function AmplitudeExercise() {
                             </Button>
                         </Group>
                         {/* Text for Debugging */}
-                        <Text size="sm" c="dimmed">
+                        {/* <Text size="sm" c="dimmed">
                             (gainValue: {gainValue})
                             (IsPlaying: {isPlaying.toString()}.)
-                        </Text>
+                        </Text> */}
                         {showWaveform && (
                             <Paper p="xs" withBorder>
                                 <canvas
