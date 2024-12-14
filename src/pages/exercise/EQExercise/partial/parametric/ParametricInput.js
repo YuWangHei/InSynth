@@ -5,10 +5,7 @@ import { CustomEQFilter } from "./utilsParametric";
 
 
 function ParametricInput({ filterSettings = [], onChange, resetFlag }) {
-  const [filters, setFilters] = useState(filterSettings.map((obj) => {
-    console.log(filterSettings);
-    return new CustomEQFilter(obj.type, 663, 1, 0);
-  }));
+  const [filters, setFilters] = useState([]);
 
   // On start, initialize filters
   useEffect(() => {
@@ -32,7 +29,6 @@ function ParametricInput({ filterSettings = [], onChange, resetFlag }) {
   }, [filterSettings, resetFlag]);
 
   const onSlide = (newFilter, index) => {
-    console.log(filters);
     const newFilters = [...filters];
     newFilters[index] = new CustomEQFilter(filters[index].type, newFilter.freq, newFilter.q, newFilter.gain);
     setFilters(newFilters);

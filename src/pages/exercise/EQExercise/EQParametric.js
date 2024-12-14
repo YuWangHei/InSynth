@@ -66,8 +66,10 @@ function EQParametric() {
 
   useEffect(() => {
     if (trigger) {
-      setFilterSettings(getFilterSettings(solFilters));
+      console.log("solFilters:");
+      console.log(solFilters);
       setFilters(solFilters);
+      setFilterSettings(getFilterSettings(solFilters));
       setFromTrigger(true);
     }
   }, [trigger]);
@@ -107,6 +109,7 @@ function EQParametric() {
     // Generate new eq solution
     const newSolFilters = getNewParametricSol(filterCount);
     setSolFilters(newSolFilters);
+    setFilterSettings(getFilterSettings(newSolFilters));
     setPlayerKey(playerKey + 1);
   }
 
@@ -126,6 +129,7 @@ function EQParametric() {
 
   // Switch to listen to user eq or solution eq
   const onSwitch = () => {
+    console.log("Switched clicked");
     // Complete first switch
     if (!firstSwitch) {
       setFirstSwitch(true);
@@ -152,20 +156,9 @@ function EQParametric() {
     console.log(newFilters);
     // Disable fromTrigger here to prevent error caused by multiple rendering at once
     setFromTrigger(false);
-    // Handle slider changes
-    const newUserFilters = userFilters.map((obj, idx) => {
-      obj.freq = newFilters[idx].freq;
-      if (newFilters[idx].gain) {
-        obj.gain = newFilters[idx].gain;
-      }
-      if (newFilters[idx].q) {
-        obj.q = newFilters[idx].q;
-      }
-      return obj;
-    });
     // Update newest user filters, and stay on user view
-    setUserFilters(newUserFilters);
-    setFilters(newUserFilters);
+    setUserFilters(newFilters);
+    setFilters(newFilters);
     setFromSlider(true);
   }
 
@@ -181,6 +174,8 @@ function EQParametric() {
   // Receive changes from StaticPlayer
   // Note: the order of React computation is: update of state -> re-rendering components -> useEffect -> receive callback from child
   const onResponse = (magResponseList, phaseResponseList) => {
+    console.log("responded");
+    console.log(magResponseList);
     // Sample the received magResponseList into log samples
     const received_values = new Array(sample_count).fill(0);
     for (let i = 0; i < solFilters.length; i++) {
@@ -191,19 +186,23 @@ function EQParametric() {
 
     // Identify whether this is induced from onSlide, and can assume current view is user
     if (fromSlider) {
+      console.log("from slider")
       setYValues(received_values);
     }
     // Identify if this is induced from trigger: if is trigger, update solValues only (currently only onEasyMode causes trigger)
     else if (fromTrigger) {
+      console.log('from trigger')
       setSolValues(received_values);
     }
     // Else, it must be switch
     // Due to the order of React computation, on switching pages, the frequency response should be updating the view that is gone
     else {
       if (viewTarget) {
+        console.log('from page switch to sol')
         setYValues(received_values);
       }
       else {
+        console.log('from page switch to user')
         setSolValues(received_values);
       }
     }

@@ -195,6 +195,7 @@ function EQGraphic() {
   // Receive changes from StaticPlayer
   // Note: the order of React computation is: update of state -> re-rendering components -> useEffect -> receive callback from child
   const onResponse = (magResponseList, phaseResponseList) => {
+    console.log('reponsed')
     // Sample the received magResponseList into log samples
     const received_values = new Array(sample_count).fill(0);
     for (let i = 0; i < filter_count; i++) {

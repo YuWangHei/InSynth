@@ -6,6 +6,10 @@ const qBound = { min: 0.1, max: 10 };
 
 const getNewParametricSol = (count) => {
   const sol_fiilters = [];
+  for (let i = 0; i < count; i++) {
+    sol_fiilters.push(new CustomEQFilter('peaking', 1000 * i, 1, -12));
+  }
+  return sol_fiilters;
   // Peaking
   if (count >= 1) {
     let pos1, gain1, q1;
