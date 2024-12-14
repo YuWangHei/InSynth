@@ -153,6 +153,7 @@ function EQParametric() {
   // Receive changes from EQPanel sliders (viewTarget must be false)
   // newFilters: array of CustomEQFilter
   const onSlide = (newFilters) => {
+    console.log("sliding")
     console.log(newFilters);
     // Disable fromTrigger here to prevent error caused by multiple rendering at once
     setFromTrigger(false);

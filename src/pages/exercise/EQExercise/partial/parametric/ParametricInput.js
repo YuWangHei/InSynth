@@ -17,7 +17,7 @@ function ParametricInput({ filterSettings = [], onChange, resetFlag }) {
     if (onChange) {
       onChange(newFilters);
     }
-  }, []);
+  }, [filterSettings]);
 
   useEffect(() => {
     if (resetFlag) {

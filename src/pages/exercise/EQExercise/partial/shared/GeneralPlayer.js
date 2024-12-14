@@ -15,6 +15,7 @@ function GeneralPlayer({ applyFilter, props }) {
   const magResponseRef = useRef([]);
   const phaseResponseRef = useRef([]);
   const [filterChange, setFilterChange] = useState(0);
+  const [initialized, setInitialized] = useState(false);
 
   const playAudio = () => {
     // Ensure audio is loaded
@@ -52,8 +53,7 @@ function GeneralPlayer({ applyFilter, props }) {
     sourceRef.current.start(0);
   };
 
-  // Actions on mount
-  useEffect(() => {
+  const onMount = () => {
     // Create AudioContext
     audioContextRef.current = new window.AudioContext();
 
@@ -74,8 +74,11 @@ function GeneralPlayer({ applyFilter, props }) {
     }
 
     loadAudio();
+  }
 
-    // Action on unmount
+  // Actions on mount
+  useEffect(() => {
+    onMount();
     return () => {
       // Cleanup
       audioContextRef.current.close();
@@ -104,7 +107,14 @@ function GeneralPlayer({ applyFilter, props }) {
 
   // Actions when filters are changes
   useEffect(() => {
-    onFilters();
+    if (initialized) {
+      onFilters();
+    }
+    else {
+      onMount();
+      setInitialized(true);
+      setFilterChange(filterChange + 1);
+    }
   }, [filterChange, filters, trigger]);
 
   // Return not UI

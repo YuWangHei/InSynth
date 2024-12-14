@@ -12,8 +12,10 @@ To run the code and access the website, you first need *Node.js* and *npm* insta
 To install Node.js and npm: go check out https://docs.npmjs.com/downloading-and-installing-node-js-and-npm
 
 To install all dependencies:
-### `npm install`
+### `npm install --legacy-peer-deps`
 list of dependencies are stored in `package.json`
+
+Note that due to some dependency issues, adding `--legacy-peer-deps` flag is needed so as to install all required packages
 
 To run the website on local pc:
 ### `npm start`
