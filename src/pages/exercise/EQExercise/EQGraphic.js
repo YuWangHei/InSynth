@@ -244,7 +244,7 @@ function EQGraphic() {
 
   // For cookie
   useEffect(() => {
-    if (score.completed === qCount) {
+    if (score.completed == qCount) {
       const cookieValue = document.cookie
         .split("; ")
         .find((row) => row.startsWith("EQEx="))
