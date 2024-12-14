@@ -420,17 +420,6 @@ function Playground() {
 
           {file && (
             <Paper p="xs" withBorder>
-              <Stack>
-                  <Slider
-                    min={0}
-                    max={duration}
-                    value={isPlaying ? Math.round(playTime) : Math.round(pauseTime)}
-                    showLabelOnHover
-                    marks={[
-                      { value: 0, label: isPlaying ? formatTime(playTime) : formatTime(pauseTime)},
-                      { value: duration, label: formatTime(duration) },
-                    ]}
-                  />
                 <canvas
                   ref={waveformCanvasRef}
                   width={800}
@@ -442,7 +431,6 @@ function Playground() {
                     borderRadius: '4px'
                   }}
                 />
-              </Stack>
             </Paper>
           )}
 
@@ -452,6 +440,19 @@ function Playground() {
                 <Text size="md">
                   Selected file: {file.name}
                 </Text>
+
+                <Slider
+                    min={0}
+                    max={duration}
+                    value={isPlaying ? Math.round(playTime) : Math.round(pauseTime)}
+                    showLabelOnHover
+                    marks={[
+                      { value: 0, label: isPlaying ? formatTime(playTime) : formatTime(pauseTime)},
+                      { value: duration, label: formatTime(duration) },
+                    ]}
+                  />
+
+                <Space/>
 
                 <Group position="center" spacing="md">
                   <Button
@@ -466,7 +467,8 @@ function Playground() {
                     checked={isLooping}
                     onChange={() => setIsLooping(!isLooping)}
                   />
-                  <Text c="dimmed" size='sm'>current:{currentTime} | pauseTime: {pauseTime}| startAt: {startTime}</Text>
+                  {/* Text for debugging */}
+                  {/* <Text c="dimmed" size='sm'>current:{currentTime} | pauseTime: {pauseTime}| startAt: {startTime}</Text> */}
                 </Group>
 
                 {/* Time display */}

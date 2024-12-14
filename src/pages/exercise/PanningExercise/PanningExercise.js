@@ -386,9 +386,10 @@ export default function PanningExercise() {
                                     size="md"
                                 >
                                 </Switch>
-                                <Text size="xs" mt={4} c="dimmed">
+                                {/* Text for debugging */}
+                                {/* <Text size="xs" mt={4} c="dimmed">
                                     {currentPan}
-                                </Text>
+                                </Text> */}
                             </Group>
                         </Stack>
                     </Group>
