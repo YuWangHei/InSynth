@@ -1,6 +1,10 @@
 # AIST2010 Group Project - InSynth
 The website is created with React.js, to run and edit the website, please follow the following instruction
----
+
+## To Play on Deployed Web
+Go to https://yuwanghei.github.io/InSynth/#
+
+
 ## Install Script
 To install the script, run the following code to download the latest version of the source code:
 ### `git clone https://github.com/YuWangHei/InSynth.git`
