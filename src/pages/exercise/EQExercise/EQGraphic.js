@@ -236,18 +236,19 @@ function EQGraphic() {
     setSubmitted(true);
   }
 
+  // For cookie
   useEffect(() => {
-    if (score.completed == qCount) {
-        const cookieValue = document.cookie
+    if (score.completed === qCount) {
+      const cookieValue = document.cookie
         .split("; ")
         .find((row) => row.startsWith("EQEx="))
         ?.split("=")[1];
-        let data = (cookieValue) ? JSON.parse(cookieValue) : {totalEx: 0, totalQ: 0, correct: 0, wrong: 0};
-        data.totalEx++;
-        data.totalQ += score.completed;
-        data.correct += score.correct;
-        data.wrong += score.completed - score.correct;
-        document.cookie = `EQEx=${JSON.stringify(data)};`;
+      let data = (cookieValue) ? JSON.parse(cookieValue) : { totalEx: 0, totalQ: 0, correct: 0, wrong: 0 };
+      data.totalEx++;
+      data.totalQ += score.completed;
+      data.correct += score.correct;
+      data.wrong += score.completed - score.correct;
+      document.cookie = `EQEx=${JSON.stringify(data)};`;
     }
   }, [score])
 

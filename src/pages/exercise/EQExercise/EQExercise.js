@@ -8,7 +8,7 @@ import { useLocation } from "react-router-dom";
 import { getRandomAudio } from "../../../Music/AudioPicker";
 import { IconArrowRight, IconRefresh } from "@tabler/icons-react";
 
-function EQGraphic({ getInitFilters, getNewSol, InputSection, Player }) {
+function EQExercise({ getInitFilters, getNewSol, InputSection, Player }) {
     const location = useLocation();
     const {
         qCount = 3
@@ -367,4 +367,4 @@ function EQGraphic({ getInitFilters, getNewSol, InputSection, Player }) {
     )
 }
 
-export default EQGraphic;
+export default EQExercise;
