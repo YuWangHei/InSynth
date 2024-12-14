@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Button, Group, Text, FileButton, Container, Switch, Title, Slider, Stack, Flex, Paper, Card, Space } from '@mantine/core';
+import { Button, Group, Text, FileButton, Container, Switch, Title, Slider, Stack, Flex, Paper, Card, Space, Progress} from '@mantine/core';
 import { IconPlayerPlayFilled, IconPlayerPauseFilled } from '@tabler/icons-react';
 import { use } from 'react';
 
@@ -33,7 +33,9 @@ function Playground() {
   const waveformCanvasRef = useRef(null);
   const analyzerRef = useRef(null);
   const animationFrameRef = useRef(null);
-  const startTime = useRef(0);
+  const [startTime, setStartTime] = useState(0);
+  const [pauseTime, setPauseTime] = useState(0);
+  const [playTime, setPlayTime] = useState(0)
 
   const createReverbBuffer = (audioContext, seconds = 1, decay = 2) => {
     const rate = audioContext.sampleRate;
@@ -189,12 +191,12 @@ function Playground() {
       highPassFilterRef.current.frequency.setValueAtTime(0, audioContextRef.current.currentTime);
 
       // Only reset startTime if we're starting from the beginning
-      if (!isPlaying || currentTime >= duration) {
-        startTime.current = audioContextRef.current.currentTime;
-      } else {
-        // Adjust startTime to maintain current position
-        startTime.current = audioContextRef.current.currentTime - currentTime;
-      }
+      // if (!isPlaying || currentTime >= duration) {
+      //   setStartTime(audioContextRef.current.currentTime);
+      // } else {
+      //   // Adjust startTime to maintain current position
+      //   setStartTime(audioContextRef.current.currentTime - currentTime);
+      // }
       // drawWaveform(); 
       // const updateTimer = setInterval(() => {
       //   if (isPlaying && audioContextRef.current) {
@@ -217,7 +219,10 @@ function Playground() {
       // }, 100);
 
       // Start playback from current position
-      sourceNode.start(0, currentTime);
+      
+      sourceNode.start(0, pauseTime);
+      setStartTime(audioContextRef.current.currentTime - pauseTime)
+      setPauseTime(0)
       sourceNodeRef.current = sourceNode;
       setIsPlaying(true);
       // drawWaveform();
@@ -230,7 +235,9 @@ function Playground() {
     if (sourceNodeRef.current) {
       sourceNodeRef.current.stop();
       setIsPlaying(false);
-
+      setPauseTime(currentTime - startTime)
+      setStartTime(0)
+      
       // Cancel animation frame
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
@@ -327,6 +334,17 @@ function Playground() {
 
     analyzerRef.current.getFloatTimeDomainData(dataArray);
 
+    // if (pauseTime) {
+    //   setCurrentTime(pauseTime)
+    // }
+    // if (startTime) {
+    //   setCurrentTime(audioContextRef.current.currentTime - startTime)
+    // }
+
+    setCurrentTime(audioContextRef.current.currentTime)
+    setPlayTime(audioContextRef.current.currentTime - startTime)
+    
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.beginPath();
     ctx.lineWidth = 2;
@@ -363,6 +381,17 @@ function Playground() {
     };
   }, []);
 
+  const formatTime = (timeInSeconds) => {
+    const minutes = Math.floor(timeInSeconds / 60);
+    const seconds = Math.floor(timeInSeconds % 60);
+    
+    // Pad with zero if less than 10
+    const formattedMinutes = minutes.toString().padStart(2, '0');
+    const formattedSeconds = seconds.toString().padStart(2, '0');
+    
+    return `${formattedMinutes}:${formattedSeconds}`;
+  };
+
   return (
     <Container size="lg" px="md">
       <Title order={1} align='center'>
@@ -391,17 +420,29 @@ function Playground() {
 
           {file && (
             <Paper p="xs" withBorder>
-              <canvas
-                ref={waveformCanvasRef}
-                width={800}
-                height={200}
-                style={{
-                  width: '100%',
-                  height: '200px',
-                  backgroundColor: '#1A1B1E',
-                  borderRadius: '4px'
-                }}
-              />
+              <Stack>
+                  <Slider
+                    min={0}
+                    max={duration}
+                    value={isPlaying ? Math.round(playTime) : Math.round(pauseTime)}
+                    showLabelOnHover
+                    marks={[
+                      { value: 0, label: isPlaying ? formatTime(playTime) : formatTime(pauseTime)},
+                      { value: duration, label: formatTime(duration) },
+                    ]}
+                  />
+                <canvas
+                  ref={waveformCanvasRef}
+                  width={800}
+                  height={200}
+                  style={{
+                    width: '100%',
+                    height: '200px',
+                    backgroundColor: '#1A1B1E',
+                    borderRadius: '4px'
+                  }}
+                />
+              </Stack>
             </Paper>
           )}
 
@@ -425,15 +466,16 @@ function Playground() {
                     checked={isLooping}
                     onChange={() => setIsLooping(!isLooping)}
                   />
+                  <Text c="dimmed" size='sm'>current:{currentTime} | pauseTime: {pauseTime}| startAt: {startTime}</Text>
                 </Group>
 
                 {/* Time display */}
-                {/* <Flex justify="space-between">
+                <Flex justify="space-between">
                     <Text>Time</Text>
                     <Progress value={currentTime / duration} />
                     <Text>{Math.round(currentTime)}s</Text>
                     <Text>{Math.round(duration)}s</Text>
-                  </Flex> */}
+                  </Flex>
 
                 <Card shadow="sm" p="md" radius="md" withBorder>
                   <Title order={3}>Gain</Title>
