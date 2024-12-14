@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/InSynth/static/css/main.5710eb47.css",
-    "main.js": "/InSynth/static/js/main.1e7affe5.js",
+    "main.js": "/InSynth/static/js/main.d796304c.js",
     "static/media/Bad_Chick_cropped.wav": "/InSynth/static/media/Bad_Chick_cropped.7430cbcd4603e547c3fd.wav",
     "static/media/Winter_cropped.wav": "/InSynth/static/media/Winter_cropped.a561e02396ddbb2a1e51.wav",
     "static/media/Born_Free_cropped.wav": "/InSynth/static/media/Born_Free_cropped.f47edde45c7bce1a3595.wav",
@@ -11,10 +11,10 @@
     "static/media/homebg4.jpeg": "/InSynth/static/media/homebg4.0427b0ba56ef82185c98.jpeg",
     "index.html": "/InSynth/index.html",
     "main.5710eb47.css.map": "/InSynth/static/css/main.5710eb47.css.map",
-    "main.1e7affe5.js.map": "/InSynth/static/js/main.1e7affe5.js.map"
+    "main.d796304c.js.map": "/InSynth/static/js/main.d796304c.js.map"
   },
   "entrypoints": [
     "static/css/main.5710eb47.css",
-    "static/js/main.1e7affe5.js"
+    "static/js/main.d796304c.js"
   ]
 }
