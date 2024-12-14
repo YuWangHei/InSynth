@@ -18,7 +18,6 @@ import { IconVolume, IconRefresh, IconArrowRight, IconPlayerPlayFilled, IconPlay
 import { getRandomAudio } from '../../../Music/AudioPicker';
 import { useNavigate, useLocation } from 'react-router-dom';
 
-const TotalScore = 10;
 // Set up sound effects for different difficulty
 const DIFFICULTY_CONFIG = {
   'Easy': {
@@ -116,7 +115,7 @@ function EffectExercise() {
   const location = useLocation();
   const {
     difficulty = 'Easy',
-    maxQuestions = 10
+    maxQuestions = 3
   } = location.state || {};
 
   const [currentEffect, setCurrentEffect] = useState(null);
@@ -166,7 +165,7 @@ function EffectExercise() {
   const generateNewEffect = () => {
     stopCurrentSound();
 
-    if (score.total <= TotalScore) {
+    if (score.total <= maxQuestions) {
       const randomEffect = effects[Math.floor(Math.random() * effects.length)];
       setCurrentEffect(randomEffect);
       setSelectedEffect(null);
@@ -325,19 +324,19 @@ function EffectExercise() {
   };
 
   useEffect(() => {
-    if (score.total == TotalScore) {
-        const cookieValue = document.cookie
+    if (score.total == maxQuestions) {
+      const cookieValue = document.cookie
         .split("; ")
         .find((row) => row.startsWith("EffectEx="))
         ?.split("=")[1];
-        let data = (cookieValue) ? JSON.parse(cookieValue) : {totalEx: 0, totalQ: 0, correct: 0, wrong: 0};
-        data.totalEx++;
-        data.totalQ += score.total;
-        data.correct += score.correct;
-        data.wrong += score.total - score.correct;
-        document.cookie = `EffectEx=${JSON.stringify(data)};`;
+      let data = (cookieValue) ? JSON.parse(cookieValue) : { totalEx: 0, totalQ: 0, correct: 0, wrong: 0 };
+      data.totalEx++;
+      data.totalQ += score.total;
+      data.correct += score.correct;
+      data.wrong += score.total - score.correct;
+      document.cookie = `EffectEx=${JSON.stringify(data)};`;
     }
-}, [score])
+  }, [score])
 
   const handleBackToSetup = () => {
     navigate('/EffectExercise/setup');
@@ -446,12 +445,12 @@ function EffectExercise() {
                 size={140}
                 label={
                   <Text size="lg" ta="center">
-                    {score.total}/{TotalScore}
+                    {score.total}/{maxQuestions}
                   </Text>
                 }
                 sections={[
-                  { value: ((score.total - score.correct) / TotalScore) * 100, color: 'red' },
-                  { value: (score.correct / TotalScore) * 100, color: 'green' }
+                  { value: ((score.total - score.correct) / maxQuestions) * 100, color: 'red' },
+                  { value: (score.correct / maxQuestions) * 100, color: 'green' }
                 ]}
               />
             </Group>
@@ -497,13 +496,13 @@ function EffectExercise() {
               </Alert>
             )}
 
-            {score.total >= TotalScore && (
+            {score.total >= maxQuestions && (
               <Alert
                 color="green"
                 title={<Text fw={700} size="lg">Finished!</Text>}
               >
                 <Text fw={500} size="md" mt={4}>
-                  All {TotalScore} Questions are finished.
+                  All {maxQuestions} Questions are finished.
                   Your score is {score.correct}/{score.total}!!!
                 </Text>
               </Alert>

@@ -102,7 +102,7 @@ const getNewGraphicSol = () => {
 }
 
 // Check the answer by calculating the difference of each point in the user answer from the solution, and check if the difference is acceptable
-const allowance = 10 / 100; // How much error can be accepted to call an answer correct
+const allowance = 20 / 100; // How much error can be accepted to call an answer correct
 function checkGraphicSolution(yValues, solValues) {
   if (yValues.length !== solValues.length) {
     throw Error('Program error in checkGraphicSolution(): yValues and solValues have different length.');
